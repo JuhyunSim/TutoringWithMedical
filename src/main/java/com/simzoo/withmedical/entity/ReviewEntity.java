@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.envers.AuditOverride;
 
-@Entity
+@Entity(name = "review")
 @Getter
 @SuperBuilder
 @AllArgsConstructor

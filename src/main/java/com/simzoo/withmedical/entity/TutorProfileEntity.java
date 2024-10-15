@@ -4,6 +4,8 @@ import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -13,6 +15,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -21,7 +24,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.envers.AuditOverride;
 
-@Entity
+@Entity(name = "tutorProfile")
 @Getter
 @SuperBuilder
 @AllArgsConstructor
@@ -33,10 +36,13 @@ public class TutorProfileEntity extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberId")
+    private MemberEntity member;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @JoinColumn(name = "tuteeProfileId")
+    @CollectionTable(name = "tutor_subjects", joinColumns = @JoinColumn(name = "tutorProfileId"))
+    @Column(name = "subjects")
     private List<Subject> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

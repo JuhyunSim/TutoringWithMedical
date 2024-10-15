@@ -10,6 +10,7 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.List;
@@ -38,8 +39,10 @@ public class MemberEntity extends BaseEntity{
     private String passwordConfirm;
     @Enumerated(EnumType.STRING)
     private Role role;
-    @OneToOne(mappedBy = "member", fetch = LAZY)
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "memberId")
     private TutorProfileEntity tutorProfile;
-    @OneToMany(mappedBy = "member", fetch = LAZY)
+    @OneToMany(fetch = LAZY)
+    @JoinColumn(name = "memberId")
     private List<TuteeProfileEntity> tuteeProfile;
 }
