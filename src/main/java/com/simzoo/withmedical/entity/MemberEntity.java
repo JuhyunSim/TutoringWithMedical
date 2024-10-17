@@ -32,6 +32,7 @@ public class MemberEntity extends BaseEntity{
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String nickname;
     @Enumerated(EnumType.STRING)
     private Gender gender;
     private String phoneNumber;

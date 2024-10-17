@@ -12,6 +12,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -32,7 +33,9 @@ public class TuteePostEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberId")
     private MemberEntity member;
+    @Enumerated(EnumType.STRING)
     private TuteeGrade grade;
     private Long tuteeId;
     private String description;
@@ -63,6 +66,7 @@ public class TuteePostEntity extends BaseEntity {
     public TuteePostingSimpleResponseDto toSimpleResponseDto() {
         return TuteePostingSimpleResponseDto.builder()
             .postingId(this.id)
+            .memberId(this.member.getId())
             .studentGrade(this.grade)
             .studentSchool(this.school)
             .personality(this.personality)

@@ -41,8 +41,9 @@ public class TutorProfileEntity extends BaseEntity{
     private MemberEntity member;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "tutor_subjects", joinColumns = @JoinColumn(name = "tutorProfileId"))
+    @CollectionTable(name = "tutorSubjects", joinColumns = @JoinColumn(name = "tutorProfileId"))
     @Column(name = "subjects")
+    @Enumerated(EnumType.STRING)
     private List<Subject> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
