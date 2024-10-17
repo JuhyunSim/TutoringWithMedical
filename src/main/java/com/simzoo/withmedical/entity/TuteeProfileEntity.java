@@ -43,8 +43,9 @@ public class TuteeProfileEntity extends BaseEntity {
     private Location location;
 
     @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "tutee_subjects", joinColumns = @JoinColumn(name = "tuteeProfileId"))
+    @CollectionTable(name = "tuteeSubjects", joinColumns = @JoinColumn(name = "tuteeProfileId"))
     @Column(name = "subjectsNeeded")
+    @Enumerated(EnumType.STRING)
     private List<Subject> subjectsNeeded = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)

@@ -13,6 +13,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class TuteePostingSimpleResponseDto {
     private Long postingId;
+    private Long memberId;
     private TuteeGrade studentGrade;
     private String studentSchool;
     private String personality;
