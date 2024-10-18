@@ -50,6 +50,8 @@ public class TuteePostEntity extends BaseEntity {
     public TuteePostingResponseDto toResponseDto() {
         return TuteePostingResponseDto.builder()
             .postingId(this.id)
+            .memberId(this.member.getId())
+            .memberNickname(this.member.getNickname())
             .studentGrade(this.grade)
             .studentSchool(this.school)
             .personality(this.personality)
@@ -67,6 +69,7 @@ public class TuteePostEntity extends BaseEntity {
         return TuteePostingSimpleResponseDto.builder()
             .postingId(this.id)
             .memberId(this.member.getId())
+            .memberNickname(this.member.getNickname())
             .studentGrade(this.grade)
             .studentSchool(this.school)
             .personality(this.personality)

@@ -30,4 +30,6 @@ public class ChatRoomEntity extends BaseEntity{
     private MemberEntity participant1;
     @ManyToOne(fetch = FetchType.LAZY)
     private MemberEntity participant2;
+
+    private Long createdBy;
 }
