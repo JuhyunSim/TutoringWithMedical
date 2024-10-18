@@ -1,28 +1,28 @@
 -- 첫 번째 회원(Member 1: 튜티)
 INSERT INTO member (nickname, gender, phoneNumber, password, passwordConfirm, role, createdAt, updatedAt)
-VALUES ('member1_nickname', 'MALE', '010-1234-5678', 'password123', 'password123', 'TUTEE', NOW(), NOW());
+VALUES ('심주', 'MALE', '010-1234-5678', 'password123', 'password123', 'TUTEE', NOW(), NOW());
 
 -- 두 번째 회원(Member 2: 튜터)
 INSERT INTO member (nickname, gender, phoneNumber, password, passwordConfirm, role, createdAt, updatedAt)
-VALUES ('member2_nickname', 'FEMALE', '010-9876-5432', 'password456', 'password456', 'TUTOR', NOW(), NOW());
+VALUES ('선생님', 'FEMALE', '010-9876-5432', 'password456', 'password456', 'TUTOR', NOW(), NOW());
 
 -- 튜터 프로필 생성
 INSERT INTO tutorProfile (memberId, location, university, status, createdAt, updatedAt)
-VALUES ((SELECT id FROM member WHERE nickname = 'member2_nickname'), 'SEOUL', 'SEOUL_UNIVERSITY', 'ENROLLED', NOW(), NOW());
+VALUES ((SELECT id FROM member WHERE nickname = '선생님'), 'SEOUL', 'SEOUL_UNIVERSITY', 'ENROLLED', NOW(), NOW());
 
 -- 튜터가 가르치는 과목 추가 (예: 수학, 과학)
 INSERT INTO tutorSubjects (tutorProfileId, subjects)
-VALUES ((SELECT id FROM tutorProfile WHERE memberId = (SELECT id FROM member WHERE nickname = 'member2_nickname')), 'MIDDLE_MATH'),
-       ((SELECT id FROM tutorProfile WHERE memberId = (SELECT id FROM member WHERE nickname = 'member2_nickname')), 'MIDDLE_ENGLISH');
+VALUES ((SELECT id FROM tutorProfile WHERE memberId = (SELECT id FROM member WHERE nickname = '선생님')), 'MIDDLE_MATH'),
+       ((SELECT id FROM tutorProfile WHERE memberId = (SELECT id FROM member WHERE nickname = '선생님')), 'MIDDLE_ENGLISH');
 
 -- 튜티 프로필 생성
 INSERT INTO tuteeProfile (memberId, location, grade, description, createdAt, updatedAt)
-VALUES ((SELECT id FROM member WHERE nickname = 'member1_nickname'), 'BUSAN', 'HIGH_1', 'Looking for a tutor in math and science.', NOW(), NOW());
+VALUES ((SELECT id FROM member WHERE nickname = '심주'), 'BUSAN', 'HIGH_1', 'Looking for a tutor in math and science.', NOW(), NOW());
 
 -- 튜티가 필요한 과목 추가 (예: 수학, 과학)
 INSERT INTO tuteeSubjects (tuteeProfileId, subjectsNeeded)
-VALUES ((SELECT id FROM tuteeProfile WHERE memberId = (SELECT id FROM member WHERE nickname = 'member1_nickname')), 'MIDDLE_MATH'),
-       ((SELECT id FROM tuteeProfile WHERE memberId = (SELECT id FROM member WHERE nickname = 'member1_nickname')), 'MIDDLE_ENGLISH');
+VALUES ((SELECT id FROM tuteeProfile WHERE memberId = (SELECT id FROM member WHERE nickname = '심주')), 'MIDDLE_MATH'),
+       ((SELECT id FROM tuteeProfile WHERE memberId = (SELECT id FROM member WHERE nickname = '심주')), 'MIDDLE_ENGLISH');
 
 
 

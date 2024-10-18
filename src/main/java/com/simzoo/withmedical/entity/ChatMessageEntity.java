@@ -1,6 +1,6 @@
 package com.simzoo.withmedical.entity;
 
-import com.simzoo.withmedical.dto.ChatMessageResponseDto;
+import com.simzoo.withmedical.dto.chat.ChatMessageResponseDto;
 import com.simzoo.withmedical.enums.MessageType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -42,12 +42,9 @@ public class ChatMessageEntity extends BaseEntity{
     public ChatMessageResponseDto toResponseDto() {
         return ChatMessageResponseDto.builder()
             .senderId(sender.getId())
-            .recipientId(recipient.getId())
             .message(message)
             .senderNickname(sender.getNickname())
-            .recipientNickname(recipient.getNickname())
             .senderRole(sender.getRole())
-            .recipientRole(recipient.getRole())
             .build();
     }
 }

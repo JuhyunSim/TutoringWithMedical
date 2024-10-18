@@ -17,6 +17,8 @@ import lombok.Setter;
 public class TuteePostingResponseDto {
 
     private Long postingId;
+    private Long memberId;
+    private String memberNickname;
     private TuteeGrade studentGrade;
     private String studentSchool;
     private String personality;
