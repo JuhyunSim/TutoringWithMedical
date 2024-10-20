@@ -1,9 +1,18 @@
 package com.simzoo.withmedical.entity;
 
+import com.simzoo.withmedical.dto.ReviewRequestDto;
+import com.simzoo.withmedical.dto.ReviewResponseDto;
+import com.simzoo.withmedical.dto.UpdateReviewRequestDto;
+import com.simzoo.withmedical.dto.UpdateTuteePostingRequestDto;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -22,7 +31,28 @@ public class ReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberId")
+    private MemberEntity writer;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tutorProfileId")
+    private TutorProfileEntity tutorProfile;
     private String content;
-    private Integer rating;
+    private Double rating;
+
+    public ReviewResponseDto toResponseDto() {
+        return ReviewResponseDto.builder()
+            .writerNickname(writer.getNickname())
+            .tutorNickname(tutorProfile.getMember().getNickname())
+            .rating(rating)
+            .reviewText(content)
+            .createdAt(this.getCreatedAt())
+            .updatedAt(this.getUpdatedAt())
+            .build();
+    }
+
+    public void update(UpdateReviewRequestDto reviewRequestDto) {
+        this.rating = reviewRequestDto.getRating();
+        this.content = reviewRequestDto.getReviewText();
+    }
 }
