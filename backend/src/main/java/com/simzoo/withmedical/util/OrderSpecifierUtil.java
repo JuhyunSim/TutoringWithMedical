@@ -7,6 +7,7 @@ import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.simzoo.withmedical.entity.QChatMessageEntity;
 import com.simzoo.withmedical.entity.QChatRoomEntity;
+import com.simzoo.withmedical.entity.QReviewEntity;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,6 +24,7 @@ public class OrderSpecifierUtil {
     static {
         ENTITY_PATH_MAP.put("chatRoomEntity", new PathBuilder<>(QChatRoomEntity.class, "chatRoomEntity"));
         ENTITY_PATH_MAP.put("chatMessageEntity", new PathBuilder<>(QChatMessageEntity.class, "chatMessageEntity"));
+        ENTITY_PATH_MAP.put("reviewEntity", new PathBuilder<>(QReviewEntity.class, "reviewEntity"));
         // 새로운 엔티티가 추가될 때마다 여기에 추가
     }
 
