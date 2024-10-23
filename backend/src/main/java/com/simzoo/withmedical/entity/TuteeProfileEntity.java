@@ -52,5 +52,4 @@ public class TuteeProfileEntity extends BaseEntity {
     private TuteeGrade grade;
 
     private String description;
-
 }

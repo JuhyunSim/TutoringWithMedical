@@ -30,7 +30,7 @@ import org.hibernate.envers.AuditOverride;
 @AllArgsConstructor
 @NoArgsConstructor
 @AuditOverride(forClass = BaseEntity.class)
-public class TutorProfileEntity extends BaseEntity{
+public class TutorProfileEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,4 +54,6 @@ public class TutorProfileEntity extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     private EnrollmentStatus status;
+
+    private String description;
 }
