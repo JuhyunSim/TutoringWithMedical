@@ -2,8 +2,11 @@ package com.simzoo.withmedical.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
+import com.simzoo.withmedical.dto.MemberResponseDto;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
+import com.simzoo.withmedical.exception.CustomException;
+import com.simzoo.withmedical.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -40,10 +43,50 @@ public class MemberEntity extends BaseEntity{
     private String passwordConfirm;
     @Enumerated(EnumType.STRING)
     private Role role;
+
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "memberId")
     private TutorProfileEntity tutorProfile;
+
+    @OneToOne(fetch = LAZY)
+    @JoinColumn(name = "memberId")
+    private TuteeProfileEntity tuteeProfile;
+
     @OneToMany(fetch = LAZY)
     @JoinColumn(name = "memberId")
-    private List<TuteeProfileEntity> tuteeProfile;
+    private List<TuteeProfileEntity> tuteeProfiles;
+
+    public MemberResponseDto toResponseDto() {
+        return MemberResponseDto.builder()
+            .id(id)
+            .nickname(nickname)
+            .gender(gender)
+            .phoneNumber(phoneNumber)
+            .role(role)
+            .tutorProfile(tutorProfile)
+            .tuteeProfiles(tuteeProfiles)
+            .tuteeProfile(tuteeProfile)
+            .build();
+    }
+
+    public void saveTuteeProfile(TuteeProfileEntity profile) {
+        if (role == Role.TUTEE) {
+            throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
+        }
+        this.tuteeProfile = profile;
+    }
+
+    public void saveTutorProfile(TutorProfileEntity profile) {
+        if (role == Role.TUTOR) {
+            throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
+        }
+        this.tutorProfile = profile;
+    }
+
+    public void addTutorProfile(TuteeProfileEntity profile) {
+        if (role == Role.PARENT) {
+            throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
+        }
+        this.tuteeProfiles.add(profile);
+    }
 }
