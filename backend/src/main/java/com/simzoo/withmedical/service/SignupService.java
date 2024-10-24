@@ -3,8 +3,6 @@ package com.simzoo.withmedical.service;
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Role;
-import com.simzoo.withmedical.exception.CustomException;
-import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.repository.MemberRepository;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.TutorProfileRepository;
@@ -22,9 +20,6 @@ public class SignupService {
 
     @Transactional
     public MemberEntity signup(SignupRequestDto requestDto) {
-        memberRepository.findByPhoneNumber(requestDto.getPhoneNumber()).ifPresent(e -> {
-            throw new CustomException(ErrorCode.ALREADY_EXIST_MEMBER);
-        });
 
         MemberEntity member = memberRepository.save(requestDto.toMemberEntity());
 
@@ -41,6 +36,4 @@ public class SignupService {
 
         return member;
     }
-
-
 }

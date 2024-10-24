@@ -49,11 +49,11 @@ public class MemberEntity extends BaseEntity{
     private TutorProfileEntity tutorProfile;
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(insertable = false, updatable = false)
     private TuteeProfileEntity tuteeProfile;
 
     @OneToMany(fetch = LAZY)
-    @JoinColumn(name = "memberId")
+    @JoinColumn(insertable = false, updatable = false)
     private List<TuteeProfileEntity> tuteeProfiles;
 
     public MemberResponseDto toResponseDto() {
