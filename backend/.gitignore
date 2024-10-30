@@ -10,3 +10,4 @@
 .idea
 # security
 application.yml
+properties.env

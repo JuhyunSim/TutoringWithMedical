@@ -7,6 +7,8 @@ import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
+import jakarta.persistence.CollectionTable;
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -47,7 +49,8 @@ public class MemberEntity extends BaseEntity{
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = LAZY)
-    @JoinColumn(name = "memberId")
+    @CollectionTable(name = "memberRoles", joinColumns = @JoinColumn(name = "memberId"))
+    @Column(name = "role")
     private List<Role> roles;
 
     @OneToOne(fetch = LAZY)

@@ -38,11 +38,9 @@ public class ChatService {
         MemberEntity participant1 = members.get(senderId);
         MemberEntity participant2 = members.get(recipientId);
 
-        String title = String.format("%s(%s) & %s(%s)의 대화",
+        String title = String.format("%s & %s의 대화",
             participant1.getNickname(),
-            participant1.getRole().name(),
-            participant2.getNickname(),
-            participant2.getRole().name()
+            participant2.getNickname()
         );
 
         ChatRoomEntity chatRoomEntity = ChatRoomEntity.builder()

@@ -2,6 +2,7 @@ package com.simzoo.withmedical.security;
 
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
+import com.simzoo.withmedical.service.LogoutService;
 import com.simzoo.withmedical.util.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,6 +24,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     private final JwtUtil jwtUtil;
     private final String ACCESS_TOKEN_HEADER = "Authorization";
     private final String TOKEN_PREFIX = "Bearer ";
+    private final LogoutService logoutService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
@@ -46,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = request.getHeader(ACCESS_TOKEN_HEADER);
 
-        if (token == null) {
+        if (token == null && logoutService.isLoggedOut(token)) {
             throw new CustomException(ErrorCode.UNAUTHENTICATED_USER);
         }
 

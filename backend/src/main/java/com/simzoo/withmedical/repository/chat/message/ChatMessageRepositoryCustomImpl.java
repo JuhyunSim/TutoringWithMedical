@@ -25,7 +25,6 @@ public class ChatMessageRepositoryCustomImpl implements ChatMessageRepositoryCus
                 new QChatMessageResponseDto(
                     chatMessage.sender.id,
                     chatMessage.sender.nickname,
-                    chatMessage.sender.role,
                     chatMessage.message))
             .from(chatMessage)
             .where(chatMessage.chatRoom.id.eq(roomId))
