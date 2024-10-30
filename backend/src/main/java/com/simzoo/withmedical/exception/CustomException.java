@@ -1,5 +1,8 @@
 package com.simzoo.withmedical.exception;
 
+import lombok.Getter;
+
+@Getter
 public class CustomException extends RuntimeException {
     private ErrorCode errorCode;
 
