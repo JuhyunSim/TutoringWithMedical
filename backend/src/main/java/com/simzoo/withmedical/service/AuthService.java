@@ -39,7 +39,7 @@ public class AuthService {
 
         return JwtResponseDto.builder().accessToken(
             jwtUtil.generateAccessToken(memberEntity.getNickname(), memberEntity.getId(),
-                memberEntity.getRoles())).build();
+                requestDto.getRole())).build();
     }
 
     private static boolean notMatchPassword(MemberEntity member, String password,

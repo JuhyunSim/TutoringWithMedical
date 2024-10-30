@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.config;
 
-import com.simzoo.withmedical.security.CustomUserDetailsService;
 import com.simzoo.withmedical.security.JwtAuthenticationFilter;
+import com.simzoo.withmedical.service.LogoutService;
 import com.simzoo.withmedical.util.JwtUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +22,11 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final CustomUserDetailsService customUserDetailsService;
+    private final LogoutService logoutService;
 
     private static final List<String> PERMIT_ALL_URLS = List.of(
-        "/index.html",
-        "/css/**",
-        "/images/**",
-        "/js/**",
-        "/swagger-ui/*",
-        "v3/api-docs/**"
+        "/index.html", "/css/**", "/images/**", "/js/**", "/swagger-ui/*", "v3/api-docs/**",
+        "/", "/auth/login", "/signup"
     );
 
     @Bean
@@ -55,7 +51,7 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(jwtUtil);
+        return new JwtAuthenticationFilter(jwtUtil, logoutService);
     }
 
     @Bean

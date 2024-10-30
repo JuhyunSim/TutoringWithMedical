@@ -44,7 +44,6 @@ public class ChatMessageEntity extends BaseEntity{
             .senderId(sender.getId())
             .message(message)
             .senderNickname(sender.getNickname())
-            .senderRole(sender.getRole())
             .build();
     }
 }

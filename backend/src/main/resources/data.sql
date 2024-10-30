@@ -1,10 +1,19 @@
 -- 첫 번째 회원(Member 1: 튜티)
-INSERT INTO member (nickname, gender, phoneNumber, password, passwordConfirm, role, createdAt, updatedAt)
-VALUES ('심주', 'MALE', '010-1234-5678', 'password123', 'password123', 'TUTEE', NOW(), NOW());
+INSERT INTO member (nickname, gender, phoneNumber, password, passwordConfirm, createdAt, updatedAt)
+VALUES ('심주', 'MALE', '010-1234-5678', 'password123', 'password123', NOW(), NOW());
+
+-- member_roles 테이블에 역할 데이터 삽입
+-- ID는 이전 INSERT에서 생성된 member의 ID를 사용 (예: 1로 가정)
+INSERT INTO memberRoles (memberId, role)
+VALUES (1, 'TUTEE');
 
 -- 두 번째 회원(Member 2: 튜터)
-INSERT INTO member (nickname, gender, phoneNumber, password, passwordConfirm, role, createdAt, updatedAt)
-VALUES ('선생님', 'FEMALE', '010-9876-5432', 'password456', 'password456', 'TUTOR', NOW(), NOW());
+INSERT INTO member (nickname, gender, phoneNumber, password, passwordConfirm, createdAt, updatedAt)
+VALUES ('선생님', 'FEMALE', '010-9876-5432', 'password456', 'password456', NOW(), NOW());
+
+INSERT INTO memberRoles (memberId, role)
+VALUES (2, 'TUTOR');
+
 
 -- 튜터 프로필 생성
 INSERT INTO tutorProfile (memberId, location, university, status, createdAt, updatedAt)

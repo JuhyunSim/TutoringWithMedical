@@ -4,6 +4,7 @@ import com.simzoo.withmedical.dto.ReviewRequestDto;
 import com.simzoo.withmedical.dto.ReviewResponseDto;
 import com.simzoo.withmedical.dto.UpdateReviewRequestDto;
 import com.simzoo.withmedical.service.ReviewService;
+import com.simzoo.withmedical.util.resolver.LoginId;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,9 +31,8 @@ public class ReviewController {
     /**
      * 리뷰 생성
      */
-    //Todo 로그인 사용자 id 매개변수로 전달
     @PostMapping
-    public ResponseEntity<ReviewResponseDto> createReview(Long userId,
+    public ResponseEntity<ReviewResponseDto> createReview(@LoginId Long userId,
         @RequestBody ReviewRequestDto requestDto) {
 
         return ResponseEntity.ok(reviewService.saveReview(userId, requestDto).toResponseDto());
