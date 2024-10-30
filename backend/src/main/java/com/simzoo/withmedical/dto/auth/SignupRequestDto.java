@@ -5,6 +5,7 @@ import com.simzoo.withmedical.dto.TutorProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
+import com.simzoo.withmedical.util.AesUtil;
 import com.simzoo.withmedical.util.validator.Password;
 import com.simzoo.withmedical.util.validator.PasswordConfirm;
 import com.simzoo.withmedical.util.validator.PhoneNumber;
@@ -18,6 +19,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Getter
 @Builder
@@ -49,13 +51,12 @@ public class SignupRequestDto {
     private TuteeProfileRequestDto tuteeProfile;
     private List<TuteeProfileRequestDto> tuteeProfiles = new ArrayList<>();
 
-    public MemberEntity toMemberEntity() {
+    public MemberEntity toMemberEntity(PasswordEncoder passwordEncoder) {
         return MemberEntity.builder()
             .nickname(nickname)
             .gender(gender)
-            .phoneNumber(phoneNumber)
-            .password(password)
-            .role(role)
+            .phoneNumber(AesUtil.decrypt(phoneNumber))
+            .password(passwordEncoder.encode(password))
             .build();
     }
 

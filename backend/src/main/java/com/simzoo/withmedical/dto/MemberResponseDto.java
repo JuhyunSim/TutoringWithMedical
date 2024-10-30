@@ -24,7 +24,7 @@ public class MemberResponseDto {
     private String nickname;
     private Gender gender;
     private String phoneNumber;
-    private Role role;
+    private List<Role> role;
 
     private TutorProfileEntity tutorProfile;
 
