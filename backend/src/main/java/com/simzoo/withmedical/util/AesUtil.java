@@ -2,8 +2,10 @@ package com.simzoo.withmedical.util;
 
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
+import java.nio.charset.StandardCharsets;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 import java.util.Base64;
@@ -47,6 +49,7 @@ public class AesUtil {
 
     public static String decrypt(String cipherText) {
         try {
+            log.info("cipherText: {}", cipherText);
             String[] parts = cipherText.split(":");
             byte[] ivBytes = Base64.getDecoder().decode(parts[0]);
             byte[] cipherBytes = Base64.getDecoder().decode(parts[1]);
@@ -62,6 +65,16 @@ public class AesUtil {
                  IllegalBlockSizeException exception) {
             log.error(exception.getMessage());
             throw new CustomException(ErrorCode.DECRYPTION_ERROR);
+        }
+    }
+
+    public static String generateHash(String input) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(input.getBytes(StandardCharsets.UTF_8));
+            return Base64.getEncoder().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
     }
 

@@ -28,7 +28,7 @@ public class AuthService {
         String phoneNumber = requestDto.getPhoneNumber();
         String password = requestDto.getPassword();
 
-        MemberEntity memberEntity = memberRepository.findByPhoneNumber(AesUtil.encrypt(phoneNumber))
+        MemberEntity memberEntity = memberRepository.findByPhoneNumber(AesUtil.generateHash(phoneNumber))
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if (notMatchPassword(memberEntity, password, passwordEncoder)) {
@@ -44,6 +44,6 @@ public class AuthService {
 
     private static boolean notMatchPassword(MemberEntity member, String password,
         PasswordEncoder passwordEncoder) {
-        return !member.getPassword().equals(passwordEncoder.encode(password));
+        return !passwordEncoder.matches(password, member.getPassword());
     }
 }

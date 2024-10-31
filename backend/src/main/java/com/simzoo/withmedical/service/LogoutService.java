@@ -18,6 +18,7 @@ public class LogoutService {
 
     @Transactional
     public void logout(String token) {
+        token = token.replace("Bearer ", "");
         ValueOperations<String, String> ops = redisTemplate.opsForValue();
         long expirationTime = jwtUtil.extractExpiration(token) - Instant.now().toEpochMilli(); // 남은 유효 시간 계산
         ops.set(token, "logout", Duration.ofMillis(expirationTime));

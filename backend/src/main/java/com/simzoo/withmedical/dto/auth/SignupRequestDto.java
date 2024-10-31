@@ -55,7 +55,7 @@ public class SignupRequestDto {
         return MemberEntity.builder()
             .nickname(nickname)
             .gender(gender)
-            .phoneNumber(AesUtil.decrypt(phoneNumber))
+            .phoneNumber(AesUtil.generateHash(phoneNumber))
             .password(passwordEncoder.encode(password))
             .build();
     }
