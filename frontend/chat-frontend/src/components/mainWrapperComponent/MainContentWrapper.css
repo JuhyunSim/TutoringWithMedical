@@ -1,0 +1,4 @@
+.main-content {
+    margin-top: 160px; /* Ensures all components are positioned below the fixed header */
+    padding: 20px;     /* Optional padding to space content within the wrapper */
+}
