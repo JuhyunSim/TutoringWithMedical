@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 @Component
@@ -32,15 +33,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String accessToken = resolveToken(request);
         log.info("request path: {}", request.getRequestURI());
+        if (accessToken != null) {
 
-        Authentication authentication = jwtUtil.getAuthentication(accessToken);
-        SecurityContextHolder.getContext()
-            .setAuthentication(authentication);
-        log.info("authentication: {}, {}", authentication.getPrincipal(),
-            authentication.getAuthorities());
+            if (jwtUtil.expiredToken(accessToken)) {
+                throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+            }
 
-        request.setAttribute("nickname", jwtUtil.getUserVo(accessToken).getNickname());
-        request.setAttribute("loginId", jwtUtil.getUserVo(accessToken).getId());
+            if (logoutService.isLoggedOut(accessToken)) {
+                throw new CustomException(ErrorCode.INVALID_TOKEN);
+            }
+
+            Authentication authentication = jwtUtil.getAuthentication(accessToken);
+            SecurityContextHolder.getContext()
+                .setAuthentication(authentication);
+            log.info("authentication: {}, {}", authentication.getPrincipal(),
+                authentication.getAuthorities());
+
+            request.setAttribute("nickname", jwtUtil.getUserVo(accessToken).getNickname());
+            request.setAttribute("loginId", jwtUtil.getUserVo(accessToken).getId());
+        }
         filterChain.doFilter(request, response);
     }
 
@@ -48,17 +59,11 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String token = request.getHeader(ACCESS_TOKEN_HEADER);
 
-        if (token == null && logoutService.isLoggedOut(token)) {
-            throw new CustomException(ErrorCode.UNAUTHENTICATED_USER);
+
+        if (!ObjectUtils.isEmpty(token) && token.startsWith(TOKEN_PREFIX)) {
+            return token.substring(TOKEN_PREFIX.length());
         }
 
-        if (!token.startsWith(TOKEN_PREFIX)) {
-            throw new CustomException(ErrorCode.INVALID_TOKEN);
-        }
-
-        token = token.replace(TOKEN_PREFIX, "");
-        jwtUtil.validateToken(token);
-
-        return token;
+        return null;
     }
 }

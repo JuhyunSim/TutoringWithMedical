@@ -6,6 +6,7 @@ import com.simzoo.withmedical.exception.ErrorCode;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.SignatureAlgorithm;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -106,7 +107,7 @@ public class JwtUtil {
             .claims(claims)
             .issuedAt(new Date())
             .expiration(Date.from(Instant.now().plusMillis(expiration)))
-            .signWith(key)
+            .signWith(key, SignatureAlgorithm.HS256)
             .compact();
     }
 

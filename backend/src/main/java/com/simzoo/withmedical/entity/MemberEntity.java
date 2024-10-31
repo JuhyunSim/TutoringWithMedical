@@ -79,21 +79,21 @@ public class MemberEntity extends BaseEntity{
     }
 
     public void saveTuteeProfile(TuteeProfileEntity profile, Role role) {
-        if (role == Role.TUTEE) {
+        if (role != Role.TUTEE) {
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
         this.tuteeProfile = profile;
     }
 
     public void saveTutorProfile(TutorProfileEntity profile, Role role) {
-        if (role == Role.TUTOR) {
+        if (role != Role.TUTOR) {
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
         this.tutorProfile = profile;
     }
 
     public void addTutorProfile(TuteeProfileEntity profile, Role role) {
-        if (role == Role.PARENT) {
+        if (role != Role.PARENT) {
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
         this.tuteeProfiles.add(profile);

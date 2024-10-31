@@ -26,7 +26,7 @@ public class SecurityConfig {
 
     private static final List<String> PERMIT_ALL_URLS = List.of(
         "/index.html", "/css/**", "/images/**", "/js/**", "/swagger-ui/*", "v3/api-docs/**",
-        "/", "/auth/login", "/signup"
+        "/", "/auth/login/**", "/send-one", "/signup/**"
     );
 
     @Bean
@@ -37,7 +37,7 @@ public class SecurityConfig {
                 request -> request
                     .requestMatchers(PERMIT_ALL_URLS.toArray(new String[0]))
                     .permitAll()
-                    .anyRequest().authenticated()
+                    .anyRequest().permitAll()
             )
             .sessionManagement(
                 session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -58,6 +58,4 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-
-
 }
