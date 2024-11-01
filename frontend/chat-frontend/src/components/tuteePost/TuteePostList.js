@@ -3,9 +3,10 @@ import axios from 'axios';
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import mockPostings from './mockData'; 
 import './TuteePostList.css';
+import { Link } from 'react-router-dom';
 
 
-const TuteePostList = ({ memberId }) => {
+const TuteePostList = ({ memberId, memberRole }) => {
     const [postings, setPostings] = useState([]);
     const [selectedPosting, setSelectedPosting] = useState(null); 
     const [message, setMessage] = useState(''); 
@@ -13,22 +14,29 @@ const TuteePostList = ({ memberId }) => {
     const [messageSent, setMessageSent] = useState(false); 
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 10;
+    const maxPageDisplay = 10;
     const totalPage = Math.ceil(mockPostings.length / pageSize);
+    const startPage = Math.floor(currentPage / maxPageDisplay) * maxPageDisplay;
 
     useEffect(() => {
-        const startIndex = currentPage * pageSize;
-        const paginatedPostings = mockPostings.slice(startIndex, startIndex + pageSize);
-        setPostings(paginatedPostings);
+        console.log("Member Role:", memberRole);  // 콘솔에서 memberRole 값을 확인
+    }, [memberRole]);
+
+    //목데이터에 적용
+    useEffect(() => {
+        // const startIndex = currentPage * pageSize;
+        // const paginatedPostings = mockPostings.slice(startIndex, startIndex + pageSize);
+        // setPostings(paginatedPostings);
     }, [currentPage]);
 
     useEffect(() => {
-        //목데이터 사용을 위해 주석처리 
-        // axios.get(`${process.env.REACT_APP_BACKEND_URL}/tutee/postings`)
-        //     .then(response => {
-        //         console.log(response.data);  
-        //         setPostings(response.data.content);
-        //     })
-        //     .catch(error => console.error('Failed to fetch postings:', error));
+        // 목데이터 사용을 위해 주석처리 
+        axios.get(`${process.env.REACT_APP_BACKEND_URL}/tutee/postings`)
+            .then(response => {
+                console.log(response.data);  
+                setPostings(response.data.content);
+            })
+            .catch(error => console.error('Failed to fetch postings:', error));
     }, []);
 
     const handleSelectPost = (posting) => {
@@ -38,7 +46,19 @@ const TuteePostList = ({ memberId }) => {
     };
 
     const handlePageChange = (page) => {
-        setCurrentPage(page);
+        if (page >= 0 && page < totalPage) setCurrentPage(page);
+    };
+
+    const handleNextPageGroup = () => {
+        if (startPage + maxPageDisplay < totalPage) {
+            setCurrentPage(startPage + maxPageDisplay);
+        }
+    };
+
+    const handlePrevPageGroup = () => {
+        if (startPage > 0) {
+            setCurrentPage(startPage - maxPageDisplay);
+        }
     };
 
     const handleSendMessage = (posting) => {
@@ -108,9 +128,14 @@ const TuteePostList = ({ memberId }) => {
 
     return (
         <div className="tutee-post-list-container">
-            <h1 className="tutee-post-list-title">Tutee Postings</h1>
+            <div className="title-container">
+                <h1 className="tutee-post-list-title">학생 목록</h1>
+                {memberRole === 'TUTEE' && (
+                        <Link to="/posting-form" className="create-post-button">과외 구인 글 작성하기</Link>
+                    )}
+            </div>
             <div className="post-grid">
-            {postings.length > 0 && postings.map(posting => (
+                {postings.length > 0 && postings.map(posting => (
                 <div key={posting.postingId} className="post-item">
                     <h3 className="post-title">{posting.studentGrade} - {posting.studentSchool}</h3>
                     <p className="post-detail">Personality: {posting.personality}</p>
@@ -125,15 +150,20 @@ const TuteePostList = ({ memberId }) => {
 
             {/* 페이지네이션 버튼 */}
             <div className="pagination">
-                {Array.from({ length: totalPage }, (_, index) => (
-                    <button
-                        key={index}
-                        onClick={() => handlePageChange(index)}
-                        className={`page-button ${index === currentPage ? 'active' : ''}`}
-                    >
-                        {index + 1}
-                    </button>
-                ))}
+                <button onClick={handlePrevPageGroup} disabled={startPage === 0}>&laquo;</button>
+                {Array.from({ length: Math.min(maxPageDisplay, totalPage - startPage) }, (_, index) => {
+                    const page = startPage + index;
+                    return (
+                        <button
+                            key={page}
+                            onClick={() => handlePageChange(page)}
+                            className={`page-button ${page === currentPage ? 'active' : ''}`}
+                        >
+                            {page + 1}
+                        </button>
+                    );
+                })}
+                <button onClick={handleNextPageGroup} disabled={startPage + maxPageDisplay >= totalPage}>&raquo;</button>
             </div>
         </div>
     );

@@ -4,6 +4,7 @@ import com.simzoo.withmedical.dto.CreateTuteePostingRequestDto;
 import com.simzoo.withmedical.dto.UpdateTuteePostingRequestDto;
 import com.simzoo.withmedical.entity.TuteePostEntity;
 import com.simzoo.withmedical.service.TuteePostService;
+import com.simzoo.withmedical.util.resolver.LoginId;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Pageable;
@@ -30,7 +31,7 @@ public class TuteePostController {
      * 게시물 생성
      */
     @PostMapping("/posting")
-    public ResponseEntity<?> createInquiryPosting(Long memberId,
+    public ResponseEntity<?> createInquiryPosting(@LoginId Long memberId,
         @Valid @RequestBody CreateTuteePostingRequestDto requestDto) {
 
         return ResponseEntity.ok(tuteePostService.saveInquiryPosting(memberId, requestDto));
@@ -40,7 +41,7 @@ public class TuteePostController {
      * 게시물 수정
      */
     @PatchMapping("/posting/{postingId}")
-    public ResponseEntity<?> updateInquiryPosting(Long memberId, @PathVariable Long postingId,
+    public ResponseEntity<?> updateInquiryPosting(@LoginId Long memberId, @PathVariable Long postingId,
         @RequestBody UpdateTuteePostingRequestDto requestDto) {
 
         return ResponseEntity.ok(
@@ -68,7 +69,7 @@ public class TuteePostController {
     }
 
     @GetMapping("/postings/me")
-    public ResponseEntity<?> getMyPostings(Long myId,
+    public ResponseEntity<?> getMyPostings(@LoginId Long myId,
         @PageableDefault(page = 0, size = 10, direction = Direction.DESC, sort = "createdAt") Pageable pageable) {
 
         return ResponseEntity.ok(tuteePostService.getMyPostings(myId, pageable)
@@ -76,7 +77,7 @@ public class TuteePostController {
     }
 
     @DeleteMapping("/postings/{postingId}")
-    public ResponseEntity<?> deleteInquiryPosting(Long memberId, @PathVariable Long postingId) {
+    public ResponseEntity<?> deleteInquiryPosting(@LoginId Long memberId, @PathVariable Long postingId) {
 
         tuteePostService.deleteInquiryPosting(memberId, postingId);
 

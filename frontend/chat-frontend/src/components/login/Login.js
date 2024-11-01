@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import axios from 'axios';
+import axios from '../axios/AxiosInstance';
 import './Login.css';
 
 const Login = ({ onLogin }) => {
@@ -13,14 +13,19 @@ const Login = ({ onLogin }) => {
     // Handle login with phone number and password
     const handleLoginSubmit = async (e) => {
         e.preventDefault();
-        setError('');
+        if (!role) {
+            setError('역할을 선택해 주세요.');
+            return;
+        }
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
+            const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/login`, {
                 phoneNumber: phoneNumber,
                 password: password,
                 role: role
             });
-            onLogin(); // 로그인 성공 시 App.js의 로그인 상태 업데이트
+            const token = response.data.accessToken;
+            localStorage.setItem('jwtToken', token);
+            onLogin(role); // 로그인 성공 시 App.js의 로그인 상태 업데이트
             console.log("Logged in successfully with phone number and password.");
             navigate('/'); // 로그인 성공 시 /home 경로로 이동
             // Redirect or further action after successful login

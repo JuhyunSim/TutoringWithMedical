@@ -1,0 +1,64 @@
+/* MyProfile.css */
+.profile-container {
+    display: flex;
+    height: 100vh;
+}
+
+.sidebar {
+    width: 200px;
+    padding: 20px;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    position: fixed;
+    top: 200px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto;
+    margin-left: 8%; /* 왼쪽 여백 추가 */
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    font-size: 18px;
+}
+.sidebar ul li {
+    font-size: 18px;
+}
+
+.sidebar li {
+    margin-bottom: 15px;
+}
+
+.sidebar a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+}
+
+.sidebar ul li a {
+    margin-top: auto;
+    display: block;
+    padding: 10px 15px;
+    background-color: #007bff; /* 버튼 배경색 */
+    color: white;
+    text-decoration: none;
+    border-radius: 10px; /* 각 버튼 둥글게 */
+    text-align: center;
+}
+
+.sidebar ul li a:hover {
+    background-color: #0056b3; /* 호버 시 색상 변경 */
+}
+
+.sidebar a.active {
+    color: #07294d;
+    border-left: 4px solid #007bff;
+    padding-left: 16px;
+    font-weight: bold;
+}
+
+.content {
+    margin-left: 220px;
+    padding: 20px;
+    width: 100%;
+}
