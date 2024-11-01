@@ -5,7 +5,7 @@ import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.repository.MemberRepository;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
-import com.simzoo.withmedical.repository.TutorProfileRepository;
+import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

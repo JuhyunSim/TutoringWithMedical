@@ -1,5 +1,6 @@
 package com.simzoo.withmedical.entity;
 
+import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
@@ -56,4 +57,18 @@ public class TutorProfileEntity extends BaseEntity {
     private EnrollmentStatus status;
 
     private String description;
+
+    public TutorProfileResponseDto toResponseDto() {
+
+        return TutorProfileResponseDto.builder()
+            .tutorId(id)
+            .nickname(this.member.getNickname())
+            .gender(this.member.getGender())
+            .subjects(this.subjects)
+            .location(this.location)
+            .university(this.university)
+            .status(this.status)
+            .description(this.description)
+            .build();
+    }
 }

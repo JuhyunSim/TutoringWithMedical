@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.dto.auth;
 
 import com.simzoo.withmedical.dto.TuteeProfileRequestDto;
-import com.simzoo.withmedical.dto.TutorProfileRequestDto;
+import com.simzoo.withmedical.dto.tutor.TutorProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
