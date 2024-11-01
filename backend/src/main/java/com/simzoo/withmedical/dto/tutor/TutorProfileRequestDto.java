@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto;
+package com.simzoo.withmedical.dto.tutor;
 
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;

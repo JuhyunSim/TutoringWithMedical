@@ -7,6 +7,7 @@ import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -36,6 +37,8 @@ public class SecurityConfig {
             authorizeHttpRequests(
                 request -> request
                     .requestMatchers(PERMIT_ALL_URLS.toArray(new String[0]))
+                    .permitAll()
+                    .requestMatchers(HttpMethod.GET, "/tutor")
                     .permitAll()
                     .anyRequest().permitAll()
             )
