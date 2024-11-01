@@ -49,6 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             log.info("authentication: {}, {}", authentication.getPrincipal(),
                 authentication.getAuthorities());
 
+            log.debug("nickname: {}, loginId: {}", jwtUtil.getUserVo(accessToken).getNickname(), jwtUtil.getUserVo(accessToken).getId());
             request.setAttribute("nickname", jwtUtil.getUserVo(accessToken).getNickname());
             request.setAttribute("loginId", jwtUtil.getUserVo(accessToken).getId());
         }

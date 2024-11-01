@@ -86,10 +86,10 @@ public class JwtUtil {
     public Authentication getAuthentication(String token) {
 
         String nickname = AesUtil.decrypt(extractAll(token).getSubject());
-        Role role = extractRole(token);
+        String role = extractRole(token);
 
         User userDetails = new User(nickname, "",
-            List.of(new SimpleGrantedAuthority(role.name())));
+            List.of(new SimpleGrantedAuthority(role)));
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
     }
@@ -121,8 +121,8 @@ public class JwtUtil {
             .getPayload();
     }
 
-    private Role extractRole(String token) {
-        return extractAll(token).get("role", Role.class);
+    private String extractRole(String token) {
+        return extractAll(token).get("role", String.class);
     }
 
 }
