@@ -57,6 +57,7 @@ public class SignupRequestDto {
             .gender(gender)
             .phoneNumber(AesUtil.generateHash(phoneNumber))
             .password(passwordEncoder.encode(password))
+            .roles(new ArrayList<>())
             .build();
     }
 

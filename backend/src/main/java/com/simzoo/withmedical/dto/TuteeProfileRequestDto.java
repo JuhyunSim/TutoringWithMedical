@@ -5,8 +5,11 @@ import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
+import java.util.ArrayList;
 import java.util.List;
+import lombok.Getter;
 
+@Getter
 public class TuteeProfileRequestDto {
 
     private Location location;
@@ -18,9 +21,10 @@ public class TuteeProfileRequestDto {
         return TuteeProfileEntity.builder()
             .location(location)
             .description(description)
-            .subjectsNeeded(subjects)
             .grade(tuteeGrade)
             .member(member)
+            .subjects(new ArrayList<>())
             .build();
     }
 }
+

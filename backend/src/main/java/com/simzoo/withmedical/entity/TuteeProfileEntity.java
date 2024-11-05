@@ -1,11 +1,7 @@
 package com.simzoo.withmedical.entity;
 
 import com.simzoo.withmedical.enums.Location;
-import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,14 +39,16 @@ public class TuteeProfileEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Location location;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "tuteeSubjects", joinColumns = @JoinColumn(name = "tuteeProfileId"))
-    @Column(name = "subjectsNeeded")
-    @Enumerated(EnumType.STRING)
-    private List<Subject> subjectsNeeded = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<SubjectEntity> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private TuteeGrade grade;
 
     private String description;
+
+
+    public void addSubject(List<SubjectEntity> subjects) {
+        this.getSubjects().addAll(subjects);
+    }
 }

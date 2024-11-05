@@ -12,15 +12,16 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class TutorSimpleResponseDto {
 
+    private Long id;
     private String nickname;
     private University university;
     private Location location;
     private List<Subject> subjects;
 
-
     @QueryProjection
-    public TutorSimpleResponseDto(String nickname, University university, Location location,
+    public TutorSimpleResponseDto(Long id, String nickname, University university, Location location,
         List<Subject> subjects) {
+        this.id = id;
         this.nickname = nickname;
         this.university = university;
         this.location = location;
