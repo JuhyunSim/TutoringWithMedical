@@ -28,6 +28,13 @@ const locationList = [
     // Add more locations as needed
 ];
 
+const enrollmentStatusList = [
+    { value: "ENROLLED", label: "재학" },
+    { value: "LEAVE_OF_ABSENCE", label: "휴학" },
+    { value: "GRADUATED", label: "졸업" },
+    { value: "DROPPED_OUT", label: "중퇴" }
+];
+
 const Signup = () => {
     const [step, setStep] = useState(1); // Tracks the current step
     const [nickname, setNickname] = useState('');
@@ -93,6 +100,8 @@ const Signup = () => {
             tuteeProfile: role === 'TUTEE' ? tuteeProfile : null,
             tuteeProfiles: role === 'PARENT' ? tuteeProfiles : [],
         };
+
+        console.log(requestBody); // requestBody에서 location 값 확인
 
         try {
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, requestBody);
@@ -235,7 +244,7 @@ const Signup = () => {
                             </div>
                             <div className="input-group">
                                 <label>Location</label>
-                                <select value={tuteeProfile.location} onChange={(e) => setTuteeProfile({ ...tuteeProfile, location: e.target.value })}>
+                                <select value={tutorProfile.location} onChange={(e) => setTutorProfile({ ...tutorProfile, location: e.target.value })}>
                                     <option value="">Select Location</option>
                                     {locationList.map((location) => (
                                         <option key={location.value} value={location.value}>{location.label}</option>
@@ -248,6 +257,15 @@ const Signup = () => {
                                     <option value="">Select University</option>
                                     {universityList.map((uni) => (
                                         <option key={uni.value} value={uni.value}>{uni.label}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="input-group">
+                                <label>Enrollment Status</label>
+                                <select value={tutorProfile.status} onChange={(e) => setTutorProfile({ ...tutorProfile, status: e.target.value })}>
+                                    <option value="">Select Enrollment Status</option>
+                                    {enrollmentStatusList.map((status) => (
+                                        <option key={status.value} value={status.value}>{status.label}</option>
                                     ))}
                                 </select>
                             </div>

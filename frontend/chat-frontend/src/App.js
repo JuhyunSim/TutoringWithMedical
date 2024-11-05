@@ -13,6 +13,8 @@ import ChangePassword from './components/profile/ChangePassword';
 import DeleteAccount from './components/profile/DeleteAccount';
 import ProfileInfo from './components/profile/ProfileInfo';
 import EditTuteePostForm from './components/tuteePost/EditTuteePostForm';
+import TutorList from './components/tutor/TutorList';
+import TutorProfile from './components/tutor/TutorProfile';
 import './App.css'
 
 
@@ -82,11 +84,9 @@ const App = () => {
                             <Route path="change-password" element={<ChangePassword />} />
                         </Route>
                         
-                        {/* 게시물 목록 페이지 */}
-                        <Route
-                            path="/posts"
-                            element={<TuteePostList memberId={memberId} memberRole={memberRole}/>}
-                        />
+                        <Route path="/posts" element={<TuteePostList memberId={memberId} memberRole={memberRole}/>}/>
+                        <Route path="/tutor-profiles" element={<TutorList />} />
+                        <Route path="/tutor-profiles/:tutorId" element={<TutorProfile/>}/>
 
                         {/* 채팅방 목록 페이지 */}
                         <Route
