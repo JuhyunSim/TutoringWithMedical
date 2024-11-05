@@ -20,6 +20,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,7 +52,7 @@ public class MemberEntity extends BaseEntity{
     @ElementCollection(fetch = LAZY)
     @CollectionTable(name = "memberRoles", joinColumns = @JoinColumn(name = "memberId"))
     @Column(name = "role")
-    private List<Role> roles;
+    private List<Role> roles = new ArrayList<>();
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "memberId")
@@ -97,6 +98,10 @@ public class MemberEntity extends BaseEntity{
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
         this.tuteeProfiles.add(profile);
+    }
+
+    public void addRole(Role role) {
+        this.roles.add(role);
     }
 
     public void updateLastLogin(LocalDateTime now) {

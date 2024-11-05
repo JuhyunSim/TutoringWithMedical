@@ -3,11 +3,7 @@ package com.simzoo.withmedical.entity;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
-import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
-import jakarta.persistence.CollectionTable;
-import jakarta.persistence.Column;
-import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -16,6 +12,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
@@ -41,11 +38,8 @@ public class TutorProfileEntity extends BaseEntity {
     @JoinColumn(name = "memberId")
     private MemberEntity member;
 
-    @ElementCollection(fetch = FetchType.LAZY)
-    @CollectionTable(name = "tutorSubjects", joinColumns = @JoinColumn(name = "tutorProfileId"))
-    @Column(name = "subjects")
-    @Enumerated(EnumType.STRING)
-    private List<Subject> subjects = new ArrayList<>();
+    @OneToMany(fetch = FetchType.LAZY)
+    private List<SubjectEntity> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     private Location location;
@@ -64,11 +58,15 @@ public class TutorProfileEntity extends BaseEntity {
             .tutorId(id)
             .nickname(this.member.getNickname())
             .gender(this.member.getGender())
-            .subjects(this.subjects)
+            .subjects(this.subjects.stream().map(SubjectEntity::getSubject).toList())
             .location(this.location)
             .university(this.university)
             .status(this.status)
             .description(this.description)
             .build();
+    }
+
+    public void addSubjects(List<SubjectEntity> subjects) {
+        this.getSubjects().addAll(subjects);
     }
 }

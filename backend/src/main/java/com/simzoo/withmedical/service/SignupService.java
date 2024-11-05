@@ -2,10 +2,16 @@ package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
+import com.simzoo.withmedical.entity.SubjectEntity;
+import com.simzoo.withmedical.entity.TuteeProfileEntity;
+import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.Role;
+import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.repository.MemberRepository;
+import com.simzoo.withmedical.repository.SubjectRepository;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,24 +25,57 @@ public class SignupService {
     private final MemberRepository memberRepository;
     private final TuteeProfileRepository tuteeProfileRepository;
     private final PasswordEncoder passwordEncoder;
+    private final SubjectRepository subjectRepository;
 
     @Transactional
     public MemberEntity signup(SignupRequestDto requestDto) {
 
         MemberEntity member = memberRepository.save(requestDto.toMemberEntity(passwordEncoder));
+        member.addRole(requestDto.getRole());
 
         if (requestDto.getRole() == Role.TUTEE) {
-            member.saveTuteeProfile(
-                tuteeProfileRepository.save(requestDto.getTuteeProfile().toEntity(member)),
-                requestDto.getRole());
+            TuteeProfileEntity tuteeProfile = tuteeProfileRepository.save(
+                requestDto.getTuteeProfile().toEntity(member));
+
+            List<SubjectEntity> subjectEntities = saveTuteeSubjects(
+                requestDto.getTuteeProfile().getSubjects(), tuteeProfile);
+
+            tuteeProfile.addSubject(subjectEntities);
+
+            member.saveTuteeProfile(tuteeProfile, requestDto.getRole());
+
         } else if (requestDto.getRole() == Role.TUTOR) {
-            member.saveTutorProfile(
-                tutorProfileRepository.save(requestDto.getTutorProfile().toEntity(member)),
-                requestDto.getRole());
+            TutorProfileEntity tutorProfile = tutorProfileRepository.save(
+                requestDto.getTutorProfile().toEntity(member));
+
+            List<SubjectEntity> subjectEntities = saveTutorSubjects(
+                requestDto.getTutorProfile().getSubjects(), tutorProfile);
+
+            tutorProfile.addSubjects(subjectEntities);
+
+            member.saveTutorProfile(tutorProfile, requestDto.getRole());
+
         } else {
             tuteeProfileRepository.saveAll(
-                requestDto.getTuteeProfiles().stream().map(e -> e.toEntity(member)).toList());
+                requestDto.getTuteeProfiles().stream().map(e -> {
+                    TuteeProfileEntity tuteeProfile = e.toEntity(member);
+                    List<SubjectEntity> subjects = saveTuteeSubjects(e.getSubjects(), tuteeProfile);
+                    tuteeProfile.addSubject(subjects);
+                    return tuteeProfile;
+                }).toList());
         }
         return member;
+    }
+
+    private List<SubjectEntity> saveTutorSubjects(List<Subject> subjects,
+        TutorProfileEntity tutorProfile) {
+        return subjectRepository.saveAll(
+            subjects.stream().map(e -> SubjectEntity.of(e, tutorProfile)).toList());
+    }
+
+    private List<SubjectEntity> saveTuteeSubjects(List<Subject> subjects,
+        TuteeProfileEntity tuteeProfile) {
+        return subjectRepository.saveAll(
+            subjects.stream().map(e -> SubjectEntity.of(e, tuteeProfile)).toList());
     }
 }

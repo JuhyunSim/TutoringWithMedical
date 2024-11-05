@@ -1,10 +1,15 @@
 package com.simzoo.withmedical.repository.tutor;
 
+import static com.querydsl.core.group.GroupBy.groupBy;
+import static com.querydsl.core.group.GroupBy.list;
+
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.dto.QTutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
+import com.simzoo.withmedical.entity.QSubjectEntity;
 import com.simzoo.withmedical.entity.QTutorProfileEntity;
 import java.util.List;
+import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -19,21 +24,30 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
     public Page<TutorSimpleResponseDto> findTutorProfileDtos(Pageable pageable) {
 
         QTutorProfileEntity tutorProfile = QTutorProfileEntity.tutorProfileEntity;
+        QSubjectEntity subject = QSubjectEntity.subjectEntity;
 
-        List<TutorSimpleResponseDto> results = jpaQueryFactory.select(new QTutorSimpleResponseDto(
-                tutorProfile.member.nickname,
-                tutorProfile.university,
-                tutorProfile.location,
-                tutorProfile.subjects
-            )).from(tutorProfile)
+        Map<Long, TutorSimpleResponseDto> results = jpaQueryFactory
+            .from(tutorProfile)
+            .leftJoin(tutorProfile.subjects, subject)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
-            .fetch();
+            .transform(groupBy(tutorProfile.id).as(
+                new QTutorSimpleResponseDto(
+                    tutorProfile.id,
+                    tutorProfile.member.nickname,
+                    tutorProfile.university,
+                    tutorProfile.location,
+                    list(subject.subject) // subjects 필드를 List로 변환
+                )
+            ));
 
-        Long total = jpaQueryFactory.select(tutorProfile.count())
+        List<TutorSimpleResponseDto> tutorList = List.copyOf(results.values());
+
+        Long total = jpaQueryFactory
+            .select(tutorProfile.count())
             .from(tutorProfile)
             .fetchOne();
 
-        return new PageImpl<>(results, pageable, total);
+        return new PageImpl<>(tutorList, pageable, total);
     }
 }
