@@ -4,7 +4,7 @@ import { Client } from '@stomp/stompjs';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
-const ChatRoom = ({ memberId, recipientId }) => {
+const ChatRoom = ({ memberId, recipientId, memberNickname }) => {
     const { roomId } = useParams();
     const [messages, setMessages] = useState([]);  // 채팅 메시지
     const [inputMessage, setInputMessage] = useState('');  // 입력 메시지
@@ -16,12 +16,15 @@ const ChatRoom = ({ memberId, recipientId }) => {
     const [isComposing, setIsComposing] = useState(false);  // 한글 입력 여부
     const containerRef = useRef(null);  // 스크롤 컨테이너 참조
 
+    const token = localStorage.getItem('jwtToken'); // JWT 토큰 가져오기
+    const bearerToken = `Bearer ${token}`;
+
     // 처음 메시지를 불러오는 함수 (최신 메시지부터)
     const loadMessages = async () => {
         if (!hasMore) return;  // 더 이상 메시지가 없을 경우 반환
 
         try {
-            const response = await axios.get(`http://localhost:8080/chatrooms/${roomId}/messages`, {
+            const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/chatrooms/${roomId}/messages`, {
                 params: { page, size: 30 },  // 페이지와 사이즈 지정
             });
 
@@ -54,7 +57,7 @@ const ChatRoom = ({ memberId, recipientId }) => {
 
     useEffect(() => {
         if (roomId && !stompClient.current) {
-            const socket = new SockJS('http://localhost:8080/ws-stomp');
+            const socket = new SockJS(`${process.env.REACT_APP_BACKEND_URL}/ws-stomp?token=${bearerToken}`);
             const client = new Client({
                 webSocketFactory: () => socket,
                 debug: (str) => console.log(str),
@@ -67,7 +70,10 @@ const ChatRoom = ({ memberId, recipientId }) => {
                     });
                 },
                 onStompError: (frame) => console.error('STOMP Error:', frame.headers['message']),
-                onDisconnect: () => setIsConnected(false),
+                onDisconnect: () => {
+                    notifyExit();
+                    setIsConnected(false);
+                }
             });
 
             client.activate();
@@ -75,19 +81,18 @@ const ChatRoom = ({ memberId, recipientId }) => {
 
             return () => {
                 if (stompClient.current) {
+                    notifyExit();
                     stompClient.current.deactivate();
                     stompClient.current = null;
                 }
             };
         }
-    }, [roomId]);
+    }, [roomId, token]);
 
     // 메시지 전송 함수
     const sendMessage = () => {
         if (stompClient.current && isConnected && inputMessage.trim() !== '') {
             const message = {
-                senderId: memberId,
-                recipientId: recipientId,
                 message: inputMessage,
             };
             stompClient.current.publish({
@@ -110,6 +115,16 @@ const ChatRoom = ({ memberId, recipientId }) => {
 
     const handleCompositionStart = () => setIsComposing(true);
     const handleCompositionEnd = () => setIsComposing(false);
+
+    const notifyExit = () => {
+        if (stompClient.current && isConnected) {
+            const exitMessage = `${memberNickname}님이 대화를 종료하였습니다.`;
+            stompClient.current.publish({
+                destination: `/app/chat/${roomId}`,
+                body: JSON.stringify({ message: exitMessage })
+            });
+        }
+    };
 
     return (
         <div>

@@ -1,0 +1,74 @@
+/* ChatRoomList.css */
+
+.chatroom-list-container {
+    padding: 20px;
+    width: 100%;
+    overflow-y: auto;
+    height: 100%; /* 부모 요소에 맞게 설정 */
+}
+
+.chatroom-list-header {
+    font-size: 24px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+.filter-container {
+    margin-bottom: 20px;
+}
+
+.filter-select {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.chatroom-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.chatroom-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid #ddd;
+    cursor: pointer;
+}
+
+.chatroom-item:hover {
+    background-color: #f5f5f5;
+}
+
+.chatroom-title {
+    font-size: 18px;
+    font-weight: bold;
+    color: #454343;
+}
+
+.last-message {
+    color: #666;
+    font-size: 14px;
+}
+
+.chatroom-item button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.chatroom-item button:hover {
+    background-color: #0056b3;
+}
