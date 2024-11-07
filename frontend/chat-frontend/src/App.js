@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import TuteePostList from './components/tuteePost/TuteePostList';
-import ChatRoom from './components/ChatRoom';
-import ChatRoomList from './components/ChatRoomList';
+import ChatRoom from './components/chat/ChatRoom';
+import ChatRoomList from './components/chat/ChatRoomList';
 import Home from './components/home/Home';
-import MyProfile from './components/profile/MyProfile';
+import ProfileLayout from './components/profile/ProfileLayout';
 import Login from './components/login/Login';
 import Signup from './components/signup/Signup';
 import PostingForm from './components/tuteePost/PostingForm';
@@ -15,13 +15,15 @@ import ProfileInfo from './components/profile/ProfileInfo';
 import EditTuteePostForm from './components/tuteePost/EditTuteePostForm';
 import TutorList from './components/tutor/TutorList';
 import TutorProfile from './components/tutor/TutorProfile';
+import ChatLayout from './components/chat/ChatLayout';
 import './App.css'
+import { faker } from '@faker-js/faker';
 
 
 const App = () => {
     const [roomId, setRoomId] = useState(null);
     const [recipientId, setRecipientId] = useState(null);  // recipientId 저장
-    const [memberId, setMemberId] = useState(2);  // 현재 로그인된 튜터 ID (예시)
+    const [memberId, setMemberId] = useState(null);
     const [memberNickname, setMemberNickname] = useState('Tutor1');
     const [memberRole, setMemberRole] = useState(null);
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
@@ -29,15 +31,18 @@ const App = () => {
     const handleLogin = (role) => {
         setIsLoggedIn(true);
         setMemberRole(role);
+        setMemberId(memberId);
     } // 로그인 성공 시 호출
 
     const handleLogout = () => {
         setIsLoggedIn(false); // 로그아웃 시 호출
         setMemberRole(null);
+        setMemberId(null)
     }
 
     const handleRoomSelect = (selectedRoomId, selectedRecipientId) => {
-        setRoomId(selectedRoomId)
+        setRoomId(selectedRoomId);
+        setRecipientId(selectedRecipientId);
     }
 
     return (
@@ -51,7 +56,6 @@ const App = () => {
                         {isLoggedIn ? (
                             <>
                                 <Link to="/profile" className="auth-link">내 정보</Link>
-                                <Link to="/chat" className="auth-link">1:1채팅</Link>
                                 <button onClick={handleLogout} className="auth-link">로그아웃</button>
                             </>
                         ) : (
@@ -68,14 +72,10 @@ const App = () => {
                         <Route path="/" element={<Home />} />
                         <Route path="/login" element={<Login onLogin={handleLogin} />} />
                         <Route path="/signup" element={<Signup />} />
-                        <Route path="/profile" element={<MyProfile />} />
-                        <Route path="/chatrooms" element={<ChatRoomList />} />
                         <Route path="/posting-form" element={<PostingForm />} /> {/* 게시물 작성 폼 */}
                         
-                        
-                        
                         {/* MyProfile 내부 라우트 설정 */}
-                        <Route path="/my-profile" element={<MyProfile />}>
+                        <Route path="/profile" element={<ProfileLayout />}>
                             <Route path="my-posts" element={<MyPosts />} />\
                             <Route path="edit-post/:postingId" element={<EditTuteePostForm />} /> {/* 추가된 라우트 */}
                             <Route path="profile-info" element={<ProfileInfo />} />
@@ -87,18 +87,10 @@ const App = () => {
                         <Route path="/posts" element={<TuteePostList memberId={memberId} memberRole={memberRole}/>}/>
                         <Route path="/tutor-profiles" element={<TutorList />} />
                         <Route path="/tutor-profiles/:tutorId" element={<TutorProfile/>}/>
-
-                        {/* 채팅방 목록 페이지 */}
-                        <Route
-                            path="/chatrooms"
-                            element={<ChatRoomList memberId={memberId}/>}
-                        />
-
-                        {/* 특정 채팅방 페이지 */}
-                        <Route
-                            path="/chatrooms/:roomId"
-                            element={<ChatRoom memberId={memberId} memberNickname={memberNickname} memberRole={memberRole} recipientId={recipientId}/>}
-                        />
+                        {/* Chat Layout */}
+                        <Route path="/chatrooms" element={<ChatLayout />}>
+                            <Route path=":roomId" element={<ChatRoom memberId={memberId} memberNickname={memberNickname} memberRole={memberRole} recipientId={recipientId}/>}/>
+                        </Route>
                     </Routes>
                 </div>
             </div>

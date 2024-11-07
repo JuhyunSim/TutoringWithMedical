@@ -21,6 +21,22 @@ const universityList = [
     // Add more universities as needed
 ];
 
+// 추가된 학년 옵션
+const tuteeGradeList = [
+    { value: "ELEMENTARY_1", label: "초등학교 1학년" },
+    { value: "ELEMENTARY_2", label: "초등학교 2학년" },
+    { value: "ELEMENTARY_3", label: "초등학교 3학년" },
+    { value: "ELEMENTARY_4", label: "초등학교 4학년" },
+    { value: "ELEMENTARY_5", label: "초등학교 5학년" },
+    { value: "ELEMENTARY_6", label: "초등학교 6학년" },
+    { value: "MIDDLE_1", label: "중학교 1학년" },
+    { value: "MIDDLE_2", label: "중학교 2학년" },
+    { value: "MIDDLE_3", label: "중학교 3학년" },
+    { value: "HIGH_1", label: "고등학교 1학년" },
+    { value: "HIGH_2", label: "고등학교 2학년" },
+    { value: "HIGH_3", label: "고등학교 3학년" }
+];
+
 const locationList = [
     { value: "SEOUL", label: "서울" },
     { value: "BUSAN", label: "부산" },
@@ -283,6 +299,7 @@ const Signup = () => {
                                     ))}
                                 </select>
                             </div>
+                            
                             <div className="input-group">
                                 <label>Subjects</label>
                                 <div className="chip-container">
@@ -296,6 +313,20 @@ const Signup = () => {
                                         </div>
                                     ))}
                                 </div>
+                            </div>
+
+                            <div className="input-group">
+                                <label>Grade</label>
+                                <select
+                                    value={tuteeProfile.tuteeGrade}
+                                    onChange={(e) => setTuteeProfile({ ...tuteeProfile, tuteeGrade: e.target.value })}
+                                    required
+                                >
+                                    <option value="">Select Grade</option>
+                                    {tuteeGradeList.map((grade) => (
+                                        <option key={grade.value} value={grade.value}>{grade.label}</option>
+                                    ))}
+                                </select>
                             </div>
                         </>
                     )}
