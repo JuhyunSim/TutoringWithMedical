@@ -1,5 +1,6 @@
 package com.simzoo.withmedical.config;
 
+import com.simzoo.withmedical.security.JwtHandShakeInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
@@ -10,10 +11,17 @@ import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerCo
 @EnableWebSocketMessageBroker
 public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final JwtHandShakeInterceptor jwtHandShakeInterceptor;
+
+    public WebSocketBrokerConfig(JwtHandShakeInterceptor jwtHandShakeInterceptor) {
+        this.jwtHandShakeInterceptor = jwtHandShakeInterceptor;
+    }
+
     //STOMP 엔드포인트 설정
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry.addEndpoint("/ws-stomp")
+            .addInterceptors(jwtHandShakeInterceptor)
             .setAllowedOriginPatterns("*")
             .withSockJS();
     }
@@ -27,8 +35,4 @@ public class WebSocketBrokerConfig implements WebSocketMessageBrokerConfigurer {
         // 클라이언트에서 서버로 메시지를 보낼 때 붙여야 하는 prefix(바로 브로커로 x)
         registry.setApplicationDestinationPrefixes("/app");
     }
-
-
-
-
 }

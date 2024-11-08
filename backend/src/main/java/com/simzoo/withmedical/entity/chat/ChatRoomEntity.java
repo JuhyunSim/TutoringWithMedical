@@ -1,11 +1,14 @@
-package com.simzoo.withmedical.entity;
+package com.simzoo.withmedical.entity.chat;
 
+import com.simzoo.withmedical.entity.BaseEntity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,10 +29,8 @@ public class ChatRoomEntity extends BaseEntity{
 
     private String title;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private MemberEntity participant1;
-    @ManyToOne(fetch = FetchType.LAZY)
-    private MemberEntity participant2;
+    @OneToMany(mappedBy = "chatRoom", fetch = FetchType.LAZY)
+    List<ChatRoomMember> members = new ArrayList<>();
 
     private Long createdBy;
 }

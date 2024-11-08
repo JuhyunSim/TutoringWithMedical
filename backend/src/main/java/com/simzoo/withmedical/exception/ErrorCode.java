@@ -11,6 +11,7 @@ public enum ErrorCode {
     NOT_FOUND_POSTING(HttpStatus.NOT_FOUND, "게시물을 찾을 수 없습니다."),
     NOT_FOUND_CHATROOM(HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다."),
     NOT_FOUND_REVIEW(HttpStatus.NOT_FOUND, "리뷰를 찾을 수 없습니다."),
+    NOT_FOUND_CHATROOM_MEMBER(HttpStatus.NOT_FOUND, "해당 채팅방 사용자를 찾을 수 없습니다."),
     PROFILE_ROLE_NOT_MATCH(HttpStatus.BAD_REQUEST, "사용자의 역할과 프로필이 일치하지 않습니다."),
     ALREADY_EXIST_MEMBER(HttpStatus.BAD_REQUEST, "이미 가입한 회원입니다."),
     VERIFY_NUMBER_NOT_MATCH(HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),

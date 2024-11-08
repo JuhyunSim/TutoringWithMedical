@@ -3,7 +3,7 @@ package com.simzoo.withmedical.repository.chat.message;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.dto.chat.ChatMessageResponseDto;
 import com.simzoo.withmedical.dto.chat.QChatMessageResponseDto;
-import com.simzoo.withmedical.entity.QChatMessageEntity;
+import com.simzoo.withmedical.entity.chat.QChatMessageEntity;
 import com.simzoo.withmedical.util.OrderSpecifierUtil;
 import java.util.List;
 import lombok.RequiredArgsConstructor;

@@ -12,6 +12,5 @@ import lombok.Setter;
 @NoArgsConstructor
 @Builder
 public class ChatMessageRequestDto {
-    private Long senderId;
     private String message;
 }

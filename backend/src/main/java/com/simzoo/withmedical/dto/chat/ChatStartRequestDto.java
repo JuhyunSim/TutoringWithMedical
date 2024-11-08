@@ -12,7 +12,6 @@ import lombok.Setter;
 @Builder
 @Setter
 public class ChatStartRequestDto {
-    private Long senderId;
     private Long recipientId;
     private String message;
 }

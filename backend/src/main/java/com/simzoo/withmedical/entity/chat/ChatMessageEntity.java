@@ -1,6 +1,8 @@
-package com.simzoo.withmedical.entity;
+package com.simzoo.withmedical.entity.chat;
 
 import com.simzoo.withmedical.dto.chat.ChatMessageResponseDto;
+import com.simzoo.withmedical.entity.BaseEntity;
+import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.MessageType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
