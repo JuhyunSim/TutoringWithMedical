@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import axiosInstance from '../axios/AxiosInstance';
 import { eventWrapper } from '@testing-library/user-event/dist/utils';
 import mockPostings from './mockData'; 
 import './TuteePostList.css';
@@ -74,7 +75,6 @@ const TuteePostList = ({ memberId, memberRole }) => {
                     const message = messageInput.value;
                     if (message.trim()) {
                         window.opener.postMessage({
-                            senderId: ${memberId},
                             recipientId: ${posting.memberId},
                             message: message
                         }, '*');
@@ -90,17 +90,19 @@ const TuteePostList = ({ memberId, memberRole }) => {
     useEffect(() => {
         const handleMessage = async (event) => {
             if (!messageSent) { 
-                const { senderId, recipientId, message } = event.data;
+                const { recipientId, message } = event.data;
+                
+                console.log('recipientId: ', recipientId)
+
                 try {
-                    const response = await axios.post(`${process.env.REACT_APP_BACKEND_URL}/chat/start`, {
-                        senderId: senderId,
+                    const response = await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/start`,
+                    {
                         recipientId: recipientId,
                         message: message
                     });
                     const roomId = response.data; 
 
-                    await axios.post(`${process.env.REACT_APP_BACKEND_URL}/chat/${roomId}`, {
-                        senderId: senderId,
+                    await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/${roomId}`, {
                         recipientId: recipientId,
                         message: message
                     });

@@ -57,7 +57,9 @@ public class JwtUtil {
 
         SecretKey key = new SecretKeySpec(secret.getBytes(), "HmacSHA256");
 
-        expiredToken(token);
+        if (expiredToken(token)) {
+            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+        }
 
         try {
             Jwts.parser()
@@ -74,7 +76,7 @@ public class JwtUtil {
 
     public boolean expiredToken(String token) throws CustomException{
         if (new Date().after(extractAll(token).getExpiration())) {
-            throw new CustomException(ErrorCode.TOKEN_EXPIRED);
+            return true;
         }
         return false;
     }

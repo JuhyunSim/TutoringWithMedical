@@ -3,6 +3,7 @@ package com.simzoo.withmedical.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import com.simzoo.withmedical.dto.MemberResponseDto;
+import com.simzoo.withmedical.entity.chat.ChatRoomMember;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.exception.CustomException;
@@ -65,6 +66,9 @@ public class MemberEntity extends BaseEntity{
     @OneToMany(fetch = LAZY)
     @JoinColumn(insertable = false, updatable = false)
     private List<TuteeProfileEntity> tuteeProfiles;
+
+    @OneToMany(fetch = LAZY)
+    private List<ChatRoomMember> chatRooms = new ArrayList<>();
 
     public MemberResponseDto toResponseDto() {
         return MemberResponseDto.builder()
