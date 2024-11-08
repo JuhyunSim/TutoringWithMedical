@@ -1,15 +1,19 @@
-/* Sidebar.css */
+/* MyProfile.css */
+.profile-container {
+    display: flex;
+    height: 100vh;
+}
+
 .sidebar {
     width: 200px;
-    height: 100vh;
     padding: 20px;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     position: fixed;
-    top: 0;
+    top: 200px;
     bottom: 0;
-    left: 8%; /* 8% 여백에 고정 */
+    left: 0;
     overflow-y: auto;
-    margin-top: 210px;
+    margin-left: 8%; /* 왼쪽 여백 추가 */
 }
 
 .sidebar ul {
@@ -17,9 +21,11 @@
     padding: 0;
     font-size: 18px;
 }
-
 .sidebar ul li {
     font-size: 18px;
+}
+
+.sidebar li {
     margin-bottom: 15px;
 }
 
@@ -30,6 +36,7 @@
 }
 
 .sidebar ul li a {
+    margin-top: auto;
     display: block;
     padding: 10px 15px;
     background-color: #007bff; /* 버튼 배경색 */
@@ -44,8 +51,14 @@
 }
 
 .sidebar a.active {
-    color: #bdd5ef;
+    color: #07294d;
     border-left: 4px solid #007bff;
     padding-left: 16px;
     font-weight: bold;
+}
+
+.content {
+    margin-left: 220px;
+    padding: 20px;
+    width: 100%;
 }

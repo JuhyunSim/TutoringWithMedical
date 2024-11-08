@@ -46,11 +46,7 @@
 }
 
 .main-content {
-  margin-top: 210px; /* Sidebar의 상단 여백과 일치 */
-  margin-left: calc(200px + 10%); /* Sidebar의 너비 + 8% 왼쪽 여백 */
-  margin-right: calc(200px + 8%); /* 오른쪽 여백: Sidebar 너비 + 8% */
-  padding: 20px;
-  
+  margin-top: 250px; /* Offset for fixed header */
 }
 
 ul {

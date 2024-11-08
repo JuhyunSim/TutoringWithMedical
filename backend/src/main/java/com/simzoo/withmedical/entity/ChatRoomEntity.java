@@ -5,9 +5,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import java.util.ArrayList;
-import java.util.List;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,8 +26,10 @@ public class ChatRoomEntity extends BaseEntity{
 
     private String title;
 
-    @OneToMany(fetch = FetchType.LAZY)
-    List<MemberEntity> members = new ArrayList<>();
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MemberEntity participant1;
+    @ManyToOne(fetch = FetchType.LAZY)
+    private MemberEntity participant2;
 
     private Long createdBy;
 }
