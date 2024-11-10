@@ -5,7 +5,7 @@ import com.simzoo.withmedical.dto.auth.LoginRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
-import com.simzoo.withmedical.repository.MemberRepository;
+import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.util.AesUtil;
 import com.simzoo.withmedical.util.JwtUtil;
 import java.time.LocalDateTime;
@@ -28,7 +28,8 @@ public class AuthService {
         String phoneNumber = requestDto.getPhoneNumber();
         String password = requestDto.getPassword();
 
-        MemberEntity memberEntity = memberRepository.findByPhoneNumber(AesUtil.generateHash(phoneNumber))
+        MemberEntity memberEntity = memberRepository.findByHashedPhoneNumber(
+                AesUtil.generateHash(phoneNumber))
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         if (notMatchPassword(memberEntity, password, passwordEncoder)) {

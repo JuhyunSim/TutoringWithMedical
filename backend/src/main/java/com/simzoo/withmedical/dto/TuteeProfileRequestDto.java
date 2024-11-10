@@ -22,7 +22,6 @@ public class TuteeProfileRequestDto {
             .location(location)
             .description(description)
             .grade(tuteeGrade)
-            .member(member)
             .subjects(new ArrayList<>())
             .build();
     }

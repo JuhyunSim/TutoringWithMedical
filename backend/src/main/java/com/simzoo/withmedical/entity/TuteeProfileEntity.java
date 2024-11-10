@@ -1,5 +1,7 @@
 package com.simzoo.withmedical.entity;
 
+import com.simzoo.withmedical.dto.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.tutee.TuteeProfileResponseDto;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import jakarta.persistence.Entity;
@@ -9,11 +11,10 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,9 +33,7 @@ public class TuteeProfileEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
-    private MemberEntity member;
+    private Long memberId;
 
     @Enumerated(EnumType.STRING)
     private Location location;
@@ -47,8 +46,38 @@ public class TuteeProfileEntity extends BaseEntity {
 
     private String description;
 
-
     public void addSubject(List<SubjectEntity> subjects) {
         this.getSubjects().addAll(subjects);
+    }
+
+    public TuteeProfileResponseDto toResponseDto() {
+
+        return TuteeProfileResponseDto.builder()
+            .tuteeId(id)
+            .location(location)
+            .subjects(subjects.stream().map(SubjectEntity::getSubject).toList())
+            .tuteeGrade(grade)
+            .description(description)
+            .build();
+
+    }
+
+    //Todo MultipartFile
+    public void updateProfile(UpdateTuteeProfileRequestDto updateTuteeProfileRequestDto) {
+        updateIfNotNull(updateTuteeProfileRequestDto.getTuteeGrade(),
+            tuteeGrade -> this.grade = tuteeGrade);
+        updateIfNotNull(updateTuteeProfileRequestDto.getDescription(),
+            description -> this.description = description);
+        updateIfNotNull(updateTuteeProfileRequestDto.getLocation(),
+            location -> this.location = location);
+        updateIfNotNull(updateTuteeProfileRequestDto.getSubjects(),
+            subjects -> this.subjects = subjects.stream().map(e -> SubjectEntity.of(e, this))
+                .toList());
+    }
+
+    private <T> void updateIfNotNull(T value, Consumer<T> updater) {
+        if (value != null) {
+            updater.accept(value);
+        }
     }
 }

@@ -4,11 +4,9 @@ import com.simzoo.withmedical.enums.Subject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,11 +25,9 @@ public class SubjectEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private TutorProfileEntity tutorProfile;
+    private Long tutorId;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    private TuteeProfileEntity tuteeProfileEntity;
+    private Long tuteeId;
 
     @Enumerated(EnumType.STRING)
     private Subject subject;
@@ -39,14 +35,14 @@ public class SubjectEntity extends BaseEntity {
     public static SubjectEntity of(Subject subject, TutorProfileEntity tutorProfile) {
         return SubjectEntity.builder()
             .subject(subject)
-            .tutorProfile(tutorProfile)
+            .tutorId(tutorProfile.getId())
             .build();
     }
 
     public static SubjectEntity of(Subject subject, TuteeProfileEntity tuteeProfile) {
         return SubjectEntity.builder()
             .subject(subject)
-            .tuteeProfileEntity(tuteeProfile)
+            .tuteeId(tuteeProfile.getId())
             .build();
     }
 }

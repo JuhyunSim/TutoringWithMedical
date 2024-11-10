@@ -9,7 +9,7 @@ import com.simzoo.withmedical.entity.chat.ChatRoomMember;
 import com.simzoo.withmedical.enums.filter.ChatRoomFilterType;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
-import com.simzoo.withmedical.repository.MemberRepository;
+import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.chat.message.ChatMessageRepository;
 import com.simzoo.withmedical.repository.chat.room.ChatRoomMemberRepository;
 import com.simzoo.withmedical.repository.chat.room.ChatRoomRepository;
