@@ -6,6 +6,7 @@ import static com.querydsl.core.group.GroupBy.list;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.dto.QTutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
+import com.simzoo.withmedical.entity.QMemberEntity;
 import com.simzoo.withmedical.entity.QSubjectEntity;
 import com.simzoo.withmedical.entity.QTutorProfileEntity;
 import java.util.List;
@@ -24,17 +25,19 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
     public Page<TutorSimpleResponseDto> findTutorProfileDtos(Pageable pageable) {
 
         QTutorProfileEntity tutorProfile = QTutorProfileEntity.tutorProfileEntity;
+        QMemberEntity member = QMemberEntity.memberEntity;
         QSubjectEntity subject = QSubjectEntity.subjectEntity;
 
         Map<Long, TutorSimpleResponseDto> results = jpaQueryFactory
             .from(tutorProfile)
+            .leftJoin(member).on(member.id.eq(tutorProfile.memberId))
             .leftJoin(tutorProfile.subjects, subject)
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .transform(groupBy(tutorProfile.id).as(
                 new QTutorSimpleResponseDto(
                     tutorProfile.id,
-                    tutorProfile.member.nickname,
+                    member.nickname,
                     tutorProfile.university,
                     tutorProfile.location,
                     list(subject.subject) // subjects 필드를 List로 변환

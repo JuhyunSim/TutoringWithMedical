@@ -2,8 +2,8 @@ package com.simzoo.withmedical.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.simzoo.withmedical.entity.TuteeProfileEntity;
-import com.simzoo.withmedical.entity.TutorProfileEntity;
+import com.simzoo.withmedical.dto.tutee.TuteeProfileResponseDto;
+import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import java.util.List;
@@ -26,9 +26,9 @@ public class MemberResponseDto {
     private String phoneNumber;
     private List<Role> role;
 
-    private TutorProfileEntity tutorProfile;
+    private TutorProfileResponseDto tutorProfile;
 
-    private TuteeProfileEntity tuteeProfile;
+    private TuteeProfileResponseDto tuteeProfile;
 
-    private List<TuteeProfileEntity> tuteeProfiles;
+    private List<TuteeProfileResponseDto> tuteeProfiles;
 }

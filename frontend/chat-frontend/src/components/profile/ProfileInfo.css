@@ -1,0 +1,83 @@
+.profile-info {
+    padding: 20px;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+  
+.profile-info h2 {
+    color: #007bff;
+    margin-bottom: 20px;
+}
+
+.profile-info p {
+    font-size: 1.1em;
+    margin: 10px 0;
+}
+
+.profile-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+  
+.edit-button, .save-button {
+    padding: 10px 20px;
+    font-size: 14px;
+    color: #fff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+  
+  .edit-button:hover, .save-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .edit-form label {
+    display: block;
+    margin-bottom: 10px;
+  }
+
+
+.profile-section {
+    margin-bottom: 30px; /* 섹션 간 간격 */
+}
+
+.profile-section label {
+    display: block;
+    margin-bottom: 15px; /* 항목 간 간격 */
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.profile-section span,
+.profile-section input,
+.profile-section textarea,
+.profile-section select {
+    display: block;
+    margin-top: 8px; /* 라벨과 입력 요소 간의 간격 */
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+textarea {
+    width: 100%;
+    min-height: 80px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+select[multiple] {
+    height: auto;
+    min-height: 60px;
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}

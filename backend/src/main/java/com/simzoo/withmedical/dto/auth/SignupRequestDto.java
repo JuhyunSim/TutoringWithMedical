@@ -55,11 +55,10 @@ public class SignupRequestDto {
         return MemberEntity.builder()
             .nickname(nickname)
             .gender(gender)
-            .phoneNumber(AesUtil.generateHash(phoneNumber))
+            .hashedPhoneNumber(AesUtil.generateHash(phoneNumber))
+            .encryptedPhoneNumber(AesUtil.encrypt(phoneNumber))
             .password(passwordEncoder.encode(password))
             .roles(new ArrayList<>())
             .build();
     }
-
-
 }

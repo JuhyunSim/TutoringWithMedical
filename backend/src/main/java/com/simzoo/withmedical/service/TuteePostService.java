@@ -8,7 +8,7 @@ import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TuteePostEntity;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
-import com.simzoo.withmedical.repository.MemberRepository;
+import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.tuteePost.TuteePostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

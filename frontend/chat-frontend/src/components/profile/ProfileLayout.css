@@ -2,10 +2,11 @@
 .profile-layout {
     display: flex;
     height: 100vh;
+    margin-top: 250px;
 }
 
 .profile-content {
-    margin-left: 220px; /* Sidebar 너비만큼 띄우기 */
+    margin-left: 320px; /* Sidebar 너비만큼 띄우기 */
     padding: 20px;
     overflow-y: auto;
     width: calc(100% - 220px); /* Sidebar를 제외한 영역 */

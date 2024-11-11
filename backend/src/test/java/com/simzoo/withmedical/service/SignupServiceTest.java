@@ -17,8 +17,8 @@ import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
-import com.simzoo.withmedical.repository.MemberRepository;
-import com.simzoo.withmedical.repository.SubjectRepository;
+import com.simzoo.withmedical.repository.member.MemberRepository;
+import com.simzoo.withmedical.repository.subject.SubjectRepository;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import com.simzoo.withmedical.util.AesUtil;
@@ -80,7 +80,7 @@ class SignupServiceTest {
             .nickname(requestDto.getNickname())
             .password(passwordEncoder.encode(requestDto.getPassword()))
             .gender(requestDto.getGender())
-            .phoneNumber(AesUtil.generateHash(requestDto.getPhoneNumber()))
+            .hashedPhoneNumber(AesUtil.generateHash(requestDto.getPhoneNumber()))
             .roles(new ArrayList<>())
             .build();
 
@@ -89,7 +89,7 @@ class SignupServiceTest {
             .description("description")
             .university(University.KOREA_UNIVERSITY)
             .status(EnrollmentStatus.ENROLLED)
-            .member(member)
+            .memberId(member.getId())
             .subjects(new ArrayList<>())
             .build();
 
@@ -99,11 +99,11 @@ class SignupServiceTest {
         when(memberRepository.save(argThat(e ->
             e.getNickname().equals(member.getNickname()) &&
                 e.getGender().equals(member.getGender()) &&
-                e.getPhoneNumber().equals(member.getPhoneNumber())
+                e.getHashedPhoneNumber().equals(member.getHashedPhoneNumber())
         ))).thenReturn(member);
 
         when(tutorProfileRepository.save(argThat(e ->
-            e.getMember().equals(member) &&
+            e.getMemberId().equals(member.getId()) &&
                 e.getLocation().equals(tutorProfile.getLocation()) &&
                 e.getUniversity().equals(tutorProfile.getUniversity()) &&
                 e.getStatus().equals(tutorProfile.getStatus()) &&
@@ -122,5 +122,4 @@ class SignupServiceTest {
         assertEquals(Gender.MALE, result.getGender());
         assertEquals(University.KOREA_UNIVERSITY, result.getTutorProfile().getUniversity());
     }
-
 }

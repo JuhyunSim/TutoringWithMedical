@@ -1,9 +1,7 @@
 package com.simzoo.withmedical.entity;
 
-import com.simzoo.withmedical.dto.ReviewRequestDto;
 import com.simzoo.withmedical.dto.ReviewResponseDto;
 import com.simzoo.withmedical.dto.UpdateReviewRequestDto;
-import com.simzoo.withmedical.dto.UpdateTuteePostingRequestDto;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -12,7 +10,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToOne;
-import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -43,7 +40,6 @@ public class ReviewEntity extends BaseEntity {
     public ReviewResponseDto toResponseDto() {
         return ReviewResponseDto.builder()
             .writerNickname(writer.getNickname())
-            .tutorNickname(tutorProfile.getMember().getNickname())
             .rating(rating)
             .reviewText(content)
             .createdAt(this.getCreatedAt())

@@ -29,7 +29,6 @@ public class TutorProfileRequestDto {
             .description(description)
             .university(university)
             .status(status)
-            .member(member)
             .subjects(new ArrayList<>())
             .build();
     }

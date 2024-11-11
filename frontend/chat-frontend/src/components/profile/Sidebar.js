@@ -7,19 +7,19 @@ const Sidebar = () => {
         <nav className="sidebar">
             <ul>
                 <li>
-                    <Link to="/profile/my-posts">나의 게시물</Link>
+                    <Link to="/me/my-posts">나의 게시물</Link>
                 </li>
                 <li>
-                    <Link to="/profile/profile-info">프로필</Link>
+                    <Link to="/me/profile">프로필</Link>
                 </li>
                 <li>
-                    <Link to="/profile/chatrooms">채팅방 목록</Link>
+                    <Link to="/me/chatrooms">채팅방 목록</Link>
                 </li>
                 <li>
-                    <Link to="/profile/delete-account">회원 탈퇴</Link>
+                    <Link to="/me/delete-account">회원 탈퇴</Link>
                 </li>
                 <li>
-                    <Link to="/profile/change-password">비밀번호 변경</Link>
+                    <Link to="/me/change-password">비밀번호 변경</Link>
                 </li>
             </ul>
         </nav>

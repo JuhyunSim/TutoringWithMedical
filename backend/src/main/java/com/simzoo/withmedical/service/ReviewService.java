@@ -7,7 +7,7 @@ import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.ReviewEntity;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
-import com.simzoo.withmedical.repository.MemberRepository;
+import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.review.ReviewRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

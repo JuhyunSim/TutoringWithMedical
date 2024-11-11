@@ -3,11 +3,13 @@ package com.simzoo.withmedical.entity;
 import static jakarta.persistence.FetchType.LAZY;
 
 import com.simzoo.withmedical.dto.MemberResponseDto;
+import com.simzoo.withmedical.dto.UpdateMemberRequestDto;
 import com.simzoo.withmedical.entity.chat.ChatRoomMember;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
+import com.simzoo.withmedical.util.AesUtil;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -23,6 +25,8 @@ import jakarta.persistence.OneToOne;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,7 +39,7 @@ import org.hibernate.envers.AuditOverride;
 @NoArgsConstructor
 @SuperBuilder
 @AuditOverride(forClass = BaseEntity.class)
-public class MemberEntity extends BaseEntity{
+public class MemberEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -44,7 +48,8 @@ public class MemberEntity extends BaseEntity{
     private String nickname;
     @Enumerated(EnumType.STRING)
     private Gender gender;
-    private String phoneNumber;
+    private String hashedPhoneNumber;
+    private String encryptedPhoneNumber;
     private String password;
     private String passwordConfirm;
     private LocalDateTime lastLogin;
@@ -75,11 +80,12 @@ public class MemberEntity extends BaseEntity{
             .id(id)
             .nickname(nickname)
             .gender(gender)
-            .phoneNumber(phoneNumber)
+            .phoneNumber(AesUtil.decrypt(encryptedPhoneNumber))
             .role(roles)
-            .tutorProfile(tutorProfile)
-            .tuteeProfiles(tuteeProfiles)
-            .tuteeProfile(tuteeProfile)
+            .tutorProfile(safeConvert(tutorProfile, TutorProfileEntity::toResponseDto))
+            .tuteeProfiles(tuteeProfiles == null ? List.of()
+                : tuteeProfiles.stream().map(TuteeProfileEntity::toResponseDto).toList())
+            .tuteeProfile(safeConvert(tuteeProfile, TuteeProfileEntity::toResponseDto))
             .build();
     }
 
@@ -110,5 +116,19 @@ public class MemberEntity extends BaseEntity{
 
     public void updateLastLogin(LocalDateTime now) {
         this.lastLogin = now;
+    }
+
+    public void updateInfo(UpdateMemberRequestDto requestDto) {
+        updateIfNotNull(requestDto.getNickname(), nickname -> this.nickname = nickname);
+    }
+
+    private <T> void updateIfNotNull(T value, Consumer<T> setter) {
+        if (value != null) {
+            setter.accept(value);
+        }
+    }
+
+    private <T, R> R safeConvert(T value, Function<T, R> mapper) {
+        return value == null ? null : mapper.apply(value);
     }
 }
