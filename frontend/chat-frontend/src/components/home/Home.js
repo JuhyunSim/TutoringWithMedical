@@ -5,8 +5,7 @@ import './Home.css';
 
 const Home = () => {
     return (
-        <div className="main-content">
-            {/* Categories Section */}
+        <div className="home-container">
             <div className="categories">
                 <Link to="/posts" className="category-link">학생 찾기</Link>
                 <Link to="/tutor-profiles" className="category-link">선생님 찾기</Link>
