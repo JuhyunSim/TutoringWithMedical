@@ -1,0 +1,152 @@
+.review-container {
+    margin: 20px auto;
+    max-width: 600px;
+}
+
+.review-list .review-item {
+    border: 1px solid #ddd;
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* 별 정렬 (왼쪽 정렬) */
+}
+
+.stars-container {
+    margin-bottom: 35px; /* 별점과 textarea 간 간격 */
+}
+
+.stars {
+    display: flex;
+    color: gold;
+}
+
+.star-wrapper {
+    position: relative;
+    display: inline-block;
+    width: 20px;
+    cursor: pointer;
+}
+
+.star {
+    font-size: 24px;
+    color: #ddd;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+
+.star.filled {
+    color: gold;
+}
+
+.star.half {
+    z-index: 1;
+    width: 50%;
+    overflow: hidden;
+    text-align: left;
+}
+
+.star.full {
+    z-index: 0;
+}
+
+
+.review-form {
+    position: relative; /* 부모 요소 기준으로 자식 요소 위치 지정 */
+    margin: 20px 0;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #fff;
+}
+
+/* 리뷰 작성 버튼 */
+.review-form .floating-button {
+    position: absolute;
+    bottom: 20px; /* 부모 요소의 하단에서 20px 위 */
+    right: 20px; /* 부모 요소의 우측에서 20px 안쪽 */
+    padding: 10px 15px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.review-form .floating-button:hover {
+    background-color: #0056b3;
+    transform: scale(1.1);
+}
+
+.pagination button {
+    margin: 0 5px;
+    padding: 5px 10px;
+}
+
+.pagination button.active {
+    font-weight: bold;
+    text-decoration: underline;
+}
+
+textarea {
+    width: 95%;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 40px; /* 버튼이 textarea와 겹치지 않도록 추가 공간 확보 */
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    resize: none;
+}
+
+.review-item {
+    position: relative;
+    margin-bottom: 16px;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+}
+
+.review-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 수평 정렬 */
+    margin-bottom: 8px; /* 리뷰 내용과 간격 */
+}
+
+.review-writer {
+    font-weight: bold;
+    margin: 0; /* 기본 여백 제거 */
+}
+
+.review-rating-stars {
+    display: flex;
+    gap: 4px; /* 별 사이의 간격 */
+}
+
+.review-text {
+    margin: 8px 0; /* 리뷰 내용 위아래 간격 */
+    line-height: 1.5; /* 가독성을 위한 줄 간격 */
+}
+
+.review-date {
+    position: absolute; /* 부모 요소인 .review-item을 기준으로 위치 지정 */
+    bottom: -5px; 
+    right: 12px; 
+    font-size: 0.875rem;
+    color: #666;
+}
+
+button {
+    margin-right: 8px;
+}

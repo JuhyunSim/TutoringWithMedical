@@ -2,11 +2,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../axios/AxiosInstance';
+import Review from '../review/Review';
 import './TutorProfile.css';
 
 const TutorProfile = () => {
     const { tutorId } = useParams();
     const [profile, setProfile] = useState(null);
+    const [showReviews, setShowReviews] = useState(false);
 
     useEffect(() => {
         fetchTutorProfile();
@@ -19,6 +21,10 @@ const TutorProfile = () => {
         } catch (error) {
             console.error('Failed to fetch tutor profile:', error);
         }
+    };
+
+    const toggleShowReviews = () => {
+        setShowReviews((prev) => !prev);
     };
 
     if (!profile) {
@@ -45,6 +51,17 @@ const TutorProfile = () => {
             <p>지역: {profile.location}</p>
             <p>등록 상태: {profile.status}</p>
             <p>소개: {profile.description}</p>
+
+            {/* 리뷰 버튼 */}
+            <button
+                className="review-toggle-button"
+                onClick={toggleShowReviews}
+            >
+                {showReviews ? '리뷰 닫기' : '리뷰 보기'}
+            </button>
+
+            {/* 리뷰 표시 */}
+            {showReviews && <Review tutorId={tutorId} />}
         </div>
     );
 };
