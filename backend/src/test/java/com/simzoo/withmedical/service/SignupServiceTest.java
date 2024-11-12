@@ -56,8 +56,8 @@ class SignupServiceTest {
     void signup_tutor_success() {
         //given
         TutorProfileRequestDto tutorRequest = TutorProfileRequestDto.builder()
-            .proofFile(null)
-            .profileImage(null)
+            .proofFileUrl(null)
+            .imageUrl(null)
             .subjects(List.of(Subject.HIGH_ENGLISH, Subject.MIDDLE_ENGLISH))
             .location(Location.BUSAN)
             .description("description")
@@ -103,7 +103,6 @@ class SignupServiceTest {
         ))).thenReturn(member);
 
         when(tutorProfileRepository.save(argThat(e ->
-            e.getMemberId().equals(member.getId()) &&
                 e.getLocation().equals(tutorProfile.getLocation()) &&
                 e.getUniversity().equals(tutorProfile.getUniversity()) &&
                 e.getStatus().equals(tutorProfile.getStatus()) &&

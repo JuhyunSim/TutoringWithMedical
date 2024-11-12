@@ -19,6 +19,7 @@ public class TuteeProfileRequestDto {
 
     public TuteeProfileEntity toEntity(MemberEntity member) {
         return TuteeProfileEntity.builder()
+            .memberId(member.getId())
             .location(location)
             .description(description)
             .grade(tuteeGrade)

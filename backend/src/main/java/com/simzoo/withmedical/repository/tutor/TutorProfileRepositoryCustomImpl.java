@@ -6,11 +6,14 @@ import static com.querydsl.core.group.GroupBy.list;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.dto.QTutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
+import com.simzoo.withmedical.dto.tutor.QTutorProfileResponseDto;
+import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.entity.QMemberEntity;
 import com.simzoo.withmedical.entity.QSubjectEntity;
 import com.simzoo.withmedical.entity.QTutorProfileEntity;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -31,16 +34,17 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
         Map<Long, TutorSimpleResponseDto> results = jpaQueryFactory
             .from(tutorProfile)
             .leftJoin(member).on(member.id.eq(tutorProfile.memberId))
-            .leftJoin(tutorProfile.subjects, subject)
+            .leftJoin(subject).on(subject.tutorId.eq(tutorProfile.id))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .transform(groupBy(tutorProfile.id).as(
                 new QTutorSimpleResponseDto(
                     tutorProfile.id,
+                    tutorProfile.imageUrl,
                     member.nickname,
                     tutorProfile.university,
                     tutorProfile.location,
-                    list(subject.subject) // subjects 필드를 List로 변환
+                    list(subject.subject)
                 )
             ));
 
@@ -52,5 +56,35 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             .fetchOne();
 
         return new PageImpl<>(tutorList, pageable, total);
+    }
+
+    @Override
+    public Optional<TutorProfileResponseDto> findTutorProfileDtoById(Long tutorId) {
+
+        QTutorProfileEntity tutorProfile = QTutorProfileEntity.tutorProfileEntity;
+        QMemberEntity member = QMemberEntity.memberEntity;
+        QSubjectEntity subject = QSubjectEntity.subjectEntity;
+
+        Map<Long, TutorProfileResponseDto> result = jpaQueryFactory
+            .from(tutorProfile)
+            .leftJoin(member).on(member.id.eq(tutorProfile.memberId))
+            .leftJoin(subject).on(subject.tutorId.eq(tutorProfile.id))
+            .where(tutorProfile.id.eq(tutorId))
+            .transform(groupBy(tutorProfile.id).as(
+                new QTutorProfileResponseDto(
+                    tutorProfile.id,
+                    member.nickname,
+                    tutorProfile.imageUrl,
+                    member.gender,
+                    list(subject.subject),
+                    tutorProfile.location,
+                    tutorProfile.university,
+                    tutorProfile.status,
+                    tutorProfile.description
+                )
+            ));
+
+        TutorProfileResponseDto dtoResult = result.get(tutorId);
+        return Optional.ofNullable(dtoResult);
     }
 }

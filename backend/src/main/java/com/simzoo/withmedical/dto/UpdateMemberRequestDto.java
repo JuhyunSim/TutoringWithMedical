@@ -12,7 +12,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @AllArgsConstructor
@@ -27,8 +26,8 @@ public class UpdateMemberRequestDto {
     @Getter
     @Builder
     public static class UpdateTutorProfileRequestDto {
-        private MultipartFile proofFile;
-        private MultipartFile profileImage;
+        private String proofFileUrl;
+        private String imageUrl;
         private List<Subject> subjects;
         private Location location;
         private String description;

@@ -92,6 +92,40 @@ const ProfileEdit = () => {
             <h2>프로필 수정</h2>
 
             <div className="input-group">
+            <div className="profile-image-container">
+                {profile.tutorProfile.imageUrl ? (
+                    <img src={`${process.env.REACT_APP_BACKEND_URL}${profile.tutorProfile.imageUrl}`} alt="Profile" className="profile-image" />
+                ) : (
+                    <div className="placeholder-image">이미지 없음</div>
+                )}
+            </div>
+            <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                    const file = e.target.files[0];
+                    const formData = new FormData();
+                    formData.append("file", file);
+
+                    // Upload the image
+                    axios
+                        .post(`${process.env.REACT_APP_BACKEND_URL}/api/images/upload`, formData, {
+                            headers: { "Content-Type": "multipart/form-data" },
+                        })
+                        .then((response) => {
+                            setProfile((prev) => ({
+                                ...prev,
+                                tutorProfile: {
+                                    ...prev.tutorProfile,
+                                    imageUrl: response.data,
+                                },
+                            }));
+                            alert("이미지가 성공적으로 업로드되었습니다!");
+                        })
+                        .catch(() => alert("이미지 업로드에 실패했습니다."));
+                }}
+            />
+
                 <label>닉네임</label>
                 <input
                     type="text"

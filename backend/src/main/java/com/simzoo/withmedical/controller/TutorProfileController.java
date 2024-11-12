@@ -22,7 +22,7 @@ public class TutorProfileController {
     private final TutorProfileService tutorProfileService;
 
     /**
-     * 선생님 프로필 전체 조회
+     * 선생님 프로필 목록 조회
      */
     @GetMapping
     public ResponseEntity<Page<TutorSimpleResponseDto>> getTutorProfiles(
@@ -36,6 +36,6 @@ public class TutorProfileController {
      */
     @GetMapping("/{tutorId}")
     public ResponseEntity<TutorProfileResponseDto> getTutorProfile(@PathVariable Long tutorId) {
-        return ResponseEntity.ok(tutorProfileService.getTutorDetail(tutorId).toResponseDto());
+        return ResponseEntity.ok(tutorProfileService.getTutorDetail(tutorId));
     }
 }

@@ -34,7 +34,7 @@ public class TutorProfileEntity extends BaseEntity {
     private Long id;
 
     private Long memberId;
-
+    private String imageUrl;
     @OneToMany(fetch = FetchType.LAZY)
     private List<SubjectEntity> subjects = new ArrayList<>();
 
@@ -53,6 +53,7 @@ public class TutorProfileEntity extends BaseEntity {
 
         return TutorProfileResponseDto.builder()
             .tutorId(id)
+            .imageUrl(imageUrl)
             .subjects(this.subjects.stream().map(SubjectEntity::getSubject).toList())
             .location(this.location)
             .university(this.university)
@@ -67,6 +68,8 @@ public class TutorProfileEntity extends BaseEntity {
 
     //Todo MultipartFile
     public void updateProfile(UpdateTutorProfileRequestDto updateTutorProfileRequestDto) {
+
+        updateIfNotNull(updateTutorProfileRequestDto.getImageUrl(), imageUrl -> this.imageUrl = imageUrl);
 
         updateIfNotNull(updateTutorProfileRequestDto.getLocation(), location -> this.location = location);
 

@@ -10,13 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
 import lombok.Getter;
-import org.springframework.web.multipart.MultipartFile;
 
 @Getter
 @Builder
 public class TutorProfileRequestDto {
-    private MultipartFile proofFile;
-    private MultipartFile profileImage;
+    private String proofFileUrl;
+    private String imageUrl;
     private List<Subject> subjects;
     private Location location;
     private String description;
@@ -25,6 +24,8 @@ public class TutorProfileRequestDto {
 
     public TutorProfileEntity toEntity(MemberEntity member) {
         return TutorProfileEntity.builder()
+            .memberId(member.getId())
+            .imageUrl(imageUrl)
             .location(location)
             .description(description)
             .university(university)

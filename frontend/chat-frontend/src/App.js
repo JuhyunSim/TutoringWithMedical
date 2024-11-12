@@ -57,7 +57,10 @@ const App = () => {
                         <Route path="/login" element={<MainContentWrapper><Login onLogin={handleLogin} /></MainContentWrapper>} />
                         <Route path="/signup" element={<MainContentWrapper><Signup /></MainContentWrapper>} />
                         <Route path="/posting-form" element={<MainContentWrapper><PostingForm /></MainContentWrapper>} />
-                        
+                        <Route path="/posts" element={<MainContentWrapper><TuteePostList memberId={memberId} memberRole={memberRole}/></MainContentWrapper>}/>
+                        <Route path="/tutor-profiles" element={<MainContentWrapper><TutorList /></MainContentWrapper>} />
+                        <Route path="/tutor-profiles/:tutorId" element={<MainContentWrapper><TutorProfile/></MainContentWrapper>}/>
+
                         {/* MyProfile 내부 라우트 설정 */}
                         <Route path="/me" element={<ProfileLayout />}>
                             <Route path="my-posts" element={<MyPosts />} />\
@@ -69,9 +72,7 @@ const App = () => {
                             <Route path="change-password" element={<ChangePassword />} />
                         </Route>
                         
-                        <Route path="/posts" element={<TuteePostList memberId={memberId} memberRole={memberRole}/>}/>
-                        <Route path="/tutor-profiles" element={<TutorList />} />
-                        <Route path="/tutor-profiles/:tutorId" element={<TutorProfile/>}/>
+                        
                         {/* Chat Layout */}
                         <Route path="/chatrooms" element={<ChatLayout />}>
                             <Route path=":roomId" element={<ChatRoom memberId={memberId} memberNickname={memberNickname} memberRole={memberRole} recipientId={recipientId}/>}/>

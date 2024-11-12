@@ -13,15 +13,17 @@ import lombok.NoArgsConstructor;
 public class TutorSimpleResponseDto {
 
     private Long id;
+    private String imageUrl;
     private String nickname;
     private University university;
     private Location location;
     private List<Subject> subjects;
 
     @QueryProjection
-    public TutorSimpleResponseDto(Long id, String nickname, University university, Location location,
+    public TutorSimpleResponseDto(Long id, String imageUrl, String nickname, University university, Location location,
         List<Subject> subjects) {
         this.id = id;
+        this.imageUrl = imageUrl;
         this.nickname = nickname;
         this.university = university;
         this.location = location;

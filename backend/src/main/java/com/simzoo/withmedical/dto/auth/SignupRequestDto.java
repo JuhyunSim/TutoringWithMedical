@@ -36,6 +36,8 @@ public class SignupRequestDto {
     @NotNull
     private Gender gender;
 
+    private String imageUrl;
+
     @NotBlank
     @PhoneNumber
     private String phoneNumber;
