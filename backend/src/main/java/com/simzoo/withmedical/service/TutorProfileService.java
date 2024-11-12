@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
-import com.simzoo.withmedical.entity.TutorProfileEntity;
+import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
@@ -29,8 +29,8 @@ public class TutorProfileService {
      * 선생님 개별조회
      */
     @Transactional(readOnly = true)
-    public TutorProfileEntity getTutorDetail(Long tutorId) {
-        return tutorProfileRepository.findById(tutorId)
+    public TutorProfileResponseDto getTutorDetail(Long tutorId) {
+        return tutorProfileRepository.findTutorProfileDtoById(tutorId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
     }
 }

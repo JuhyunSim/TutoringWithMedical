@@ -27,7 +27,7 @@ public class MemberController {
 
     @PutMapping("/me")
     public ResponseEntity<?> updateMyInfo(@LoginId Long userId,
-        @RequestBody UpdateMemberRequestDto requestDt) {
-        return ResponseEntity.ok(memberService.updateMember(userId, requestDt).toResponseDto());
+        @RequestBody UpdateMemberRequestDto requestDto) {
+        return ResponseEntity.ok(memberService.updateMember(userId, requestDto).toResponseDto());
     }
 }
