@@ -39,6 +39,13 @@ const ProfileInfo = () => {
           수정
         </Link>
       </div>
+      <div className="profile-image-container">
+            {profile.tutorProfile.imageUrl ? (
+            <img src={`${process.env.REACT_APP_BACKEND_URL}${profile.tutorProfile.imageUrl}`} alt="Profile" className="profile-image" />
+            ) : (
+            <div className="placeholder-image">이미지 없음</div>
+            )}
+      </div>
       <div className="profile-section">
         <p><strong>닉네임:</strong> {profile.nickname}</p>
         <p><strong>성별:</strong> {profile.gender === "MALE" ? "남성" : "여성"}</p>

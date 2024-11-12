@@ -62,7 +62,9 @@ const Signup = () => {
     const [role, setRole] = useState('');
     const [tutorProfile, setTutorProfile] = useState({
         proofFile: null,
-        profileImage: null,
+        imageUrl: null,
+        proofFilePreview: null, 
+        profileImagePreview: null,
         subjects: [],
         location: '',
         description: '',
@@ -132,8 +134,38 @@ const Signup = () => {
     const nextStep = () => setStep((prev) => prev + 1);
     const prevStep = () => setStep((prev) => prev - 1);
 
-    const handleFileChange = (e, field) => {
-        setTutorProfile({ ...tutorProfile, [field]: e.target.files[0] });
+    const handleFileChange = async (e, field) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        // Update preview URL
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setTutorProfile((prev) => ({
+                ...prev,
+                [`${field}Preview`]: reader.result, // Update preview field
+            }));
+        };
+        reader.readAsDataURL(file);
+
+        // Upload the file to the server
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const response = await axios.post(
+                `${process.env.REACT_APP_BACKEND_URL}/api/images/upload`,
+                formData,
+                { headers: { 'Content-Type': 'multipart/form-data' } }
+            );
+            setTutorProfile((prev) => ({
+                ...prev,
+                [field]: response.data, // Save the uploaded file URL
+            }));
+        } catch (err) {
+            console.error('Failed to upload file:', err);
+            setError('이미지 업로드에 실패했습니다. 다시 시도해 주세요.');
+        }
     };
 
     const handleAddTuteeProfile = () => {
@@ -242,7 +274,22 @@ const Signup = () => {
                             </div>
                             <div className="input-group">
                                 <label>Profile Image</label>
-                                <input type="file" onChange={(e) => handleFileChange(e, 'profileImage')} />
+                                <div className="profile-image-container">
+                                    {tutorProfile.profileImagePreview ? (
+                                        <img
+                                            src={tutorProfile.profileImagePreview}
+                                            alt="Profile Preview"
+                                            className="preview-image"
+                                        />
+                                    ) : (
+                                        <div className="placeholder-image">이미지 없음</div>
+                                    )}
+                                </div>
+                                <input
+                                    type="file"
+                                    onChange={(e) => handleFileChange(e, 'imageUrl')}
+                                    accept="image/*"
+                                />
                             </div>
                             <div className="input-group">
                                 <label>Subjects</label>

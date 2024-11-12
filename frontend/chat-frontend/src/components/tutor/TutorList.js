@@ -35,7 +35,16 @@ const TutorList = () => {
             <h2>선생님 목록</h2>
             <div className="tutor-grid">
                 {tutors.map(tutor => (
-                    <div key={tutor.nickname} className="tutor-item">
+                    <div key={tutor.id} className="tutor-item">
+                        {tutor.imageUrl ? (
+                            <img
+                                src={`${process.env.REACT_APP_BACKEND_URL}${tutor.imageUrl}`}
+                                alt={`${tutor.nickname}의 프로필 이미지`}
+                                className="tutor-image"
+                            />
+                        ) : (
+                            <div className="placeholder-image">이미지 없음</div>
+                        )}
                         <h3>{tutor.nickname}</h3>
                         <p>학교: {tutor.university}</p>
                         <p>지역: {tutor.location}</p>
