@@ -42,10 +42,10 @@ public class ReviewController {
      * 리뷰 수정
      */
     @PutMapping("/{reviewId}")
-    public ResponseEntity<ReviewResponseDto> updateReview(@PathVariable Long reviewId,
+    public ResponseEntity<ReviewResponseDto> updateReview(@LoginId Long userId, @PathVariable Long reviewId,
         @RequestBody UpdateReviewRequestDto requestDto) {
 
-        return ResponseEntity.ok(reviewService.changeReview(reviewId, requestDto).toResponseDto());
+        return ResponseEntity.ok(reviewService.changeReview(userId, reviewId, requestDto).toResponseDto());
     }
 
     /**
@@ -61,10 +61,10 @@ public class ReviewController {
     /**
      * 리뷰 삭제
      */
-    @DeleteMapping({"reviewID"})
-    public ResponseEntity<Void> deleteReview(@PathVariable Long reviewId) {
+    @DeleteMapping({"{reviewId}"})
+    public ResponseEntity<Void> deleteReview(@LoginId Long userId, @PathVariable Long reviewId) {
 
-        reviewService.deleteReview(reviewId);
+        reviewService.deleteReview(userId, reviewId);
         return ResponseEntity.ok().build();
     }
 }

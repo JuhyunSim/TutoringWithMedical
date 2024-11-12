@@ -9,7 +9,6 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -28,7 +27,7 @@ public class ReviewEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "memberId")
     private MemberEntity writer;
     @ManyToOne(fetch = FetchType.LAZY)
@@ -39,6 +38,7 @@ public class ReviewEntity extends BaseEntity {
 
     public ReviewResponseDto toResponseDto() {
         return ReviewResponseDto.builder()
+            .reviewId(id)
             .writerNickname(writer.getNickname())
             .rating(rating)
             .reviewText(content)

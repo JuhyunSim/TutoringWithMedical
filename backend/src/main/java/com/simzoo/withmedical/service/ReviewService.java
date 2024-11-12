@@ -25,20 +25,25 @@ public class ReviewService {
     @Transactional
     public ReviewEntity saveReview(Long userId, ReviewRequestDto requestDto) {
 
+        reviewRepository.findByTutorProfile_IdAndWriter_Id(requestDto.getTutorProfileId(), userId)
+            .ifPresent(existingReview -> {
+                throw new CustomException(ErrorCode.ALREADY_EXIST_REVIEW);
+            });
+
         MemberEntity tutor = memberRepository.findByTutorProfile_Id(
-            requestDto.getTutorProfileId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+                requestDto.getTutorProfileId())
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
-        MemberEntity writer = memberRepository.findById(
-            requestDto.getTutorProfileId()).orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
-
+        MemberEntity writer = memberRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         return reviewRepository.save(requestDto.toEntity(tutor, writer));
     }
 
     @Transactional
-    public ReviewEntity changeReview(Long reviewId, UpdateReviewRequestDto requestDto) {
+    public ReviewEntity changeReview(Long userId, Long reviewId, UpdateReviewRequestDto requestDto) {
 
-        ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
+        ReviewEntity reviewEntity = reviewRepository.findByIdAndWriter_Id(reviewId, userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
         reviewEntity.update(requestDto);
@@ -56,8 +61,8 @@ public class ReviewService {
      * 리뷰 삭제
      */
     @Transactional
-    public void deleteReview(Long reviewId) {
-        ReviewEntity reviewEntity = reviewRepository.findById(reviewId)
+    public void deleteReview(Long userId, Long reviewId) {
+        ReviewEntity reviewEntity = reviewRepository.findByIdAndWriter_Id(reviewId, userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_REVIEW));
 
         reviewRepository.delete(reviewEntity);
