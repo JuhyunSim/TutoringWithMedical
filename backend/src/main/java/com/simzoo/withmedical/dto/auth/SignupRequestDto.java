@@ -1,6 +1,7 @@
 package com.simzoo.withmedical.dto.auth;
 
-import com.simzoo.withmedical.dto.TuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.tutee.ParentTuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
 import com.simzoo.withmedical.dto.tutor.TutorProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Gender;
@@ -51,7 +52,7 @@ public class SignupRequestDto {
 
     private TutorProfileRequestDto tutorProfile;
     private TuteeProfileRequestDto tuteeProfile;
-    private List<TuteeProfileRequestDto> tuteeProfiles = new ArrayList<>();
+    private List<ParentTuteeProfileRequestDto> tuteeProfiles = new ArrayList<>();
 
     public MemberEntity toMemberEntity(PasswordEncoder passwordEncoder) {
         return MemberEntity.builder()

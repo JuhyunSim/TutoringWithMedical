@@ -3,7 +3,6 @@ package com.simzoo.withmedical.repository.member;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.QMemberEntity;
-import com.simzoo.withmedical.entity.QSubjectEntity;
 import com.simzoo.withmedical.entity.QTuteeProfileEntity;
 import com.simzoo.withmedical.entity.QTutorProfileEntity;
 import java.util.Optional;
@@ -20,12 +19,24 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
         QMemberEntity member = QMemberEntity.memberEntity;
         QTutorProfileEntity tutorProfile = QTutorProfileEntity.tutorProfileEntity;
         QTuteeProfileEntity tuteeProfile = QTuteeProfileEntity.tuteeProfileEntity;
-        QSubjectEntity subject = QSubjectEntity.subjectEntity;
 
         return Optional.ofNullable(queryFactory.selectFrom(member)
             .leftJoin(member.tutorProfile, tutorProfile).fetchJoin()
-            .leftJoin(member.tuteeProfile, tuteeProfile).fetchJoin()
+            .leftJoin(member.tuteeProfiles, tuteeProfile).fetchJoin()
             .where(member.id.eq(memberId))
             .fetchOne());
+    }
+
+    @Override
+    public Optional<MemberEntity> findParentWithTuteeProfile(Long memberId) {
+        QMemberEntity member = QMemberEntity.memberEntity;
+        QTuteeProfileEntity tuteeProfile = QTuteeProfileEntity.tuteeProfileEntity;
+
+        MemberEntity memberEntity = queryFactory.selectFrom(member)
+            .leftJoin(member.tuteeProfiles, tuteeProfile).fetchJoin()
+            .where(member.id.eq(memberId))
+            .fetchOne();
+
+        return Optional.ofNullable(memberEntity);
     }
 }

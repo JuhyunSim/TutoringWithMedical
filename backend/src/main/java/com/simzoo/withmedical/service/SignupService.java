@@ -42,8 +42,7 @@ public class SignupService {
 
             tuteeProfile.addSubject(subjectEntities);
 
-            member.saveTuteeProfile(tuteeProfile, requestDto.getRole());
-
+            member.saveTuteeProfiles(List.of(tuteeProfile), requestDto.getRole());
         } else if (requestDto.getRole() == Role.TUTOR) {
             TutorProfileEntity tutorProfile = tutorProfileRepository.save(
                 requestDto.getTutorProfile().toEntity(member));
@@ -56,13 +55,16 @@ public class SignupService {
             member.saveTutorProfile(tutorProfile, requestDto.getRole());
 
         } else {
-            tuteeProfileRepository.saveAll(
-                requestDto.getTuteeProfiles().stream().map(e -> {
-                    TuteeProfileEntity tuteeProfile = e.toEntity(member);
-                    List<SubjectEntity> subjects = saveTuteeSubjects(e.getSubjects(), tuteeProfile);
-                    tuteeProfile.addSubject(subjects);
-                    return tuteeProfile;
-                }).toList());
+            List<TuteeProfileEntity> tuteeProfileList = requestDto.getTuteeProfiles().stream().map(e -> {
+                TuteeProfileEntity tuteeProfile = e.toEntity(member);
+                List<SubjectEntity> subjectEntities = saveTuteeSubjects(e.getSubjects(),
+                    tuteeProfile);
+                tuteeProfile.addSubject(subjectEntities);
+                return tuteeProfile;
+            }).toList();
+
+            member.saveTuteeProfiles(tuteeProfileList, requestDto.getRole());
+            tuteeProfileRepository.saveAll(tuteeProfileList);
         }
         return member;
     }

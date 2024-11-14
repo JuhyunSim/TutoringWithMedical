@@ -21,7 +21,7 @@ import lombok.Setter;
 public class UpdateMemberRequestDto {
     private String nickname;
     private UpdateTutorProfileRequestDto tutorProfile;
-    private UpdateTuteeProfileRequestDto tuteeProfile;
+    private List<UpdateTuteeProfileRequestDto> tuteeProfile;
 
     @Getter
     @Builder
@@ -37,6 +37,7 @@ public class UpdateMemberRequestDto {
 
     @Getter
     public static class UpdateTuteeProfileRequestDto {
+        private Long tuteeId;
         private List<Subject> subjects = new ArrayList<>();
         private Location location;
         private TuteeGrade tuteeGrade;

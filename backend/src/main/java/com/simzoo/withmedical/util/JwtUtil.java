@@ -50,7 +50,7 @@ public class JwtUtil {
     public UserVo getUserVo(String token) {
         Claims claims = extractAll(token);
         return new UserVo(Long.valueOf(AesUtil.decrypt(claims.getId())),
-            AesUtil.decrypt(claims.getSubject()));
+            AesUtil.decrypt(claims.getSubject()), AesUtil.decrypt(extractRole(token)));
     }
 
     public boolean validateToken(String token) throws CustomException {

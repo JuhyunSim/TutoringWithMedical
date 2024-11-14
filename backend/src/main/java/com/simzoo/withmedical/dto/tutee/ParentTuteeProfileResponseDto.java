@@ -6,12 +6,10 @@ import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import java.util.ArrayList;
 import java.util.List;
-import lombok.Builder;
 import lombok.Getter;
 
 @Getter
-@Builder
-public class TuteeProfileResponseDto {
+public class ParentTuteeProfileResponseDto {
 
     private Long tuteeId;
     private String tuteeName;
