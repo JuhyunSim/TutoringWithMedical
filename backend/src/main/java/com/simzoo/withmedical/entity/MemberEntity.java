@@ -10,6 +10,7 @@ import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.util.AesUtil;
+import jakarta.annotation.Nullable;
 import jakarta.persistence.CollectionTable;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -62,17 +63,14 @@ public class MemberEntity extends BaseEntity {
 
     @OneToOne(fetch = LAZY)
     @JoinColumn(name = "memberId")
+    @Nullable
     private TutorProfileEntity tutorProfile;
 
-    @OneToOne(fetch = LAZY)
-    @JoinColumn(insertable = false, updatable = false)
-    private TuteeProfileEntity tuteeProfile;
-
-    @OneToMany(fetch = LAZY)
-    @JoinColumn(insertable = false, updatable = false)
+    @OneToMany(mappedBy = "member", fetch = LAZY)
+    @Nullable
     private List<TuteeProfileEntity> tuteeProfiles;
 
-    @OneToMany(fetch = LAZY)
+    @OneToMany(mappedBy = "member", fetch = LAZY)
     private List<ChatRoomMember> chatRooms = new ArrayList<>();
 
     public MemberResponseDto toResponseDto() {
@@ -85,15 +83,19 @@ public class MemberEntity extends BaseEntity {
             .tutorProfile(safeConvert(tutorProfile, TutorProfileEntity::toResponseDto))
             .tuteeProfiles(tuteeProfiles == null ? List.of()
                 : tuteeProfiles.stream().map(TuteeProfileEntity::toResponseDto).toList())
-            .tuteeProfile(safeConvert(tuteeProfile, TuteeProfileEntity::toResponseDto))
             .build();
     }
 
-    public void saveTuteeProfile(TuteeProfileEntity profile, Role role) {
-        if (role != Role.TUTEE) {
+    public void saveTuteeProfiles(List<TuteeProfileEntity> tuteeProfiles, Role role) {
+        if (role != Role.PARENT && role != Role.TUTEE) {
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
-        this.tuteeProfile = profile;
+
+        if (role == Role.TUTEE && tuteeProfiles.size() > 1) {
+            throw new CustomException(ErrorCode.TUTEE_PROFILE_CANNOT_EXCEED_ONE_PROFILE);
+        }
+
+        this.tuteeProfiles = tuteeProfiles;
     }
 
     public void saveTutorProfile(TutorProfileEntity profile, Role role) {
@@ -103,11 +105,21 @@ public class MemberEntity extends BaseEntity {
         this.tutorProfile = profile;
     }
 
-    public void addTutorProfile(TuteeProfileEntity profile, Role role) {
+    public void addTuteeProfile(TuteeProfileEntity profile, Role role) {
         if (role != Role.PARENT) {
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
+        if (this.tuteeProfiles == null) {
+            this.tuteeProfiles = new ArrayList<>();
+        }
         this.tuteeProfiles.add(profile);
+    }
+
+    public void removeTuteeProfile(TuteeProfileEntity profile) {
+        if (this.tuteeProfiles == null || !this.tuteeProfiles.contains(profile)) {
+            throw new CustomException(ErrorCode.INVALID_DATA);
+        }
+        this.tuteeProfiles.remove(profile);
     }
 
     public void addRole(Role role) {
@@ -120,6 +132,7 @@ public class MemberEntity extends BaseEntity {
 
     public void updateInfo(UpdateMemberRequestDto requestDto) {
         updateIfNotNull(requestDto.getNickname(), nickname -> this.nickname = nickname);
+        updateIfNotNull(requestDto.getGender(), gender -> this.gender = gender);
     }
 
     private <T> void updateIfNotNull(T value, Consumer<T> setter) {

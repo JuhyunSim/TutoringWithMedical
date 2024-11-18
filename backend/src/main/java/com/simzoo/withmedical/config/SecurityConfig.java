@@ -40,6 +40,9 @@ public class SecurityConfig {
                     .permitAll()
                     .requestMatchers(HttpMethod.GET, "/tutor")
                     .permitAll()
+//                    테스트 이후 활성화
+//                    .requestMatchers(HttpMethod.PUT, "/me/add-profile")
+//                    .hasAuthority("PARENT")
                     .anyRequest().permitAll()
             )
             .sessionManagement(

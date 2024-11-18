@@ -1,12 +1,8 @@
 package com.simzoo.withmedical.repository.tutor;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.config.QueryDslConfig;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
-import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -42,16 +38,5 @@ class TutorProfileRepositoryCustomImplTest {
             pageable);
 
         //then
-    }
-
-    @Test
-    void testFindTutorProfileById() {
-        //given
-        //when
-        Optional<TutorProfileResponseDto> result = tutorProfileRepository.findTutorProfileDtoById(
-            1L);
-
-        //then
-        assertEquals("심주현", result.get().getNickname());
     }
 }

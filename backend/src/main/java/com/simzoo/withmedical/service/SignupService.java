@@ -7,9 +7,9 @@ import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
+import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
-import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -42,8 +42,7 @@ public class SignupService {
 
             tuteeProfile.addSubject(subjectEntities);
 
-            member.saveTuteeProfile(tuteeProfile, requestDto.getRole());
-
+            member.saveTuteeProfiles(List.of(tuteeProfile), requestDto.getRole());
         } else if (requestDto.getRole() == Role.TUTOR) {
             TutorProfileEntity tutorProfile = tutorProfileRepository.save(
                 requestDto.getTutorProfile().toEntity(member));
@@ -56,13 +55,20 @@ public class SignupService {
             member.saveTutorProfile(tutorProfile, requestDto.getRole());
 
         } else {
-            tuteeProfileRepository.saveAll(
-                requestDto.getTuteeProfiles().stream().map(e -> {
-                    TuteeProfileEntity tuteeProfile = e.toEntity(member);
-                    List<SubjectEntity> subjects = saveTuteeSubjects(e.getSubjects(), tuteeProfile);
-                    tuteeProfile.addSubject(subjects);
+            //Todo 리스트 요소들을 하나씩 저장해야 하는 부분 비효율적
+            List<TuteeProfileEntity> tuteeProfileList = requestDto.getTuteeProfiles().stream()
+                .map(e -> {
+                    TuteeProfileEntity tuteeProfile = tuteeProfileRepository.save(
+                        e.toEntity(member));
+                    List<SubjectEntity> subjectEntities = saveTuteeSubjects(e.getSubjects(),
+                        tuteeProfile);
+                    tuteeProfile.addSubject(subjectEntities);
                     return tuteeProfile;
-                }).toList());
+                }).toList();
+
+            tuteeProfileRepository.saveAll(tuteeProfileList);
+
+            member.saveTuteeProfiles(tuteeProfileList, requestDto.getRole());
         }
         return member;
     }

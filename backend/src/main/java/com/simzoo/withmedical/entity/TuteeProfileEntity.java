@@ -2,6 +2,7 @@ package com.simzoo.withmedical.entity;
 
 import com.simzoo.withmedical.dto.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileResponseDto;
+import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import jakarta.persistence.Entity;
@@ -11,6 +12,8 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,12 +36,18 @@ public class TuteeProfileEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberId")
+    private MemberEntity member;
+
+    private String name;
+
+    private Gender gender;
 
     @Enumerated(EnumType.STRING)
     private Location location;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tuteeProfile")
     private List<SubjectEntity> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -47,32 +56,33 @@ public class TuteeProfileEntity extends BaseEntity {
     private String description;
 
     public void addSubject(List<SubjectEntity> subjects) {
+        if (subjects == null) {
+            subjects = new ArrayList<>();
+        }
+        this.subjects.clear();
         this.getSubjects().addAll(subjects);
     }
 
     public TuteeProfileResponseDto toResponseDto() {
-
         return TuteeProfileResponseDto.builder()
             .tuteeId(id)
+            .tuteeName(name)
+            .gender(gender)
             .location(location)
             .subjects(subjects.stream().map(SubjectEntity::getSubject).toList())
             .tuteeGrade(grade)
             .description(description)
             .build();
-
     }
 
-    //Todo MultipartFile
     public void updateProfile(UpdateTuteeProfileRequestDto updateTuteeProfileRequestDto) {
+        updateIfNotNull(updateTuteeProfileRequestDto.getTuteeName(), name -> this.name = name);
         updateIfNotNull(updateTuteeProfileRequestDto.getTuteeGrade(),
             tuteeGrade -> this.grade = tuteeGrade);
         updateIfNotNull(updateTuteeProfileRequestDto.getDescription(),
             description -> this.description = description);
         updateIfNotNull(updateTuteeProfileRequestDto.getLocation(),
             location -> this.location = location);
-        updateIfNotNull(updateTuteeProfileRequestDto.getSubjects(),
-            subjects -> this.subjects = subjects.stream().map(e -> SubjectEntity.of(e, this))
-                .toList());
     }
 
     private <T> void updateIfNotNull(T value, Consumer<T> updater) {

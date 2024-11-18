@@ -1,30 +1,28 @@
 import React, { useEffect, useState } from "react";
 import axios from "../axios/AxiosInstance";
-import { Link } from "react-router-dom";
+import MyTutorProfile from "./tutorProfile/MyTutorProfile";
+import MyTuteeProfile from "./tuteeProfile/MyTuteeProfile";
+import MyParentProfile from "./parentProfile/MyParentProfile";
 import "./ProfileInfo.css";
-
-const subjectDescriptions = {
-  ELEMENTARY_MATH: "초등수학",
-  MIDDLE_MATH: "중등수학",
-  HIGH_MATH: "고등수학",
-  ELEMENTARY_ENGLISH: "초등영어",
-  MIDDLE_ENGLISH: "중등영어",
-  HIGH_ENGLISH: "고등영어",
-};
 
 const ProfileInfo = () => {
   const [profile, setProfile] = useState(null);
   const [error, setError] = useState(null);
+  const [selectedProfileIndex, setSelectedProfileIndex] = useState(0); // 선택된 학생 프로필 인덱스
+
+  // 프로필 데이터 불러오기
+  const fetchProfile = async () => {
+    try {
+      const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/me`);
+      console.log("API 응답:", response.data); // 디버깅용
+      setProfile(response.data);
+    } catch (err) {
+      console.error("프로필 로드 실패:", err);
+      setError("프로필 정보를 불러오는 데 실패했습니다.");
+    }
+  };
 
   useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/me`);
-        setProfile(response.data);
-      } catch (err) {
-        setError("프로필 정보를 불러오는 데 실패했습니다.");
-      }
-    };
     fetchProfile();
   }, []);
 
@@ -34,35 +32,31 @@ const ProfileInfo = () => {
   return (
     <div className="profile-info">
       <div className="profile-header">
-        <h2>나의 프로필</h2>
-        <Link to="/me/profile/edit" className="edit-link">
-          수정
-        </Link>
+        <h2>내 프로필</h2>
       </div>
-      <div className="profile-image-container">
-            {profile.tutorProfile.imageUrl ? (
-            <img src={`${process.env.REACT_APP_BACKEND_URL}${profile.tutorProfile.imageUrl}`} alt="Profile" className="profile-image" />
-            ) : (
-            <div className="placeholder-image">이미지 없음</div>
-            )}
-      </div>
-      <div className="profile-section">
-        <p><strong>닉네임:</strong> {profile.nickname}</p>
-        <p><strong>성별:</strong> {profile.gender === "MALE" ? "남성" : "여성"}</p>
-      </div>
+
+      {/* 나의 프로필 */}
       {profile.role.includes("TUTOR") && (
-        <div className="profile-section">
-          <h3>선생님 프로필</h3>
-          <p><strong>대학교:</strong> {profile.tutorProfile.university}</p>
-          <p><strong>위치:</strong> {profile.tutorProfile.location}</p>
-          <p>
-            <strong>과목:</strong>{" "}
-            {profile.tutorProfile.subjects
-              .map((subject) => subjectDescriptions[subject])
-              .join(", ")}
-          </p>
-          <p><strong>소개:</strong> {profile.tutorProfile.description || "소개가 없습니다."}</p>
-        </div>
+        <MyTutorProfile
+          memberInfo={profile}
+          tutorProfile={profile.tutorProfile}
+          refreshProfile={fetchProfile}
+        />
+      )}
+      {profile.role.includes("TUTEE") && (
+        <MyTuteeProfile 
+        memberInfo={profile}
+        tuteeProfiles={profile.tuteeProfiles || []}
+        refreshProfile={fetchProfile} />
+      )}
+      {profile.role.includes("PARENT") && (
+        <MyParentProfile
+          parentInfo={profile}
+          tuteeProfiles={profile.tuteeProfiles || []}
+          selectedProfileIndex={selectedProfileIndex} // 상태 전달
+          setSelectedProfileIndex={setSelectedProfileIndex} // 상태 업데이트 함수 전달
+          refreshProfiles={fetchProfile} // 데이터 새로고침 전달
+        />
       )}
     </div>
   );

@@ -7,4 +7,5 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface SubjectRepository extends JpaRepository<SubjectEntity, Long>, SubjectRepositoryCustom {
 
+    void deleteAllByTuteeProfile_Id(Long tuteeId);
 }
