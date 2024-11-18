@@ -7,6 +7,8 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -25,9 +27,13 @@ public class SubjectEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long tutorId;
+    @ManyToOne
+    @JoinColumn(name = "tuteeId")
+    private TuteeProfileEntity tuteeProfile;
 
-    private Long tuteeId;
+    @ManyToOne
+    @JoinColumn(name = "tutorId")
+    private TutorProfileEntity tutorProfile;
 
     @Enumerated(EnumType.STRING)
     private Subject subject;
@@ -35,14 +41,14 @@ public class SubjectEntity extends BaseEntity {
     public static SubjectEntity of(Subject subject, TutorProfileEntity tutorProfile) {
         return SubjectEntity.builder()
             .subject(subject)
-            .tutorId(tutorProfile.getId())
+            .tutorProfile(tutorProfile)
             .build();
     }
 
     public static SubjectEntity of(Subject subject, TuteeProfileEntity tuteeProfile) {
         return SubjectEntity.builder()
             .subject(subject)
-            .tuteeId(tuteeProfile.getId())
+            .tuteeProfile(tuteeProfile)
             .build();
     }
 }

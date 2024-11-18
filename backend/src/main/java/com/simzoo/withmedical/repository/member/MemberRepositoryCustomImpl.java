@@ -28,7 +28,7 @@ public class MemberRepositoryCustomImpl implements MemberRepositoryCustom {
     }
 
     @Override
-    public Optional<MemberEntity> findParentWithTuteeProfile(Long memberId) {
+    public Optional<MemberEntity> findParentWithATuteeProfile(Long memberId) {
         QMemberEntity member = QMemberEntity.memberEntity;
         QTuteeProfileEntity tuteeProfile = QTuteeProfileEntity.tuteeProfileEntity;
 

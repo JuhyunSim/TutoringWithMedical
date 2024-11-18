@@ -51,6 +51,14 @@ public class MemberController {
             memberService.addTuteeProfile(userId, role, requestDto).toResponseDto());
     }
 
+    @PutMapping("/parent/tutee")
+    public ResponseEntity<MemberResponseDto> updateProfile(@LoginId Long userId,
+        @RequestBody UpdateMemberRequestDto requestDto) {
+
+        return ResponseEntity.ok(
+            memberService.updateParentProfile(userId, requestDto).toResponseDto());
+    }
+
     @DeleteMapping("/parent/tutee/{tuteeId}")
     public ResponseEntity<Void> deleteProfile(@LoginId Long userId, @PathVariable Long tuteeId) {
 

@@ -132,6 +132,7 @@ public class MemberEntity extends BaseEntity {
 
     public void updateInfo(UpdateMemberRequestDto requestDto) {
         updateIfNotNull(requestDto.getNickname(), nickname -> this.nickname = nickname);
+        updateIfNotNull(requestDto.getGender(), gender -> this.gender = gender);
     }
 
     private <T> void updateIfNotNull(T value, Consumer<T> setter) {

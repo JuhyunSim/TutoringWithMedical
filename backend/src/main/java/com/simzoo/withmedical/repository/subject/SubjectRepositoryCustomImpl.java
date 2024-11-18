@@ -16,7 +16,7 @@ public class SubjectRepositoryCustomImpl implements SubjectRepositoryCustom{
         QSubjectEntity subjectEntity = QSubjectEntity.subjectEntity;
 
         return queryFactory.selectFrom(subjectEntity)
-            .where(subjectEntity.tutorId.eq(tutorProfileId))
+            .where(subjectEntity.tutorProfile.id.eq(tutorProfileId))
             .fetch();
     }
 
@@ -25,7 +25,7 @@ public class SubjectRepositoryCustomImpl implements SubjectRepositoryCustom{
         QSubjectEntity subjectEntity = QSubjectEntity.subjectEntity;
 
         return queryFactory.selectFrom(subjectEntity)
-            .where(subjectEntity.tutorId.eq(tuteeProfileId))
+            .where(subjectEntity.tuteeProfile.id.eq(tuteeProfileId))
             .fetch();
     }
 

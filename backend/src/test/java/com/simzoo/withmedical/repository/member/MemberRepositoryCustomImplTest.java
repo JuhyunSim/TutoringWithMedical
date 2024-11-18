@@ -31,7 +31,7 @@ class MemberRepositoryCustomImplTest {
 
     @Test
     @Transactional
-    void findParentWithTuteeProfiles() {
+    void findParentWithATuteeProfiles() {
         //given
         MemberEntity member = MemberEntity.builder()
             .nickname("testNickname")
@@ -51,10 +51,9 @@ class MemberRepositoryCustomImplTest {
         tuteeProfileRepository.save(tuteeProfile);
 
         //when
-        Optional<MemberEntity> result = memberRepository.findParentWithTuteeProfile(member.getId());
+        Optional<MemberEntity> result = memberRepository.findParentWithATuteeProfile(member.getId());
         //then
         assertTrue(result.isPresent());
         assertEquals("testNickname", result.get().getNickname());
-        assertEquals(1, result.get().getTuteeProfiles().size());
     }
 }

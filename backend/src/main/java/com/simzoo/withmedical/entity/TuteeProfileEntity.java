@@ -47,7 +47,7 @@ public class TuteeProfileEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Location location;
 
-    @OneToMany(fetch = FetchType.LAZY)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tuteeProfile")
     private List<SubjectEntity> subjects = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
@@ -59,6 +59,7 @@ public class TuteeProfileEntity extends BaseEntity {
         if (subjects == null) {
             subjects = new ArrayList<>();
         }
+        this.subjects.clear();
         this.getSubjects().addAll(subjects);
     }
 
@@ -75,6 +76,7 @@ public class TuteeProfileEntity extends BaseEntity {
     }
 
     public void updateProfile(UpdateTuteeProfileRequestDto updateTuteeProfileRequestDto) {
+        updateIfNotNull(updateTuteeProfileRequestDto.getTuteeName(), name -> this.name = name);
         updateIfNotNull(updateTuteeProfileRequestDto.getTuteeGrade(),
             tuteeGrade -> this.grade = tuteeGrade);
         updateIfNotNull(updateTuteeProfileRequestDto.getDescription(),

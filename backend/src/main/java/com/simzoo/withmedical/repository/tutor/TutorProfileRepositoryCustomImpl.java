@@ -34,7 +34,7 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
         Map<Long, TutorSimpleResponseDto> results = jpaQueryFactory
             .from(tutorProfile)
             .leftJoin(member).on(member.id.eq(tutorProfile.memberId))
-            .leftJoin(subject).on(subject.tutorId.eq(tutorProfile.id))
+            .leftJoin(subject).on(subject.tutorProfile.id.eq(tutorProfile.id))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .transform(groupBy(tutorProfile.id).as(
@@ -68,14 +68,12 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
         Map<Long, TutorProfileResponseDto> result = jpaQueryFactory
             .from(tutorProfile)
             .leftJoin(member).on(member.id.eq(tutorProfile.memberId))
-            .leftJoin(subject).on(subject.tutorId.eq(tutorProfile.id))
+            .leftJoin(subject).on(subject.tutorProfile.id.eq(tutorProfile.id))
             .where(tutorProfile.id.eq(tutorId))
             .transform(groupBy(tutorProfile.id).as(
                 new QTutorProfileResponseDto(
                     tutorProfile.id,
-                    member.nickname,
                     tutorProfile.imageUrl,
-                    member.gender,
                     list(subject.subject),
                     tutorProfile.location,
                     tutorProfile.university,

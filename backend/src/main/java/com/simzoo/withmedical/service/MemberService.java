@@ -15,8 +15,6 @@ import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.PersistenceContext;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -33,8 +31,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
     private final TuteeProfileRepository tuteeProfileRepository;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Transactional(readOnly = true)
     public void checkMemberExist(String phoneNumber) {
@@ -55,8 +51,8 @@ public class MemberService {
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
 
         memberEntity.updateInfo(requestDto);
-        log.info("tutor profile = {}", memberEntity.getTutorProfile());
-        log.info("request profile = {}", requestDto.getTutorProfile());
+        log.debug("tutor profile = {}", memberEntity.getTutorProfile());
+        log.debug("request profile = {}", requestDto.getTutorProfile());
 
         if (memberEntity.getTutorProfile() != null && requestDto.getTutorProfile() != null) {
             updateTutorSubjectAndProfile(memberEntity, requestDto.getTutorProfile());
@@ -88,9 +84,20 @@ public class MemberService {
     }
 
     @Transactional
+    public MemberEntity updateParentProfile(Long userId, UpdateMemberRequestDto requestDto) {
+        MemberEntity memberEntity = memberRepository.findParentWithATuteeProfile(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        memberEntity.updateInfo(requestDto);
+
+        updateTuteeSubjectAndProfile(memberEntity, requestDto.getTuteeProfile());
+        return memberEntity;
+    }
+
+    @Transactional
     public void removeProfile(Long userId, Long tuteeId) {
 
-        subjectRepository.deleteAllByTuteeId(tuteeId);
+        subjectRepository.deleteAllByTuteeProfile_Id(tuteeId);
 
         TuteeProfileEntity tuteeProfile = tuteeProfileRepository.findByIdAndMember_Id(tuteeId,
                 userId)
@@ -130,29 +137,33 @@ public class MemberService {
     }
 
     private void updateTuteeSubjectAndProfile(MemberEntity member,
-        List<UpdateTuteeProfileRequestDto> requestDto) {
-        Map<Long, TuteeProfileEntity> tuteeProfileMap = member.getTuteeProfiles().stream()
-            .collect(Collectors.toMap(TuteeProfileEntity::getId, e -> e));
+        UpdateTuteeProfileRequestDto requestDto) {
 
-        requestDto.forEach(request -> {
-            TuteeProfileEntity tuteeProfile = tuteeProfileMap.get(request.getTuteeId());
-            //subject 저장
-            List<SubjectEntity> subjectEntities = subjectRepository.fetchTuteeSubjects(
-                request.getTuteeId());
+        Map<Long, TuteeProfileEntity> tuteeProfileMap = member.getTuteeProfiles().stream().collect(
+            Collectors.toMap(TuteeProfileEntity::getId, e -> e));
 
-            List<SubjectEntity> toDelete = subjectEntities.stream()
-                .filter(savedSubject -> !request.getSubjects().contains(savedSubject.getSubject()))
-                .toList();
+        TuteeProfileEntity tuteeProfile = tuteeProfileMap.get(requestDto.getTuteeId());
+        //subject 저장
+        List<SubjectEntity> subjectEntities = subjectRepository.fetchTuteeSubjects(
+                requestDto.getTuteeId());
 
-            List<SubjectEntity> toAdd = request.getSubjects().stream().filter(
-                    requestSubject -> !subjectEntities.stream().map(SubjectEntity::getSubject).toList()
-                        .contains(requestSubject))
-                .map(e -> SubjectEntity.of(e, tuteeProfile)).toList();
-            subjectRepository.deleteAll(toDelete);
-            subjectRepository.saveAll(toAdd);
-            //tuteeprofile 업데이트
-            tuteeProfile.addSubject(subjectRepository.fetchTuteeSubjects(request.getTuteeId()));
-            tuteeProfile.updateProfile(request);
-        });
+        List<SubjectEntity> toDelete = subjectEntities.stream()
+            .filter(savedSubject -> requestDto.getSubjects().stream()
+                .noneMatch(requestSubject -> requestSubject.equals(savedSubject.getSubject())))
+            .toList();
+        log.debug("toDelete = {}",
+            toDelete.isEmpty() ? "No subjects to delete" : toDelete.get(0).getSubject());
+        List<SubjectEntity> toAdd = requestDto.getSubjects().stream()
+            .filter(requestSubject -> subjectEntities.stream()
+                .noneMatch(savedSubject -> savedSubject.getSubject().equals(requestSubject)))
+            .map(e -> SubjectEntity.of(e, tuteeProfile))
+            .toList();
+        log.debug("toAdd = {}",
+            toAdd.isEmpty() ? "No subjects to add" : toAdd.get(0).getSubject());
+        subjectRepository.deleteAll(toDelete);
+        subjectRepository.saveAll(toAdd);
+        //tuteeprofile 업데이트
+        tuteeProfile.addSubject(subjectRepository.fetchTuteeSubjects(requestDto.getTuteeId()));
+        tuteeProfile.updateProfile(requestDto);
     }
 }
