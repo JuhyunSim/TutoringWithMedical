@@ -1,6 +1,6 @@
 package com.simzoo.withmedical.controller;
 
-import com.simzoo.withmedical.dto.MemberResponseDto;
+import com.simzoo.withmedical.dto.member.MemberResponseDto;
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
 import com.simzoo.withmedical.service.MemberService;
 import com.simzoo.withmedical.service.SignupService;

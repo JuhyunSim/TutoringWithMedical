@@ -2,6 +2,7 @@ package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.dto.auth.JwtResponseDto;
 import com.simzoo.withmedical.dto.auth.LoginRequestDto;
+import com.simzoo.withmedical.dto.member.ChangePasswordDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
@@ -41,6 +42,19 @@ public class AuthService {
         return JwtResponseDto.builder().accessToken(
             jwtUtil.generateAccessToken(memberEntity.getNickname(), memberEntity.getId(),
                 requestDto.getRole())).build();
+    }
+
+    @Transactional
+    public void changeMyPassword(Long userId, ChangePasswordDto requestDto) {
+
+        MemberEntity memberEntity = memberRepository.findById(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        if (notMatchPassword(memberEntity, requestDto.getOldPassword(), passwordEncoder)) {
+            throw new CustomException(ErrorCode.NOT_MATCH_PASSWORD);
+        }
+
+        memberEntity.changePassword(requestDto.getNewPassword(), passwordEncoder);
     }
 
     private static boolean notMatchPassword(MemberEntity member, String password,

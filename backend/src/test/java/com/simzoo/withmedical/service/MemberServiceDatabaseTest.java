@@ -1,14 +1,16 @@
 package com.simzoo.withmedical.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.simzoo.withmedical.config.QueryDslConfig;
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto;
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TuteeProfileEntity;
+import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
@@ -16,6 +18,7 @@ import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
+import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.DisplayName;
@@ -24,11 +27,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @Import({MemberService.class, QueryDslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 class  MemberServiceDatabaseTest {
 
     @Autowired
@@ -41,6 +46,8 @@ class  MemberServiceDatabaseTest {
     private TuteeProfileRepository tuteeProfileRepository;
     @Autowired
     private SubjectRepository subjectRepository;
+    @Autowired
+    private TutorProfileRepository tutorProfileRepository;
 
     @Test
     @DisplayName("학생프로필 저장 확인")
@@ -166,6 +173,91 @@ class  MemberServiceDatabaseTest {
         assertEquals(Subject.HIGH_ENGLISH,
             result.getTuteeProfiles().get(0).getSubjects().get(0).getSubject());
         assertEquals("updatedTuteeName", result.getTuteeProfiles().get(0).getName());
+    }
+
+    @Test
+    @DisplayName("회원삭제 테스트_학생 회원")
+    @Transactional
+    void cancleAccount() {
+        //given
+        Role role = Role.TUTEE;
+
+        TuteeProfileEntity tuteeProfile = TuteeProfileEntity.builder()
+            .name("tuteeName")
+            .gender(Gender.FEMALE)
+            .description("testDescription")
+            .subjects(new ArrayList<>())
+            .build();
+
+        TuteeProfileEntity savedTutee = tuteeProfileRepository.save(tuteeProfile);
+
+        SubjectEntity subject = SubjectEntity.builder()
+            .tuteeProfile(savedTutee)
+            .subject(Subject.ELEMENTARY_ENGLISH)
+            .build();
+
+        SubjectEntity savedSubject = subjectRepository.save(subject);
+
+        savedTutee.addSubject(List.of(savedSubject));
+
+        MemberEntity member = MemberEntity.builder()
+            .nickname("parent")
+            .gender(Gender.FEMALE)
+            .roles(List.of(role))
+            .build();
+
+        MemberEntity savedMember = memberRepository.save(member);
+        savedMember.saveTuteeProfiles(List.of(savedTutee), role);
+
+        //when
+         memberService.deleteMember(savedMember.getId());
+
+        //then
+        assertTrue(memberRepository.findById(savedMember.getId()).isEmpty());
+        assertTrue(tuteeProfileRepository.findAll().isEmpty());
+        assertTrue(subjectRepository.findAll().isEmpty());
+    }
+
+    @Test
+    @DisplayName("회원삭제 테스트_선생님 회원")
+    @Transactional
+    void cancleAccount_Tutor() {
+        //given
+        Role role = Role.TUTOR;
+
+        TutorProfileEntity tutorProfile = TutorProfileEntity.builder()
+            .imageUrl("testImage")
+            .description("testDescription")
+            .subjects(new ArrayList<>())
+            .build();
+
+        TutorProfileEntity savedTutor = tutorProfileRepository.save(tutorProfile);
+
+        SubjectEntity subject = SubjectEntity.builder()
+            .tutorProfile(savedTutor)
+            .subject(Subject.ELEMENTARY_ENGLISH)
+            .build();
+
+        SubjectEntity savedSubject = subjectRepository.save(subject);
+
+        savedTutor.addSubjects(List.of(savedSubject));
+
+        MemberEntity member = MemberEntity.builder()
+            .nickname("parent")
+            .gender(Gender.FEMALE)
+            .roles(List.of(role))
+            .build();
+
+        MemberEntity savedMember = memberRepository.save(member);
+        savedMember.saveTutorProfile(savedTutor, role);
+
+        //when
+        memberService.deleteMember(savedMember.getId());
+
+        //then
+        assertTrue(memberRepository.findById(savedMember.getId()).isEmpty());
+        assertTrue(tutorProfileRepository.findAll().isEmpty());
+        assertTrue(subjectRepository.findAll().isEmpty());
     }
 
 }

@@ -2,8 +2,8 @@ package com.simzoo.withmedical.entity;
 
 import static jakarta.persistence.FetchType.LAZY;
 
-import com.simzoo.withmedical.dto.MemberResponseDto;
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto;
+import com.simzoo.withmedical.dto.member.MemberResponseDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto;
 import com.simzoo.withmedical.entity.chat.ChatRoomMember;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
@@ -33,6 +33,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.hibernate.envers.AuditOverride;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity(name = "member")
 @Getter
@@ -54,6 +55,7 @@ public class MemberEntity extends BaseEntity {
     private String password;
     private String passwordConfirm;
     private LocalDateTime lastLogin;
+    private LocalDateTime passwordChangedAt;
 
     @Enumerated(EnumType.STRING)
     @ElementCollection(fetch = LAZY)
@@ -133,6 +135,11 @@ public class MemberEntity extends BaseEntity {
     public void updateInfo(UpdateMemberRequestDto requestDto) {
         updateIfNotNull(requestDto.getNickname(), nickname -> this.nickname = nickname);
         updateIfNotNull(requestDto.getGender(), gender -> this.gender = gender);
+    }
+
+    public void changePassword(String newPassword, PasswordEncoder passwordEncoder) {
+        this.password = passwordEncoder.encode(newPassword);
+        this.passwordChangedAt = LocalDateTime.now();
     }
 
     private <T> void updateIfNotNull(T value, Consumer<T> setter) {

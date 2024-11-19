@@ -1,6 +1,6 @@
 package com.simzoo.withmedical.entity;
 
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileResponseDto;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Location;

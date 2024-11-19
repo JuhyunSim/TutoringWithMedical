@@ -10,4 +10,5 @@
 .idea
 # security
 application.yml
+application-test.yml
 properties.env
