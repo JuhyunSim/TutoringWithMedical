@@ -1,8 +1,8 @@
 package com.simzoo.withmedical.service;
 
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto;
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
-import com.simzoo.withmedical.dto.UpdateMemberRequestDto.UpdateTutorProfileRequestDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTutorProfileRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
@@ -15,8 +15,11 @@ import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
+import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,7 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
     private final TuteeProfileRepository tuteeProfileRepository;
+    private final TutorProfileRepository tutorProfileRepository;
 
     @Transactional(readOnly = true)
     public void checkMemberExist(String phoneNumber) {
@@ -108,6 +112,34 @@ public class MemberService {
         MemberEntity memberEntity = memberRepository.findById(userId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
         memberEntity.removeTuteeProfile(tuteeProfile);
+    }
+
+    @Transactional
+    public void deleteMember(Long userId) {
+        MemberEntity memberEntity = memberRepository.findByIdWithProfile(userId)
+            .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
+
+        List<TuteeProfileEntity> tuteeProfiles = memberEntity.getTuteeProfiles();
+        TutorProfileEntity tutorProfile = memberEntity.getTutorProfile();
+
+        // 1. SubjectEntity 삭제
+        List<SubjectEntity> subjectsToDelete = new ArrayList<>();
+        Optional.ofNullable(tuteeProfiles).ifPresent(profiles ->
+            profiles.forEach(e -> subjectsToDelete.addAll(e.getSubjects()))
+        );
+        Optional.ofNullable(tutorProfile).ifPresent(profile ->
+            subjectsToDelete.addAll(profile.getSubjects())
+        );
+        subjectRepository.deleteAll(subjectsToDelete);
+
+        // 2. TuteeProfileEntity 삭제
+        Optional.ofNullable(tuteeProfiles).ifPresent(tuteeProfileRepository::deleteAll);
+
+        // 3. TutorProfileEntity 삭제
+        Optional.ofNullable(tutorProfile).ifPresent(tutorProfileRepository::delete);
+
+        // 4. MemberEntity 삭제
+        memberRepository.delete(memberEntity);
     }
 
     private void updateTutorSubjectAndProfile(MemberEntity member,

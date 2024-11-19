@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto;
+package com.simzoo.withmedical.dto.member;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
