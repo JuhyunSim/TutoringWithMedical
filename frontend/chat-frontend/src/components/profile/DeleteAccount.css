@@ -1,0 +1,32 @@
+.delete-account {
+    margin-left: 220px; /* Sidebar와의 거리 */
+    padding: 20px;
+    font-size: 18px;
+}
+
+.delete-account input {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+}
+
+.delete-account button {
+    padding: 10px 20px;
+    background-color: #d9534f;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.delete-account button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.delete-account .error-message {
+    color: red;
+    margin-top: 10px;
+}
