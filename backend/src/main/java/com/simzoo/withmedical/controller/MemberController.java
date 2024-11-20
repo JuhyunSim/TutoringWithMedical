@@ -1,6 +1,5 @@
 package com.simzoo.withmedical.controller;
 
-import com.simzoo.withmedical.dto.member.ChangePasswordDto;
 import com.simzoo.withmedical.dto.member.MemberResponseDto;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
@@ -14,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -81,22 +79,5 @@ public class MemberController {
         memberService.removeProfile(userId, tuteeId);
 
         return ResponseEntity.ok().build();
-    }
-
-    @DeleteMapping("/me")
-    public ResponseEntity<Void> cancleAccount(@LoginId Long userId) {
-
-        memberService.deleteMember(userId);
-
-        return ResponseEntity.ok().build();
-    }
-
-    @PatchMapping("/me/password")
-    public ResponseEntity<?> changePassword(@LoginId Long userId,
-        @RequestBody ChangePasswordDto requestDto) {
-
-        authService.changeMyPassword(userId, requestDto);
-
-        return null;
     }
 }
