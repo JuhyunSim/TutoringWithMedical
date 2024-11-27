@@ -19,8 +19,8 @@ import ChatLayout from './components/chat/ChatLayout';
 import './App.css'
 import MainContentWrapper from './components/mainWrapperComponent/MainContentWrapper';
 import FixedHeader from './components/header/FixedHeader';
-import { faker } from '@faker-js/faker';
 import ProfileEdit from './components/profile/ProfileEdit';
+import Membership from './components/memberShip/MemberShip';
 
 
 const App = () => {
@@ -70,6 +70,7 @@ const App = () => {
                             <Route path="chatrooms" element={<ChatRoomList />} />
                             <Route path="delete-account" element={<DeleteAccount />} />
                             <Route path="change-password" element={<ChangePassword />} />
+                            <Route path="membership" element={<Membership />} />
                         </Route>
                         
                         

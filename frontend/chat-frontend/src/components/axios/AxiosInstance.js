@@ -10,9 +10,21 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('jwtToken');
-        if (token) {
+        const portOneSecret = process.env.REACT_APP_PORTONE_SECRET; // .env 파일에서 API Secret 가져오기
+
+        // 요청 URL이 PortOne API인지 확인
+        const isPortOneApi = config.baseURL?.includes("api.portone.io");
+
+        if (isPortOneApi) {
+            // PortOne API 요청에 PortOne Secret 추가
+            if (portOneSecret) {
+                config.headers['Authorization'] = `PortOne ${portOneSecret}`;
+            }
+        } else if (token) {
+            // 다른 요청은 JWT 토큰 사용
             config.headers['Authorization'] = `Bearer ${token}`;
         }
+
         return config;
     },
     (error) => {

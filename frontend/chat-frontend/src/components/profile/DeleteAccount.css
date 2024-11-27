@@ -1,15 +1,16 @@
 .delete-account {
-    margin-left: 220px; /* Sidebar와의 거리 */
+    margin-left: 150px; /* Sidebar와의 거리 */
     padding: 20px;
     font-size: 18px;
 }
 
 .delete-account input {
-    width: 100%;
+    width: 300px;
     margin: 10px 0;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 4px;
+    display: block;
 }
 
 .delete-account button {

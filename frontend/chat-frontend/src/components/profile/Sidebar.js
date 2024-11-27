@@ -21,6 +21,9 @@ const Sidebar = () => {
                 <li>
                     <Link to="/me/change-password">비밀번호 변경</Link>
                 </li>
+                <li>
+                    <Link to="/me/membership">멤버십 가입하기</Link>
+                </li>
             </ul>
         </nav>
     );

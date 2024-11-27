@@ -4,6 +4,7 @@ import MyPosts from './MyPosts';
 import ChatRoomList from './ChatRoomList';
 import ProfileInfo from './ProfileInfo';
 import ChangePassword from './ChangePassword';
+import Membership from '../memberShip/MemberShip';
 
 const ProfileRoutes = () => (
     <Routes>
