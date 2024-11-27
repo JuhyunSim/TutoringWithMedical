@@ -5,6 +5,7 @@ import static jakarta.persistence.FetchType.LAZY;
 import com.simzoo.withmedical.dto.member.MemberResponseDto;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto;
 import com.simzoo.withmedical.entity.chat.ChatRoomMember;
+import com.simzoo.withmedical.entity.payment.PaymentEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.exception.CustomException;
@@ -74,6 +75,9 @@ public class MemberEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "member", fetch = LAZY)
     private List<ChatRoomMember> chatRooms = new ArrayList<>();
+
+    @OneToMany(mappedBy = "member", fetch = LAZY)
+    private List<PaymentEntity> payments = new ArrayList<>();
 
     public MemberResponseDto toResponseDto() {
         return MemberResponseDto.builder()
