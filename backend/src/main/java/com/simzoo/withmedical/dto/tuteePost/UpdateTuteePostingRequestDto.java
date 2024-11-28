@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto;
+package com.simzoo.withmedical.dto.tuteePost;
 
 import com.simzoo.withmedical.enums.TutoringType;
 import lombok.AllArgsConstructor;
@@ -11,7 +11,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class UpdateTuteePostingRequestDto {
-    private String personality;
     private TutoringType tutoringType;
     private String possibleSchedule;
     private String description;

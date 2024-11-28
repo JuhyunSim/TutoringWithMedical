@@ -53,7 +53,11 @@ public class TuteeProfileEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TuteeGrade grade;
 
+    private String personality;
+
     private String description;
+
+    private String school;
 
     public void addSubject(List<SubjectEntity> subjects) {
         if (subjects == null) {

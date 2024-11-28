@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import com.simzoo.withmedical.TestSecurityConfig;
 import com.simzoo.withmedical.config.QueryDslConfig;
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
-import com.simzoo.withmedical.dto.tutee.ParentTuteeProfileRequestDto;
+import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
@@ -35,12 +35,12 @@ class SignupServiceDatabaseTest {
     void saveParentMember_CheckSubjectTuteeId() {
         //given
 
-        ParentTuteeProfileRequestDto tuteeRequest1 = ParentTuteeProfileRequestDto.builder()
+        TuteeProfileRequestDto tuteeRequest1 = TuteeProfileRequestDto.builder()
             .subjects(new ArrayList<>(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH)))
             .tuteeName("testName")
             .build();
 
-        ParentTuteeProfileRequestDto tuteeRequest2 = ParentTuteeProfileRequestDto.builder()
+        TuteeProfileRequestDto tuteeRequest2 = TuteeProfileRequestDto.builder()
             .subjects(new ArrayList<>(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH)))
             .tuteeName("testName")
             .build();

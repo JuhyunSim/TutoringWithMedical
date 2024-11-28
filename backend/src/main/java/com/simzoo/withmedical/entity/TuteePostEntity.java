@@ -1,10 +1,13 @@
 package com.simzoo.withmedical.entity;
 
-import com.simzoo.withmedical.dto.TuteePostingResponseDto;
-import com.simzoo.withmedical.dto.TuteePostingSimpleResponseDto;
-import com.simzoo.withmedical.dto.UpdateTuteePostingRequestDto;
+import com.simzoo.withmedical.dto.tuteePost.TuteePostingResponseDto;
+import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
+import com.simzoo.withmedical.dto.tuteePost.UpdateTuteePostingRequestDto;
+import com.simzoo.withmedical.enums.GradeType;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.enums.TutoringType;
+import com.simzoo.withmedical.exception.CustomException;
+import com.simzoo.withmedical.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +17,10 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostLoad;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -37,6 +44,7 @@ public class TuteePostEntity extends BaseEntity {
     private MemberEntity member;
     @Enumerated(EnumType.STRING)
     private TuteeGrade grade;
+    private GradeType gradeGroup;
     private Long tuteeId;
     private String description;
     private String school;
@@ -47,14 +55,19 @@ public class TuteePostEntity extends BaseEntity {
     private String level;
     private Integer fee;
 
+    @PostLoad
+    public void syncGradeGroup() {
+        this.gradeGroup = this.grade.getGroup(); // grade와 group 동기화
+    }
+
     public TuteePostingResponseDto toResponseDto() {
         return TuteePostingResponseDto.builder()
             .postingId(this.id)
             .memberId(this.member.getId())
             .memberNickname(this.member.getNickname())
-            .studentGrade(this.grade)
-            .studentSchool(this.school)
-            .personality(this.personality)
+            .studentGrade(toMap(this.member.getTuteeProfiles()).get(tuteeId).getGrade())
+            .studentSchool(toMap(this.member.getTuteeProfiles()).get(tuteeId).getSchool())
+            .personality(toMap(this.member.getTuteeProfiles()).get(tuteeId).getPersonality())
             .tutoringType(this.type)
             .possibleSchedule(this.possibleSchedule)
             .level(this.level)
@@ -70,9 +83,10 @@ public class TuteePostEntity extends BaseEntity {
             .postingId(this.id)
             .memberId(this.member.getId())
             .memberNickname(this.member.getNickname())
-            .studentGrade(this.grade)
-            .studentSchool(this.school)
-            .personality(this.personality)
+            .gender(toMap(this.member.getTuteeProfiles()).get(tuteeId).getGender())
+            .studentGrade(toMap(this.member.getTuteeProfiles()).get(tuteeId).getGrade())
+            .studentSchool(toMap(this.member.getTuteeProfiles()).get(tuteeId).getSchool())
+            .personality(toMap(this.member.getTuteeProfiles()).get(tuteeId).getPersonality())
             .tutoringType(this.type)
             .possibleSchedule(this.possibleSchedule)
             .level(this.level)
@@ -80,8 +94,13 @@ public class TuteePostEntity extends BaseEntity {
             .build();
     }
 
+    public void saveProfileInfo(TuteeProfileEntity tuteeProfileEntity) {
+        this.school = tuteeProfileEntity.getSchool();
+        this.personality = tuteeProfileEntity.getPersonality();
+        this.grade = tuteeProfileEntity.getGrade();
+    }
+
     public void update(UpdateTuteePostingRequestDto requestDto) {
-        this.personality = getUpdatedValue(requestDto.getPersonality(), this.personality);
         this.type = getUpdatedValue(requestDto.getTutoringType(), this.type);
         this.possibleSchedule = getUpdatedValue(requestDto.getPossibleSchedule(), this.possibleSchedule);
         this.description = getUpdatedValue(requestDto.getDescription(), this.description);
@@ -90,5 +109,15 @@ public class TuteePostEntity extends BaseEntity {
 
     private <T> T getUpdatedValue(T newValue, T currentValue) {
         return newValue != null ? newValue : currentValue;
+    }
+
+    private Map<Long, TuteeProfileEntity> toMap(List<TuteeProfileEntity> tuteeProfileEntities) {
+
+        if (tuteeProfileEntities == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_PROFILE);
+        }
+
+        return tuteeProfileEntities.stream()
+            .collect(Collectors.toMap(TuteeProfileEntity::getId, e -> e));
     }
 }
