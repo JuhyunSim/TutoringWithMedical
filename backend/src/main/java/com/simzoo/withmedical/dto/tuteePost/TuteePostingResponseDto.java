@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto;
+package com.simzoo.withmedical.dto.tuteePost;
 
 import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.enums.TutoringType;

@@ -1,10 +1,11 @@
 package com.simzoo.withmedical.entity;
 
-import com.simzoo.withmedical.dto.TuteePostingResponseDto;
-import com.simzoo.withmedical.dto.TuteePostingSimpleResponseDto;
-import com.simzoo.withmedical.dto.UpdateTuteePostingRequestDto;
-import com.simzoo.withmedical.enums.TuteeGrade;
+import com.simzoo.withmedical.dto.tuteePost.TuteePostingResponseDto;
+import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
+import com.simzoo.withmedical.dto.tuteePost.UpdateTuteePostingRequestDto;
 import com.simzoo.withmedical.enums.TutoringType;
+import com.simzoo.withmedical.exception.CustomException;
+import com.simzoo.withmedical.exception.ErrorCode;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -14,6 +15,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,14 +37,9 @@ public class TuteePostEntity extends BaseEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "memberId")
-    private MemberEntity member;
-    @Enumerated(EnumType.STRING)
-    private TuteeGrade grade;
-    private Long tuteeId;
+    @JoinColumn(name = "tuteeId")
+    private TuteeProfileEntity tuteeProfile;
     private String description;
-    private String school;
-    private String personality;
     @Enumerated(EnumType.STRING)
     private TutoringType type;
     private String possibleSchedule;
@@ -50,11 +49,11 @@ public class TuteePostEntity extends BaseEntity {
     public TuteePostingResponseDto toResponseDto() {
         return TuteePostingResponseDto.builder()
             .postingId(this.id)
-            .memberId(this.member.getId())
-            .memberNickname(this.member.getNickname())
-            .studentGrade(this.grade)
-            .studentSchool(this.school)
-            .personality(this.personality)
+            .memberId(this.tuteeProfile.getMember().getId())
+            .memberNickname(this.tuteeProfile.getMember().getNickname())
+            .studentGrade(this.tuteeProfile.getGrade())
+            .studentSchool(this.tuteeProfile.getSchool())
+            .personality(this.tuteeProfile.getPersonality())
             .tutoringType(this.type)
             .possibleSchedule(this.possibleSchedule)
             .level(this.level)
@@ -68,11 +67,12 @@ public class TuteePostEntity extends BaseEntity {
     public TuteePostingSimpleResponseDto toSimpleResponseDto() {
         return TuteePostingSimpleResponseDto.builder()
             .postingId(this.id)
-            .memberId(this.member.getId())
-            .memberNickname(this.member.getNickname())
-            .studentGrade(this.grade)
-            .studentSchool(this.school)
-            .personality(this.personality)
+            .memberId(this.tuteeProfile.getMember().getId())
+            .memberNickname(this.tuteeProfile.getMember().getNickname())
+            .gender(this.tuteeProfile.getGender())
+            .studentGrade(this.tuteeProfile.getGrade())
+            .studentSchool(this.tuteeProfile.getSchool())
+            .personality(this.tuteeProfile.getPersonality())
             .tutoringType(this.type)
             .possibleSchedule(this.possibleSchedule)
             .level(this.level)
@@ -80,15 +80,33 @@ public class TuteePostEntity extends BaseEntity {
             .build();
     }
 
+    public void saveTuteeProfile(TuteeProfileEntity tuteeProfile) {
+        this.tuteeProfile = tuteeProfile;
+    }
+
     public void update(UpdateTuteePostingRequestDto requestDto) {
-        this.personality = getUpdatedValue(requestDto.getPersonality(), this.personality);
         this.type = getUpdatedValue(requestDto.getTutoringType(), this.type);
         this.possibleSchedule = getUpdatedValue(requestDto.getPossibleSchedule(), this.possibleSchedule);
         this.description = getUpdatedValue(requestDto.getDescription(), this.description);
         this.fee = getUpdatedValue(requestDto.getFee(), this.fee);
+
+        // 연관된 TuteeProfileEntity 업데이트
+        if (this.tuteeProfile != null) {
+            this.tuteeProfile.syncPost(this);
+        }
     }
 
     private <T> T getUpdatedValue(T newValue, T currentValue) {
         return newValue != null ? newValue : currentValue;
+    }
+
+    private Map<Long, TuteeProfileEntity> toMap(List<TuteeProfileEntity> tuteeProfileEntities) {
+
+        if (tuteeProfileEntities == null) {
+            throw new CustomException(ErrorCode.NOT_FOUND_PROFILE);
+        }
+
+        return tuteeProfileEntities.stream()
+            .collect(Collectors.toMap(TuteeProfileEntity::getId, e -> e));
     }
 }

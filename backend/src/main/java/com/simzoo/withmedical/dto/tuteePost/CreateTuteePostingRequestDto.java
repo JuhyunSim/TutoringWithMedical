@@ -1,8 +1,7 @@
-package com.simzoo.withmedical.dto;
+package com.simzoo.withmedical.dto.tuteePost;
 
-import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TuteePostEntity;
-import com.simzoo.withmedical.enums.TuteeGrade;
+import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.enums.TutoringType;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
@@ -21,11 +20,7 @@ import lombok.Setter;
 public class CreateTuteePostingRequestDto {
 
     @NotNull
-    private TuteeGrade tuteeGrade;
-
-    @Size(min = 4, max = 20)
-    @NotBlank
-    private String school;
+    private Long tuteeId;
 
     @Size(max = 100)
     private String personality;
@@ -46,18 +41,15 @@ public class CreateTuteePostingRequestDto {
 
     private String description;
 
-    public TuteePostEntity toEntity(MemberEntity member) {
+    public TuteePostEntity toEntity(TuteeProfileEntity tuteeProfile) {
 
         return TuteePostEntity.builder()
-            .member(member)
+            .tuteeProfile(tuteeProfile)
             .description(this.description)
-            .school(this.school)
-            .personality(this.personality)
             .type(this.tutoringType)
             .possibleSchedule(this.possibleSchedule)
             .level(this.level)
             .fee(this.fee)
-            .grade(this.tuteeGrade)
             .build();
     }
 }

@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface TuteePostRepository extends JpaRepository<TuteePostEntity, Long> {
+public interface TuteePostRepository extends JpaRepository<TuteePostEntity, Long>, TuteePostRepositoryCustom {
 
-    Page<TuteePostEntity> findAllByMember_Id(Long myId, Pageable pageable);
+    Page<TuteePostEntity> findAllByTuteeProfile_Member_Id(Long myId, Pageable pageable);
 
-    Optional<TuteePostEntity> findByIdAndMember_Id(Long postingId, Long memberId);
+    Optional<TuteePostEntity> findByIdAndTuteeProfile_Member_Id(Long postingId, Long memberId);
 }

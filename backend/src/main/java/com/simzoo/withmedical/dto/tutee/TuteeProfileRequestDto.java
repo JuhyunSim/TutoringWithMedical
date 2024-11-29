@@ -23,6 +23,8 @@ public class TuteeProfileRequestDto {
     private Location location;
     @NotNull
     private List<Subject> subjects;
+
+    private String personality;
     private String description;
     @NotNull
     private TuteeGrade tuteeGrade;
@@ -33,6 +35,7 @@ public class TuteeProfileRequestDto {
             .name(tuteeName)
             .gender(gender)
             .location(location)
+            .personality(personality)
             .description(description)
             .grade(tuteeGrade)
             .subjects(new ArrayList<>())
