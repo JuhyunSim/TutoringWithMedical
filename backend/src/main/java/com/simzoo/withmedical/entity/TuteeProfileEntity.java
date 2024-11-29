@@ -3,6 +3,7 @@ package com.simzoo.withmedical.entity;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileResponseDto;
 import com.simzoo.withmedical.enums.Gender;
+import com.simzoo.withmedical.enums.GradeType;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import jakarta.persistence.Entity;
@@ -15,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PostLoad;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
@@ -53,11 +55,22 @@ public class TuteeProfileEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private TuteeGrade grade;
 
+    @Enumerated(EnumType.STRING)
+    private GradeType gradeGroup;
+
     private String personality;
 
     private String description;
 
     private String school;
+
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "tuteeProfile")
+    private List<TuteePostEntity> posts = new ArrayList<>();
+
+    @PostLoad
+    public void syncGradeGroup() {
+        this.gradeGroup = this.getGrade().getGroup();
+    }
 
     public void addSubject(List<SubjectEntity> subjects) {
         if (subjects == null) {
@@ -79,6 +92,13 @@ public class TuteeProfileEntity extends BaseEntity {
             .build();
     }
 
+    public void addPost(TuteePostEntity postEntity) {
+        if (this.posts == null) {
+            this.posts = new ArrayList<>();
+        }
+        this.posts.add(postEntity);
+    }
+
     public void updateProfile(UpdateTuteeProfileRequestDto updateTuteeProfileRequestDto) {
         updateIfNotNull(updateTuteeProfileRequestDto.getTuteeName(), name -> this.name = name);
         updateIfNotNull(updateTuteeProfileRequestDto.getTuteeGrade(),
@@ -87,6 +107,27 @@ public class TuteeProfileEntity extends BaseEntity {
             description -> this.description = description);
         updateIfNotNull(updateTuteeProfileRequestDto.getLocation(),
             location -> this.location = location);
+    }
+
+    public void syncPost(TuteePostEntity tuteePostEntity) {
+        if (this.posts == null) {
+            this.posts = new ArrayList<>();
+        }
+
+        boolean exists = this.posts.stream()
+            .anyMatch(e -> e.getId().equals(tuteePostEntity.getId()));
+
+        if (!exists) {
+            this.posts.add(tuteePostEntity);
+        } else {
+            this.posts = this.posts.stream()
+                .map(e -> e.getId().equals(tuteePostEntity.getId()) ? tuteePostEntity : e)
+                .toList();
+        }
+
+        if (this.member != null) {
+            this.member.syncTutees(this);
+        }
     }
 
     private <T> void updateIfNotNull(T value, Consumer<T> updater) {

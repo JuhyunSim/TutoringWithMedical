@@ -155,4 +155,21 @@ public class MemberEntity extends BaseEntity {
     private <T, R> R safeConvert(T value, Function<T, R> mapper) {
         return value == null ? null : mapper.apply(value);
     }
+
+    public void syncTutees(TuteeProfileEntity tuteeProfileEntity) {
+        if (tuteeProfiles == null) {
+            this.tuteeProfiles = new ArrayList<>();
+        }
+
+        boolean exists = this.tuteeProfiles.stream()
+            .anyMatch(e -> e.getId().equals(tuteeProfileEntity.getId()));
+
+        if (!exists) {
+            this.tuteeProfiles.add(tuteeProfileEntity);
+        } else {
+            this.tuteeProfiles = this.tuteeProfiles.stream()
+                .map(e -> e.getId().equals(tuteeProfileEntity.getId()) ? tuteeProfileEntity : e)
+                .toList();
+        }
+    }
 }

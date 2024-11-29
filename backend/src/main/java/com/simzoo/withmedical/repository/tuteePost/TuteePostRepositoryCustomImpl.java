@@ -35,8 +35,8 @@ public class TuteePostRepositoryCustomImpl implements TuteePostRepositoryCustom 
         // 기본 쿼리 생성
         var query = queryFactory
             .selectFrom(tuteePost)
-            .join(tuteePost.member, member)
-            .fetchJoin();
+            .join(tuteePost.tuteeProfile, tuteeProfile)
+            .join(tuteePost.tuteeProfile.member, member);
 
         // 필터 조건 추가
         var predicate = buildPredicate(filterRequest, tuteePost, member);
@@ -50,15 +50,12 @@ public class TuteePostRepositoryCustomImpl implements TuteePostRepositoryCustom 
 
         // 페이징 처리
         long total = query.fetchCount();
+
         List<TuteePostingSimpleResponseDto> results = query.select(new QTuteePostingSimpleResponseDto(
-                tuteePost.id, tuteePost.member.id, tuteePost.member.nickname,
+                tuteePost.id, tuteePost.tuteeProfile.member.id, tuteePost.tuteeProfile.member.nickname,
                 tuteeProfile.gender, tuteeProfile.grade, tuteeProfile.school, tuteeProfile.personality,
                 tuteePost.type, tuteePost.possibleSchedule, tuteePost.level, tuteePost.fee
             ))
-            .from(tuteePost)
-            .join(tuteePost.member, member)
-            .join(member.tuteeProfiles, tuteeProfile)
-            .where(tuteeProfile.id.eq(tuteePost.id))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();
@@ -75,7 +72,7 @@ public class TuteePostRepositoryCustomImpl implements TuteePostRepositoryCustom 
         }
         if (filterRequest.getTuteeGradeType() != null) {
             predicate = combine(predicate,
-                tuteePost.gradeGroup.eq(filterRequest.getTuteeGradeType()));
+                tuteePost.tuteeProfile.gradeGroup.eq(filterRequest.getTuteeGradeType()));
         }
         if (filterRequest.getTutoringType() != null) {
             predicate = combine(predicate, tuteePost.type.eq(filterRequest.getTutoringType()));
