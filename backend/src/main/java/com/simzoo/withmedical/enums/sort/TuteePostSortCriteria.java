@@ -8,7 +8,7 @@ import lombok.Getter;
 public enum TuteePostSortCriteria implements SortFields {
     CREATED_AT("createdAt"),
     FEE("fee"),
-    TUTEE_GRADE("grade.order");
+    TUTEE_GRADE("tuteeProfile.grade");
 
     private final String field;
 }

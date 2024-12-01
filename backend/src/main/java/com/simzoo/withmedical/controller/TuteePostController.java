@@ -84,8 +84,10 @@ public class TuteePostController {
         @PageableDefault(page = 0, size = 10, direction = Direction.DESC, sort = "createdAt") Pageable pageable) {
 
         // sortBy와 direction을 SortRequestDto로 변환하여 처리
+        int sortBySize = sortBy == null ? 0 : sortBy.size();
+
         List<SortRequestDto<TuteePostSortCriteria>> sortRequests = IntStream
-            .range(0, sortBy.size())
+            .range(0, sortBySize)
             .mapToObj(i -> SortRequestDto.<TuteePostSortCriteria>builder()
                 .sortBy(sortBy.get(i))
                 .direction(sortDirection.get(i))
