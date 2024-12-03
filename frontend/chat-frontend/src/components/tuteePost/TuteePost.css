@@ -1,0 +1,33 @@
+.post-actions {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.back-button, .inquiry-button {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+/* 돌아가기 버튼 스타일 */
+.back-button {
+    background-color: #6c757d;
+}
+
+.back-button:hover {
+    background-color: #5a6268;
+}
+
+/* 문의하기 버튼 스타일 */
+.inquiry-button {
+    background-color: #007bff;
+}
+
+.inquiry-button:hover {
+    background-color: #0056b3;
+}

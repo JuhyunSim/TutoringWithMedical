@@ -1,69 +1,128 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
+import qs from 'qs'; 
 import axiosInstance from '../axios/AxiosInstance';
-import { eventWrapper } from '@testing-library/user-event/dist/utils';
-import mockPostings from './mockData'; 
 import './TuteePostList.css';
 import { Link } from 'react-router-dom';
 
-
 const TuteePostList = ({ memberId, memberRole }) => {
     const [postings, setPostings] = useState([]);
-    const [selectedPosting, setSelectedPosting] = useState(null); 
-    const [message, setMessage] = useState(''); 
-    const [showInput, setShowInput] = useState(false); 
-    const [messageSent, setMessageSent] = useState(false); 
+    const [selectedPosting, setSelectedPosting] = useState(null);
+    const [messageSent, setMessageSent] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 10;
     const maxPageDisplay = 10;
-    const totalPage = Math.ceil(mockPostings.length / pageSize);
-    const startPage = Math.floor(currentPage / maxPageDisplay) * maxPageDisplay;
+    const [totalPages, setTotalPages] = useState(0); // API로 받은 총 페이지 수 저장
+    const [sortCriteria, setSortCriteria] = useState([]);
+    const [sortDirections, setSortDirection] = useState([]);
+    const [filters, setFilters] = useState({
+        gender: '',
+        tuteeGradeType: '',
+        tutoringType: ''
+    });
 
+    // 게시물 데이터 가져오기
     useEffect(() => {
-        console.log("Member Role:", memberRole);  // 콘솔에서 memberRole 값을 확인
-    }, [memberRole]);
-
-    //목데이터에 적용
-    useEffect(() => {
-        // const startIndex = currentPage * pageSize;
-        // const paginatedPostings = mockPostings.slice(startIndex, startIndex + pageSize);
-        // setPostings(paginatedPostings);
-    }, [currentPage]);
-
-    useEffect(() => {
-        // 목데이터 사용을 위해 주석처리 
-        axios.get(`${process.env.REACT_APP_BACKEND_URL}/tutee/postings`)
-            .then(response => {
-                console.log(response.data);  
+        const fetchPostings = async () => {
+            try {
+                const response = await axios.get(
+                    `${process.env.REACT_APP_BACKEND_URL}/tutee/postings`,
+                    {
+                        params: {
+                            sortBy: [sortCriteria],
+                            sortDirection: sortDirections,
+                            gender: filters.gender || null,
+                            tuteeGradeType: filters.tuteeGradeType || null,
+                            tutoringType: filters.tutoringType || null,
+                            page: currentPage,
+                            size: pageSize,
+                        },
+                        paramsSerializer: (params) => {
+                            return qs.stringify(params, { arrayFormat: 'repeat' });
+                        },
+                    }
+                );
                 setPostings(response.data.content);
-            })
-            .catch(error => console.error('Failed to fetch postings:', error));
-    }, []);
+                setTotalPages(response.data.totalPages);
+            } catch (error) {
+                console.error('Failed to fetch postings:', error);
+            }
+        };
 
-    const handleSelectPost = (posting) => {
-        setSelectedPosting(posting); 
-        setMessage(''); 
-        setShowInput(true); 
+        fetchPostings();
+    }, [currentPage, sortCriteria, sortDirections, filters]);
+
+    // 메시지 이벤트 리스너 등록
+    useEffect(() => {
+        if (selectedPosting) {
+            const handleMessage = async (event) => {
+                if (!messageSent) {
+                    const { recipientId, message } = event.data;
+
+                    try {
+                        const response = await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/start`, {
+                            recipientId: recipientId,
+                            message: message
+                        });
+                        const roomId = response.data;
+
+                        await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/${roomId}`, {
+                            recipientId: recipientId,
+                            message: message
+                        });
+
+                        console.log('Message sent, roomId:', roomId);
+                        setMessageSent(true);
+                    } catch (error) {
+                        console.error('Failed to send message:', error);
+                    }
+                }
+            };
+
+            window.addEventListener('message', handleMessage);
+
+            return () => {
+                window.removeEventListener('message', handleMessage);
+            };
+        }
+    }, [selectedPosting, messageSent]);
+
+    // 필터 값 변경
+    const handleFilterChange = (filterName, value) => {
+        setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
     };
 
-    const handlePageChange = (page) => {
-        if (page >= 0 && page < totalPage) setCurrentPage(page);
+    // 정렬 기준 변경
+    const handleSortChange = (event) => {
+        const selectedValue = event.target.value;
+        setSortCriteria((prev) =>
+            prev.includes(selectedValue) ? prev.filter((v) => v !== selectedValue) : [...prev, selectedValue]
+        );
     };
+    
+
+    const handleSortDirectionChange = (event) => {
+        setSortDirection(event.target.value);
+    };
+
+    // 페이지 변경
+    const handlePageChange = useCallback((page) => {
+        if (page >= 0 && page < totalPages) setCurrentPage(page);
+    }, [totalPages]);
 
     const handleNextPageGroup = () => {
-        if (startPage + maxPageDisplay < totalPage) {
-            setCurrentPage(startPage + maxPageDisplay);
-        }
+        if ((currentPage + 1) < totalPages) setCurrentPage((prev) => prev + 1);
     };
 
     const handlePrevPageGroup = () => {
-        if (startPage > 0) {
-            setCurrentPage(startPage - maxPageDisplay);
-        }
+        if (currentPage > 0) setCurrentPage((prev) => prev - 1);
     };
 
+    // 메시지 보내기 창 열기
     const handleSendMessage = (posting) => {
-        const newWindow = window.open('', '', 'width=400,height=300'); 
+        setSelectedPosting(posting);
+
+        const newWindow = window.open('', '', 'width=400,height=300');
         newWindow.document.write(`<h2>To: ${posting.memberNickname}</h2>
             <input id="messageInput" type="text" placeholder="메시지를 입력하세요" style="width: 100%; padding: 10px; margin: 10px 0;" />
             <button id="sendMessageBtn" style="padding: 10px; width: 100%;">메시지 전송</button>
@@ -83,49 +142,7 @@ const TuteePostList = ({ memberId, memberRole }) => {
                         alert('메시지를 입력하세요');
                     }
                 });
-            </script>`
-        );
-    };
-
-    useEffect(() => {
-        const handleMessage = async (event) => {
-            if (!messageSent) { 
-                const { recipientId, message } = event.data;
-                
-                console.log('recipientId: ', recipientId)
-
-                try {
-                    const response = await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/start`,
-                    {
-                        recipientId: recipientId,
-                        message: message
-                    });
-                    const roomId = response.data; 
-
-                    await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/${roomId}`, {
-                        recipientId: recipientId,
-                        message: message
-                    });
-
-                    console.log('Message sent, roomId:', roomId);
-                    setMessageSent(true); 
-                } catch (error) {
-                    console.error('Failed to send message:', error);
-                }
-            }
-        };
-
-        window.addEventListener('message', handleMessage);
-
-        return () => {
-            window.removeEventListener('message', handleMessage);
-        };
-    }, [memberId]);
-
-    const handleKeyPress = (event) => {
-        if (event.key === 'Enter') {
-            handleSendMessage(selectedPosting);
-        }
+            </script>`);
     };
 
     return (
@@ -133,28 +150,103 @@ const TuteePostList = ({ memberId, memberRole }) => {
             <div className="title-container">
                 <h1 className="tutee-post-list-title">학생 목록</h1>
                 {memberRole === 'TUTEE' && (
-                        <Link to="/posting-form" className="create-post-button">과외 구인 글 작성하기</Link>
-                    )}
+                    <Link to="/posting-form" className="create-post-button">과외 구인 글 작성하기</Link>
+                )}
+            </div>
+            <div className='sorting-container'>
+                <h3>정렬 기준</h3>
+                <div className='sort-group'>
+                    <label>
+                        <input
+                            type="checkbox"
+                            value="CREATED_AT"
+                            onChange={handleSortChange}
+                            checked={sortCriteria.includes("CREATED_AT")}
+                        />
+                        최신순
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            value="FEE"
+                            onChange={handleSortChange}
+                            checked={sortCriteria.includes("FEE")}
+                        />
+                        수업료순
+                    </label>
+                    <label>
+                        <input
+                            type="checkbox"
+                            value="TUTEE_GRADE"
+                            onChange={handleSortChange}
+                            checked={sortCriteria.includes("TUTEE_GRADE")}
+                        />
+                        학년순
+                    </label>
+                </div>
+                {sortCriteria.map((criterion, index) => (
+                    <div key={criterion}>
+                        <label>{criterion}</label>
+                        <select
+                            value={sortDirections[index] || "DESC"}
+                            onChange={(e) => handleSortDirectionChange(e, criterion)}
+                        >
+                            <option value="DESC">내림차순</option>
+                            <option value="ASC">오름차순</option>
+                        </select>
+                    </div>
+                ))}
+            </div>
+            <div className='filters-container'>
+                <h3>필터</h3>
+                <div className='filter-group'>
+                    <select onChange={(e) => handleFilterChange('gender', e.target.value)}>
+                        <option value="">성별 선택</option>
+                        <option value="MALE">남성</option>
+                        <option value="FEMALE">여성</option>
+                    </select>
+                    <select onChange={(e) => handleFilterChange('tuteeGradeType', e.target.value)}>
+                        <option value="">학년 선택</option>
+                        <option value="ELEMENTARY">초등학교</option>
+                        <option value="MIDDLE">중학교</option>
+                        <option value="HIGH">고등학교</option>
+                    </select>
+                    <select onChange={(e) => handleFilterChange('tutoringType', e.target.value)}>
+                        <option value="">수업 형태 선택</option>
+                        <option value="ON_LINE">온라인</option>
+                        <option value="OFF_LINE">오프라인</option>
+                    </select>
+                </div>
             </div>
             <div className="post-grid">
-                {postings.length > 0 && postings.map(posting => (
-                <div key={posting.postingId} className="post-item">
-                    <h3 className="post-title">{posting.studentGrade} - {posting.studentSchool}</h3>
-                    <p className="post-detail">Personality: {posting.personality}</p>
-                    <p className="post-detail">Possible Schedule: {posting.possibleSchedule}</p>
-                    <p className="post-detail">Level: {posting.level}</p>
-                    <p className="post-detail">Fee: {posting.fee}</p>
-                    <button onClick={() => handleSendMessage(posting)} className="inquiry-button">과외 문의하기</button>
-                </div>
-            ))}
-            {postings.length === 0 && <p className="no-post-message">게시물이 없습니다.</p>}
+                {postings.map((posting) => (
+                    <div key={posting.postingId} className="post-item">
+                        <h3>{posting.studentGrade} - {posting.studentSchool}</h3>
+                        <p>{posting.personality}</p>
+                        <p>Possible Schedule: {posting.possibleSchedule}</p>
+                        <p>Level: {posting.level}</p>
+                        <p>Fee: {posting.fee}</p>
+                        <div className="post-actions">
+                            <button
+                                onClick={() => handleSendMessage(posting)}
+                                className="inquiry-button"
+                            >
+                                과외 문의하기
+                            </button>
+                            <button
+                                onClick={() => window.location.href = `/tutee/post/${posting.postingId}`}
+                                className="details-button"
+                            >
+                                상세보기
+                            </button>
+                        </div>
+                    </div>
+                ))}
             </div>
-
-            {/* 페이지네이션 버튼 */}
             <div className="pagination">
-                <button onClick={handlePrevPageGroup} disabled={startPage === 0}>&laquo;</button>
-                {Array.from({ length: Math.min(maxPageDisplay, totalPage - startPage) }, (_, index) => {
-                    const page = startPage + index;
+                <button onClick={handlePrevPageGroup} disabled={currentPage === 0}>&laquo;</button>
+                {Array.from({ length: Math.min(maxPageDisplay, totalPages - currentPage) }, (_, index) => {
+                    const page = currentPage + index;
                     return (
                         <button
                             key={page}
@@ -165,7 +257,7 @@ const TuteePostList = ({ memberId, memberRole }) => {
                         </button>
                     );
                 })}
-                <button onClick={handleNextPageGroup} disabled={startPage + maxPageDisplay >= totalPage}>&raquo;</button>
+                <button onClick={handleNextPageGroup} disabled={currentPage + 1 >= totalPages}>&raquo;</button>
             </div>
         </div>
     );
