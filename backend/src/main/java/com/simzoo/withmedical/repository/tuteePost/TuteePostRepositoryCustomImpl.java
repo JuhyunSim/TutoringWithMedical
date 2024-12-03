@@ -1,5 +1,6 @@
 package com.simzoo.withmedical.repository.tuteePost;
 
+import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
@@ -44,18 +45,22 @@ public class TuteePostRepositoryCustomImpl implements TuteePostRepositoryCustom 
             query.where(predicate);
         }
         // 정렬 조건 추가
-        OrderSpecifier<?>[] orderSpecifiers = OrderSpecifierUtil.getAllOrderSpecifiers(pageable,
-            "tuteePostEntity");
+        OrderSpecifier<?>[] orderSpecifiers = OrderSpecifierUtil.getAllOrderSpecifiers(sortRequests,
+            pageable,
+            "tuteePostEntity", "createdAt", Order.DESC);
         query.orderBy(orderSpecifiers);
 
         // 페이징 처리
         long total = query.fetchCount();
 
-        List<TuteePostingSimpleResponseDto> results = query.select(new QTuteePostingSimpleResponseDto(
-                tuteePost.id, tuteePost.tuteeProfile.member.id, tuteePost.tuteeProfile.member.nickname,
-                tuteeProfile.gender, tuteeProfile.grade, tuteeProfile.school, tuteeProfile.personality,
-                tuteePost.type, tuteePost.possibleSchedule, tuteePost.level, tuteePost.fee
-            ))
+        List<TuteePostingSimpleResponseDto> results = query.select(
+                new QTuteePostingSimpleResponseDto(
+                    tuteePost.id, tuteePost.tuteeProfile.member.id,
+                    tuteePost.tuteeProfile.member.nickname, tuteePost.tuteeProfile.gender,
+                    tuteePost.tuteeProfile.grade, tuteePost.tuteeProfile.school,
+                    tuteePost.tuteeProfile.personality, tuteePost.type, tuteePost.possibleSchedule,
+                    tuteePost.level, tuteePost.fee
+                ))
             .offset(pageable.getOffset())
             .limit(pageable.getPageSize())
             .fetch();

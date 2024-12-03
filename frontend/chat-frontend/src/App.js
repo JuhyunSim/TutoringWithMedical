@@ -21,7 +21,8 @@ import MainContentWrapper from './components/mainWrapperComponent/MainContentWra
 import FixedHeader from './components/header/FixedHeader';
 import ProfileEdit from './components/profile/ProfileEdit';
 import Membership from './components/memberShip/MemberShip';
-
+import TuteePost from './components/tuteePost/TuteePost';
+import { AuthProvider } from './components/context/AuthContext';
 
 const App = () => {
     const [roomId, setRoomId] = useState(null);
@@ -49,8 +50,9 @@ const App = () => {
     }
 
     return (
+        <AuthProvider>
         <Router>
-            <FixedHeader isLoggedIn={isLoggedIn} onLogout={handleLogout} />
+            <FixedHeader />
                     {/* 라우팅 설정 */}
                     <Routes>
                         <Route path="/" element={<MainContentWrapper><Home /></MainContentWrapper>} />
@@ -58,6 +60,7 @@ const App = () => {
                         <Route path="/signup" element={<MainContentWrapper><Signup /></MainContentWrapper>} />
                         <Route path="/posting-form" element={<MainContentWrapper><PostingForm /></MainContentWrapper>} />
                         <Route path="/posts" element={<MainContentWrapper><TuteePostList memberId={memberId} memberRole={memberRole}/></MainContentWrapper>}/>
+                        <Route path="/tutee/post/:postingId" element={<MainContentWrapper><TuteePost /></MainContentWrapper>} />
                         <Route path="/tutor-profiles" element={<MainContentWrapper><TutorList /></MainContentWrapper>} />
                         <Route path="/tutor-profiles/:tutorId" element={<MainContentWrapper><TutorProfile/></MainContentWrapper>}/>
 
@@ -80,6 +83,7 @@ const App = () => {
                         </Route>
                     </Routes>
         </Router>
+        </AuthProvider>
     );
 };
 

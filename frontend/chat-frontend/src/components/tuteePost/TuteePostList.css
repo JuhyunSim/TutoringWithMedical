@@ -9,7 +9,7 @@
 .title-container {
     display: flex;
     align-items: center;
-    justify-content: space-between; /* 제목과 버튼을 양쪽으로 정렬 */
+    justify-content: space-between;
     padding: 10px 20px;
     border-bottom: 1px solid #ddd;
     margin-bottom: 20px;
@@ -35,11 +35,58 @@
     background-color: #0056b3;
 }
 
+/* 필터 및 정렬 컨테이너 */
+.filters-container, .sorting-container {
+    margin-bottom: 20px;
+    padding: 15px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.filters-container h3, .sorting-container h3 {
+    margin-bottom: 10px;
+    color: #007bff;
+    font-size: 1.2em;
+}
+
+.filter-group, .sort-group {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.filter-group select, .sort-group input[type="checkbox"] {
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    font-size: 1em;
+    width: 150px;
+    cursor: pointer;
+}
+
+/* 정렬 기준 스타일 */
+.sort-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 1em;
+    color: #333;
+}
+
+.sort-group select {
+    padding: 5px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
 /* 그리드 레이아웃 설정 */
 .post-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); /* 최소 250px의 너비를 가지며, 가능한 만큼의 열로 정렬 */
-    gap: 20px; /* 각 아이템 간격 */
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
 }
 
 /* 게시물 목록 제목 */
@@ -57,7 +104,7 @@
     border-radius: 8px;
     padding: 15px;
     margin-bottom: 15px;
-    max-width: 300px; /* 원하는 가로 길이 설정 */
+    max-width: 300px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
@@ -109,10 +156,11 @@
     margin-bottom: 10px;
 }
 
+/* 페이지네이션 스타일 */
 .pagination {
     display: flex;
     justify-content: center;
-    margin-top: 20ps;
+    margin-top: 20px;
 }
 
 .page-button {
@@ -132,4 +180,78 @@
 
 .page-button.active {
     background-color: #0056b3;
+}
+
+/*상세보기*/
+.tutee-post-details-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.tutee-post-details-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 24px;
+    color: #333;
+}
+
+.posting-details p {
+    font-size: 16px;
+    margin: 10px 0;
+    color: #555;
+}
+
+.posting-details p strong {
+    color: #333;
+}
+/* 버튼 스타일 */
+.post-actions {
+    display: flex;
+    justify-content: space-between; /* 버튼 간 간격 설정 */
+    align-items: center;
+    margin-top: 15px;
+    gap: 10px; /* 버튼 간 여백 */
+}
+
+/* 버튼 공통 스타일 */
+.inquiry-button,
+.details-button {
+    flex: 1; /* 동일한 너비 설정 */
+    height: 40px; /* 동일한 높이 설정 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.9em;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-align: center;
+}
+/* 문의하기 버튼 스타일 */
+.inquiry-button {
+    background-color: #007bff;
+    color: white;
+}
+
+.inquiry-button:hover {
+    background-color: #0056b3;
+}
+
+/* 상세보기 버튼 스타일 */
+.details-button {
+    background-color: #17a2b8;
+    color: white;
+}
+
+
+.details-button:hover {
+    background-color: #138496;
 }

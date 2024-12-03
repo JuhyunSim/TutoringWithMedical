@@ -4,6 +4,7 @@ import com.simzoo.withmedical.dto.SortRequestDto;
 import com.simzoo.withmedical.dto.filter.FilterRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.CreateTuteePostingRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.TuteePostingResponseDto;
+import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
 import com.simzoo.withmedical.dto.tuteePost.UpdateTuteePostingRequestDto;
 import com.simzoo.withmedical.entity.TuteePostEntity;
 import com.simzoo.withmedical.enums.Gender;
@@ -14,7 +15,9 @@ import com.simzoo.withmedical.service.TuteePostService;
 import com.simzoo.withmedical.util.resolver.LoginId;
 import jakarta.validation.Valid;
 import java.util.List;
+import java.util.stream.IntStream;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
@@ -72,12 +75,24 @@ public class TuteePostController {
      * 게시물 전체조회
      */
     @GetMapping("/postings")
-    public ResponseEntity<?> getPostings(
-        @RequestBody List<SortRequestDto<TuteePostSortCriteria>> sortRequests,
+    public ResponseEntity<Page<TuteePostingSimpleResponseDto>> getPostings(
+        @RequestParam(required = false) List<TuteePostSortCriteria> sortBy,
+        @RequestParam(required = false) List<Direction> sortDirection,
         @RequestParam(required = false) Gender gender,
         @RequestParam(required = false) GradeType tuteeGradeType,
         @RequestParam(required = false) TutoringType tutoringType,
         @PageableDefault(page = 0, size = 10, direction = Direction.DESC, sort = "createdAt") Pageable pageable) {
+
+        // sortBy와 direction을 SortRequestDto로 변환하여 처리
+        int sortBySize = sortBy == null ? 0 : sortBy.size();
+
+        List<SortRequestDto<TuteePostSortCriteria>> sortRequests = IntStream
+            .range(0, sortBySize)
+            .mapToObj(i -> SortRequestDto.<TuteePostSortCriteria>builder()
+                .sortBy(sortBy.get(i))
+                .direction(sortDirection.get(i))
+                .build())
+            .toList();
 
         FilterRequestDto filterRequests = FilterRequestDto.builder()
             .gender(gender)

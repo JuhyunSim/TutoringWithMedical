@@ -169,10 +169,6 @@ class TuteePostRepositoryCustomImplTest {
 
         List<SortRequestDto<TuteePostSortCriteria>> sortRequests = Arrays.asList(
             SortRequestDto.<TuteePostSortCriteria>builder()
-                .sortBy(TuteePostSortCriteria.CREATED_AT)
-                .direction(Direction.DESC)
-                .build(),
-            SortRequestDto.<TuteePostSortCriteria>builder()
                 .sortBy(TuteePostSortCriteria.FEE)
                 .direction(Direction.DESC)
                 .build(),
@@ -256,7 +252,7 @@ class TuteePostRepositoryCustomImplTest {
             .description("description2")
             .type(TutoringType.OFF_LINE)
             .level("하")
-            .fee(300000)
+            .fee(600000)
             .possibleSchedule("any")
             .build();
 
@@ -274,6 +270,6 @@ class TuteePostRepositoryCustomImplTest {
         assertNotNull(results);
         assertEquals(2, results.getTotalElements());
         assertEquals(2, results.getContent().size());
-        assertEquals(TuteeGrade.HIGH_1, results.getContent().get(0).getStudentGrade());
+        assertEquals(TuteeGrade.ELEMENTARY_1, results.getContent().get(0).getStudentGrade());
     }
 }
