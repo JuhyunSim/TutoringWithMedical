@@ -1,14 +1,16 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useAsyncValue, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useAuth } from '../context/AuthProvider';
 import './Login.css';
 
-const Login = ({ onLogin }) => {
+const Login = () => {
     const [phoneNumber, setPhoneNumber] = useState('');
     const [password, setPassword] = useState('');
     const [role, setRole] = useState(''); // 추가된 역할 상태
     const [error, setError] = useState('');
     const navigate = useNavigate(); // 리다이렉션을 위한 useNavigate 훅 사용
+    const { login } = useAuth();
 
     // Handle login with phone number and password
     const handleLoginSubmit = async (e) => {
@@ -25,10 +27,9 @@ const Login = ({ onLogin }) => {
             });
             const token = response.data.accessToken;
             localStorage.setItem('jwtToken', token);
-            onLogin(role); // 로그인 성공 시 App.js의 로그인 상태 업데이트
+            login(role, token)
             console.log("Logged in successfully with phone number and password.");
-            navigate('/'); // 로그인 성공 시 /home 경로로 이동
-            // Redirect or further action after successful login
+            navigate('/');
         } catch (err) {
             setError('Failed to log in. Please check your phone number and password and try again.');
             console.error(err);

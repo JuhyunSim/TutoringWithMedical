@@ -1,14 +1,14 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import qs from 'qs'; 
 import axiosInstance from '../axios/AxiosInstance';
+import InquiryButton from '../button/InquiryButton';
 import './TuteePostList.css';
 import { Link } from 'react-router-dom';
 
 const TuteePostList = ({ memberId, memberRole }) => {
     const [postings, setPostings] = useState([]);
-    const [selectedPosting, setSelectedPosting] = useState(null);
-    const [messageSent, setMessageSent] = useState(false);
     const [currentPage, setCurrentPage] = useState(0);
     const pageSize = 10;
     const maxPageDisplay = 10;
@@ -20,6 +20,7 @@ const TuteePostList = ({ memberId, memberRole }) => {
         tuteeGradeType: '',
         tutoringType: ''
     });
+    const navigate = useNavigate();
 
     // 게시물 데이터 가져오기
     useEffect(() => {
@@ -51,41 +52,6 @@ const TuteePostList = ({ memberId, memberRole }) => {
 
         fetchPostings();
     }, [currentPage, sortCriteria, sortDirections, filters]);
-
-    // 메시지 이벤트 리스너 등록
-    useEffect(() => {
-        if (selectedPosting) {
-            const handleMessage = async (event) => {
-                if (!messageSent) {
-                    const { recipientId, message } = event.data;
-
-                    try {
-                        const response = await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/start`, {
-                            recipientId: recipientId,
-                            message: message
-                        });
-                        const roomId = response.data;
-
-                        await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/${roomId}`, {
-                            recipientId: recipientId,
-                            message: message
-                        });
-
-                        console.log('Message sent, roomId:', roomId);
-                        setMessageSent(true);
-                    } catch (error) {
-                        console.error('Failed to send message:', error);
-                    }
-                }
-            };
-
-            window.addEventListener('message', handleMessage);
-
-            return () => {
-                window.removeEventListener('message', handleMessage);
-            };
-        }
-    }, [selectedPosting, messageSent]);
 
     // 필터 값 변경
     const handleFilterChange = (filterName, value) => {
@@ -119,30 +85,25 @@ const TuteePostList = ({ memberId, memberRole }) => {
     };
 
     // 메시지 보내기 창 열기
-    const handleSendMessage = (posting) => {
-        setSelectedPosting(posting);
+    const handleSendMessage = async (recipientId, message) => {
+        console.log(`Sending message to ${recipientId}: ${message}`);
+        try {
+            const response = await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/start`, {
+                recipientId: recipientId,
+                message: message
+            });
+            const roomId = response.data;
 
-        const newWindow = window.open('', '', 'width=400,height=300');
-        newWindow.document.write(`<h2>To: ${posting.memberNickname}</h2>
-            <input id="messageInput" type="text" placeholder="메시지를 입력하세요" style="width: 100%; padding: 10px; margin: 10px 0;" />
-            <button id="sendMessageBtn" style="padding: 10px; width: 100%;">메시지 전송</button>
-            <script>
-                const messageInput = document.getElementById('messageInput');
-                const sendMessageBtn = document.getElementById('sendMessageBtn');
+            await axiosInstance.post(`${process.env.REACT_APP_BACKEND_URL}/chat/${roomId}`, {
+                recipientId: recipientId,
+                message: message
+            });
 
-                sendMessageBtn.addEventListener('click', () => {
-                    const message = messageInput.value;
-                    if (message.trim()) {
-                        window.opener.postMessage({
-                            recipientId: ${posting.memberId},
-                            message: message
-                        }, '*');
-                        window.close();
-                    } else {
-                        alert('메시지를 입력하세요');
-                    }
-                });
-            </script>`);
+            console.log('Message sent, roomId:', roomId);
+        } catch (error) {
+            console.log('recipientId: ', recipientId);
+            console.error('Failed to send message:', error);
+        }
     };
 
     return (
@@ -227,14 +188,13 @@ const TuteePostList = ({ memberId, memberRole }) => {
                         <p>Level: {posting.level}</p>
                         <p>Fee: {posting.fee}</p>
                         <div className="post-actions">
+                            <InquiryButton
+                                recipientId={posting.memberId}
+                                memberNickname={posting.memberNickname}
+                                onSendMessage={handleSendMessage}
+                            />
                             <button
-                                onClick={() => handleSendMessage(posting)}
-                                className="inquiry-button"
-                            >
-                                과외 문의하기
-                            </button>
-                            <button
-                                onClick={() => window.location.href = `/tutee/post/${posting.postingId}`}
+                                onClick={() => navigate(`/tutee/post/${posting.postingId}`)}
                                 className="details-button"
                             >
                                 상세보기
