@@ -22,68 +22,61 @@ import FixedHeader from './components/header/FixedHeader';
 import ProfileEdit from './components/profile/ProfileEdit';
 import Membership from './components/memberShip/MemberShip';
 import TuteePost from './components/tuteePost/TuteePost';
-import { AuthProvider } from './components/context/AuthContext';
+import { useAuth } from './components/context/AuthProvider';
 
-const App = () => {
-    const [roomId, setRoomId] = useState(null);
+const AppContent = () => {
+
     const [recipientId, setRecipientId] = useState(null);  // recipientId 저장
     const [memberId, setMemberId] = useState(null);
     const [memberNickname, setMemberNickname] = useState('Tutor1');
     const [memberRole, setMemberRole] = useState(null);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+    const { isLoading } = useAuth();
 
-    const handleLogin = (role) => {
-        setIsLoggedIn(true);
-        setMemberRole(role);
-        setMemberId(memberId);
-    } // 로그인 성공 시 호출
-
-    const handleLogout = () => {
-        setIsLoggedIn(false); // 로그아웃 시 호출
-        setMemberRole(null);
-        setMemberId(null)
-    }
-
-    const handleRoomSelect = (selectedRoomId, selectedRecipientId) => {
-        setRoomId(selectedRoomId);
-        setRecipientId(selectedRecipientId);
+    if (isLoading) {
+        return <div>Loading...</div>; // 초기화 중 표시
     }
 
     return (
-        <AuthProvider>
-        <Router>
+        <>
             <FixedHeader />
-                    {/* 라우팅 설정 */}
-                    <Routes>
-                        <Route path="/" element={<MainContentWrapper><Home /></MainContentWrapper>} />
-                        <Route path="/login" element={<MainContentWrapper><Login onLogin={handleLogin} /></MainContentWrapper>} />
-                        <Route path="/signup" element={<MainContentWrapper><Signup /></MainContentWrapper>} />
-                        <Route path="/posting-form" element={<MainContentWrapper><PostingForm /></MainContentWrapper>} />
-                        <Route path="/posts" element={<MainContentWrapper><TuteePostList memberId={memberId} memberRole={memberRole}/></MainContentWrapper>}/>
-                        <Route path="/tutee/post/:postingId" element={<MainContentWrapper><TuteePost /></MainContentWrapper>} />
-                        <Route path="/tutor-profiles" element={<MainContentWrapper><TutorList /></MainContentWrapper>} />
-                        <Route path="/tutor-profiles/:tutorId" element={<MainContentWrapper><TutorProfile/></MainContentWrapper>}/>
+            {/* 라우팅 설정 */}
+            <Routes>
+                <Route path="/" element={<MainContentWrapper><Home /></MainContentWrapper>} />
+                <Route path="/login" element={<MainContentWrapper><Login /></MainContentWrapper>} />
+                <Route path="/signup" element={<MainContentWrapper><Signup /></MainContentWrapper>} />
+                <Route path="/posting-form" element={<MainContentWrapper><PostingForm /></MainContentWrapper>} />
+                <Route path="/posts" element={<MainContentWrapper><TuteePostList memberId={memberId} memberRole={memberRole}/></MainContentWrapper>}/>
+                <Route path="/tutee/post/:postingId" element={<MainContentWrapper><TuteePost /></MainContentWrapper>} />
+                <Route path="/tutor-profiles" element={<MainContentWrapper><TutorList /></MainContentWrapper>} />
+                <Route path="/tutor-profiles/:tutorId" element={<MainContentWrapper><TutorProfile/></MainContentWrapper>}/>
 
-                        {/* MyProfile 내부 라우트 설정 */}
-                        <Route path="/me" element={<ProfileLayout />}>
-                            <Route path="my-posts" element={<MyPosts />} />\
-                            <Route path="edit-post/:postingId" element={<EditTuteePostForm />} /> {/* 추가된 라우트 */}
-                            <Route path="profile" element={<ProfileInfo />} />
-                            <Route path="profile/edit" element={<ProfileEdit />} />
-                            <Route path="chatrooms" element={<ChatRoomList />} />
-                            <Route path="delete-account" element={<DeleteAccount />} />
-                            <Route path="change-password" element={<ChangePassword />} />
-                            <Route path="membership" element={<Membership />} />
-                        </Route>
-                        
-                        
-                        {/* Chat Layout */}
-                        <Route path="/chatrooms" element={<ChatLayout />}>
-                            <Route path=":roomId" element={<ChatRoom memberId={memberId} memberNickname={memberNickname} memberRole={memberRole} recipientId={recipientId}/>}/>
-                        </Route>
-                    </Routes>
+                {/* MyProfile 내부 라우트 설정 */}
+                <Route path="/me" element={<ProfileLayout />}>
+                    <Route path="my-posts" element={<MyPosts />} />\
+                    <Route path="edit-post/:postingId" element={<EditTuteePostForm />} /> {/* 추가된 라우트 */}
+                    <Route path="profile" element={<ProfileInfo />} />
+                    <Route path="profile/edit" element={<ProfileEdit />} />
+                    <Route path="chatrooms" element={<ChatRoomList />} />
+                    <Route path="delete-account" element={<DeleteAccount />} />
+                    <Route path="change-password" element={<ChangePassword />} />
+                    <Route path="membership" element={<Membership />} />
+                </Route>
+                
+                
+                {/* Chat Layout */}
+                <Route path="/chatrooms" element={<ChatLayout />}>
+                    <Route path=":roomId" element={<ChatRoom memberId={memberId} memberNickname={memberNickname} memberRole={memberRole} recipientId={recipientId}/>}/>
+                </Route>
+            </Routes>
+        </>
+    );
+}
+
+const App = () => {
+    return (
+        <Router>
+            <AppContent />
         </Router>
-        </AuthProvider>
     );
 };
 
