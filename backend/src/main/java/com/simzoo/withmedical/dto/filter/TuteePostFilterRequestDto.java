@@ -8,7 +8,7 @@ import lombok.Getter;
 
 @Getter
 @Builder
-public class FilterRequestDto {
+public class TuteePostFilterRequestDto {
     Gender gender;
     GradeType tuteeGradeType;
     TutoringType tutoringType;

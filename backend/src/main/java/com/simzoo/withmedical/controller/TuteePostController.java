@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.controller;
 
 import com.simzoo.withmedical.dto.SortRequestDto;
-import com.simzoo.withmedical.dto.filter.FilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TuteePostFilterRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.CreateTuteePostingRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.TuteePostingResponseDto;
 import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
@@ -94,7 +94,7 @@ public class TuteePostController {
                 .build())
             .toList();
 
-        FilterRequestDto filterRequests = FilterRequestDto.builder()
+        TuteePostFilterRequestDto filterRequests = TuteePostFilterRequestDto.builder()
             .gender(gender)
             .tuteeGradeType(tuteeGradeType)
             .tutoringType(tutoringType)

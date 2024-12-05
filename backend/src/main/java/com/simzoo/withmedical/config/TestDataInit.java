@@ -88,7 +88,7 @@ public class TestDataInit {
                 memberRepository.save(tutorMember);
 
                 TutorProfileEntity tutorProfile = TutorProfileEntity.builder()
-                    .memberId(tutorMember.getId())
+                    .member(tutorMember)
                     .location(Location.SEOUL)
                     .university(i % 2 == 0 ? University.KOREA_UNIVERSITY : University.YONSEI_UNIVERSITY)
                     .status(EnrollmentStatus.ENROLLED)

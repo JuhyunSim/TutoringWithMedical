@@ -65,7 +65,6 @@ public class MemberEntity extends BaseEntity {
     private List<Role> roles = new ArrayList<>();
 
     @OneToOne(fetch = LAZY)
-    @JoinColumn(name = "memberId")
     @Nullable
     private TutorProfileEntity tutorProfile;
 
@@ -109,6 +108,10 @@ public class MemberEntity extends BaseEntity {
             throw new CustomException(ErrorCode.PROFILE_ROLE_NOT_MATCH);
         }
         this.tutorProfile = profile;
+
+        if (this.tutorProfile != null) {
+            this.tutorProfile.saveMember(this);
+        }
     }
 
     public void addTuteeProfile(TuteeProfileEntity profile, Role role) {

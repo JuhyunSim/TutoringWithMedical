@@ -5,7 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import com.simzoo.withmedical.config.QueryDslConfig;
 import com.simzoo.withmedical.dto.SortRequestDto;
-import com.simzoo.withmedical.dto.filter.FilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TuteePostFilterRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TuteePostEntity;
@@ -68,7 +68,7 @@ class TuteePostRepositoryCustomImplTest {
                 .build()
         );
 
-        FilterRequestDto filterRequest = FilterRequestDto.builder()
+        TuteePostFilterRequestDto filterRequest = TuteePostFilterRequestDto.builder()
             .tuteeGradeType(GradeType.ELEMENTARY)
             .tutoringType(TutoringType.OFF_LINE)
             .gender(Gender.MALE)
@@ -178,7 +178,7 @@ class TuteePostRepositoryCustomImplTest {
                 .build()
         );
 
-        FilterRequestDto filterRequest = FilterRequestDto.builder()
+        TuteePostFilterRequestDto filterRequest = TuteePostFilterRequestDto.builder()
             .build();
 
         //데이터 저장
