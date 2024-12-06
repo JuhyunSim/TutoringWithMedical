@@ -8,7 +8,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface TutorProfileRepositoryCustom {
-    Page<TutorSimpleResponseDto> findTutorProfileDtos(Pageable pageable, TutorFilterRequestDto tutorFilterRequestDto);
+
+    Long countFilteredProfiles(TutorFilterRequestDto filterRequestDto);
+
+    Page<TutorSimpleResponseDto> findFilteredProfiles(TutorFilterRequestDto filterRequestDto, Pageable pageable);
 
     Optional<TutorProfileResponseDto> findTutorProfileDtoById(Long id);
 }

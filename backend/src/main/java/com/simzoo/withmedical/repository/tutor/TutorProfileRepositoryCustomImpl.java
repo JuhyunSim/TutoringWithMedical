@@ -2,10 +2,10 @@ package com.simzoo.withmedical.repository.tutor;
 
 import static com.querydsl.core.group.GroupBy.groupBy;
 import static com.querydsl.core.group.GroupBy.list;
+import static com.querydsl.jpa.JPAExpressions.select;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.simzoo.withmedical.dto.QTutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
 import com.simzoo.withmedical.dto.tutor.QTutorProfileResponseDto;
@@ -15,7 +15,12 @@ import com.simzoo.withmedical.entity.QSubjectEntity;
 import com.simzoo.withmedical.entity.QTutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
+import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -29,42 +34,116 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
 
     private final JPAQueryFactory jpaQueryFactory;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Override
-    public Page<TutorSimpleResponseDto> findTutorProfileDtos(Pageable pageable,
-        TutorFilterRequestDto filterRequest) {
+    public Long countFilteredProfiles(TutorFilterRequestDto filterRequestDto) {
 
         QTutorProfileEntity tutorProfile = QTutorProfileEntity.tutorProfileEntity;
-        QMemberEntity member = QMemberEntity.memberEntity;
         QSubjectEntity subject = QSubjectEntity.subjectEntity;
+        QMemberEntity member = QMemberEntity.memberEntity;
 
-        BooleanExpression eqFilterCondition = buildPredicate(filterRequest, tutorProfile, subject, member);
-        List<TutorSimpleResponseDto> tutorList = jpaQueryFactory
-            .selectDistinct(new QTutorSimpleResponseDto(
-                tutorProfile.id,
-                tutorProfile.imageUrl,
-                member.nickname,
-                tutorProfile.university,
-                tutorProfile.location,
-                list(subject.subject)
-            ))
-            .from(tutorProfile)
-            .leftJoin(tutorProfile.member, member)
-            .leftJoin(tutorProfile.subjects, subject)
-            .where(eqFilterCondition)
-            .offset(pageable.getOffset())
-            .limit(pageable.getPageSize())
-            .fetch();
+        BooleanExpression eqFilterCondition = buildPredicate(filterRequestDto, tutorProfile,
+            subject,
+            member);
 
-        Long total = jpaQueryFactory
-            .select(tutorProfile.count())
+        return select(tutorProfile.count())
             .from(tutorProfile)
             .leftJoin(tutorProfile.member, member)
             .leftJoin(tutorProfile.subjects, subject)
             .where(eqFilterCondition)
             .fetchOne();
+    }
+    @Override
+    public Page<TutorSimpleResponseDto> findFilteredProfiles(TutorFilterRequestDto filterRequest,
+        Pageable pageable) {
+        String sql = """
+            WITH filtered_profiles AS (
+                SELECT
+                    tpe.id AS tutor_id,
+                    tpe.imageUrl AS image_url,
+                    m.nickname AS tutor_nickname,
+                    tpe.university AS tutor_university,
+                    tpe.location AS tutor_location,
+                    ARRAY_AGG(s.subject) AS subjects
+                FROM
+                    tutorProfile tpe
+                LEFT JOIN
+                    member m ON tpe.memberId = m.id
+                LEFT JOIN
+                    SubjectEntity s ON tpe.id = s.tutorId
+                WHERE
+                    (:gender IS NULL OR m.gender = :gender)
+                    AND (:subjects IS NULL OR s.subject = ANY(:subjects))
+                    AND (:locations IS NULL OR tpe.location = ANY(:locations))
+                    AND (:universities IS NULL OR tpe.university = ANY(:universities))
+                    AND (:statuslist IS NULL OR tpe.status = ANY(:statuslist))
+                GROUP BY
+                    tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
+            )
+            SELECT *
+            FROM filtered_profiles
+            ORDER BY tutor_id
+            OFFSET :offset ROWS FETCH FIRST :limit ROWS ONLY
+        """;
+
+        // 필터링 값 추출
+        String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
+        String[] subjects = filterRequest.getSubjects() != null
+            ? filterRequest.getSubjects().stream().map(Enum::name).toArray(String[]::new)
+            : new String[0]; // null 대신 빈 배열로 처리
+        String[] locations = filterRequest.getLocations() != null
+            ? filterRequest.getLocations().stream().map(Location::name).toArray(String[]::new)
+            : new String[0];
+        String[] universities = filterRequest.getUniversities() != null
+            ? filterRequest.getUniversities().stream().map(University::name).toArray(String[]::new)
+            : new String[0];
+        String[] statusList = filterRequest.getStatusList() != null
+            ? filterRequest.getStatusList().stream().map(EnrollmentStatus::name).toArray(String[]::new)
+            : new String[0];
+
+        // 페이징
+        Long offset = pageable.getOffset();
+        Integer limit = pageable.getPageSize();
+
+        // 페이징 처리된 데이터 쿼리
+        Query query = entityManager.createNativeQuery(sql);
+        query.setParameter("gender", gender);
+        query.setParameter("subjects", subjects);
+        query.setParameter("locations", locations); // NPE 방지
+        query.setParameter("universities", universities);
+        query.setParameter("statuslist", statusList);
+        query.setParameter("offset", offset);
+        query.setParameter("limit", limit);
+
+        @SuppressWarnings("unchecked")
+        List<Object[]> results = query.getResultList();
+
+        // 전체 데이터 개수 쿼리
+        long total = ((Number) entityManager.createNativeQuery("SELECT COUNT(*) FROM ...") // Simplified for brevity
+            .setParameter("gender", gender)
+            .setParameter("subjects", subjects)
+            .setParameter("locations", locations) // NPE 방지
+            .setParameter("universities", universities)
+            .setParameter("statuslist", statusList)
+            .getSingleResult()).longValue();
+
+        // 결과를 DTO로 변환
+        List<TutorSimpleResponseDto> tutorList = results.stream()
+            .map(row -> new TutorSimpleResponseDto(
+                (Long) row[0], // tutor_id
+                (String) row[1], // image_url
+                (String) row[2], // tutor_nickname
+                University.valueOf((String) row[3]), // tutor_university
+                Location.valueOf((String) row[4]), // tutor_location
+                Arrays.asList((Subject[]) row[5]) // subjects as List<String>
+            ))
+            .toList();
 
         return new PageImpl<>(tutorList, pageable, total);
     }
+
 
     @Override
     public Optional<TutorProfileResponseDto> findTutorProfileDtoById(Long tutorId) {
@@ -102,18 +181,23 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             predicate = combine(predicate, member.gender.eq(filterRequest.getGender()));
         }
         if (filterRequest.getSubjects() != null && !filterRequest.getSubjects().isEmpty()) {
+            System.out.println("filterRequest.getSubjects() = " + filterRequest.getSubjects());
             predicate = combine(predicate, subject.subject.in(filterRequest.getSubjects()));
         }
         if (filterRequest.getLocations() != null && !filterRequest.getLocations().isEmpty()) {
-            List<String> locationNames = filterRequest.getLocations().stream().map(Location::name).toList();
+            List<String> locationNames = filterRequest.getLocations().stream().map(Location::name)
+                .toList();
             predicate = combine(predicate, tutorProfile.location.stringValue().in(locationNames));
         }
         if (filterRequest.getUniversities() != null && !filterRequest.getUniversities().isEmpty()) {
-            List<String> universityNames = filterRequest.getUniversities().stream().map(University::name).toList();
-            predicate = combine(predicate, tutorProfile.university.stringValue().in(universityNames));
+            List<String> universityNames = filterRequest.getUniversities().stream()
+                .map(University::name).toList();
+            predicate = combine(predicate,
+                tutorProfile.university.stringValue().in(universityNames));
         }
         if (filterRequest.getStatusList() != null && !filterRequest.getStatusList().isEmpty()) {
-            List<String> statusNames = filterRequest.getStatusList().stream().map(EnrollmentStatus::name).toList();
+            List<String> statusNames = filterRequest.getStatusList().stream()
+                .map(EnrollmentStatus::name).toList();
             predicate = combine(predicate, tutorProfile.status.stringValue().in(statusNames));
         }
 
