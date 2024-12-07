@@ -2,7 +2,6 @@ package com.simzoo.withmedical.service;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.simzoo.withmedical.config.QueryDslConfig;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
@@ -17,6 +16,7 @@ import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
+import com.simzoo.withmedical.repository.tutor.TutorProfileJdbcRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,11 +29,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort.Direction;
-import org.springframework.test.context.ActiveProfiles;
 
-@ActiveProfiles("test")
 @DataJpaTest
-@Import({QueryDslConfig.class, TutorProfileService.class, ObjectMapper.class})
+@Import({TutorProfileService.class, TutorProfileJdbcRepository.class, QueryDslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class TutorProfileServiceDatabaseTest {
     @Autowired
@@ -110,6 +108,9 @@ class TutorProfileServiceDatabaseTest {
         TutorFilterRequestDto filterRequest = TutorFilterRequestDto.builder()
             .gender(Gender.MALE)
             .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
+            .locations(new ArrayList<>())
+            .universities(new ArrayList<>())
+            .statusList(new ArrayList<>())
             .build();
 
         //when
