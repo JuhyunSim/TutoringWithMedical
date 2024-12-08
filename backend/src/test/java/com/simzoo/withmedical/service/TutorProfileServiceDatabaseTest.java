@@ -34,6 +34,7 @@ import org.springframework.data.domain.Sort.Direction;
 @Import({TutorProfileService.class, TutorProfileJdbcRepository.class, QueryDslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 class TutorProfileServiceDatabaseTest {
+
     @Autowired
     private MemberRepository memberRepository;
 
@@ -58,7 +59,7 @@ class TutorProfileServiceDatabaseTest {
 
         MemberEntity member2 = MemberEntity.builder()
             .nickname("nickname2")
-            .gender(Gender.FEMALE)
+            .gender(Gender.MALE)
             .tutorProfile(null)
             .roles(List.of(Role.TUTOR))
             .build();
@@ -106,11 +107,16 @@ class TutorProfileServiceDatabaseTest {
         //given
         Pageable pageable = PageRequest.of(0, 10, Direction.ASC, "createdAt");
         TutorFilterRequestDto filterRequest = TutorFilterRequestDto.builder()
-            .gender(Gender.MALE)
-            .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
-            .locations(new ArrayList<>())
-            .universities(new ArrayList<>())
-            .statusList(new ArrayList<>())
+//            .gender(Gender.MALE)
+//            .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
+//            .locations(new ArrayList<>())
+//            .universities(new ArrayList<>())
+//            .statusList(new ArrayList<>())
+            .gender(null)
+            .subjects(null)
+            .locations(null)
+            .universities(null)
+            .statusList(null)
             .build();
 
         //when

@@ -48,26 +48,10 @@ public class TutorProfileJdbcRepository {
                     SubjectEntity s ON tpe.id = s.tutorId
                 WHERE
                     (? IS NULL OR m.gender = ?)
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND s.subject = ANY(?::text[])
-                        )
-                    )
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND tpe.location = ANY(?::text[])
-                        )
-                    )
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND tpe.university = ANY(?::text[])
-                        )
-                    )
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND tpe.status = ANY(?::text[])
-                        )
-                    )
+                    AND (? IS NULL OR s.subject = ANY(?::text[]))
+                    AND (? IS NULL OR tpe.location = ANY(?::text[]))
+                    AND (? IS NULL OR tpe.university = ANY(?::text[]))
+                    AND (? IS NULL OR tpe.status = ANY(?::text[]))
                 GROUP BY
                     tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
             )
@@ -113,23 +97,22 @@ public class TutorProfileJdbcRepository {
                 setParameter(ps, 2, gender, connection);
 
                 setArrayParameter(ps, 3, subjects, connection);
-                setParameter(ps, 4, "{}", connection);
-                setArrayParameter(ps, 5, subjects, connection);
+                setArrayParameter(ps, 4, subjects, connection);
 
+                setArrayParameter(ps, 5, locations, connection);
                 setArrayParameter(ps, 6, locations, connection);
-                setParameter(ps, 7, "{}", connection);
-                setArrayParameter(ps, 8, locations, connection);
 
-                setArrayParameter(ps, 9, universities, connection);
-                setParameter(ps, 10, "{}", connection);
-                setArrayParameter(ps, 11, universities, connection);
+                setArrayParameter(ps, 7, universities, connection);
+                setArrayParameter(ps, 8, universities, connection);
 
-                setArrayParameter(ps, 12, statusList, connection);
-                setParameter(ps, 13, "{}", connection);
-                setArrayParameter(ps, 14, statusList, connection);
+                setArrayParameter(ps, 9, statusList, connection);
+                setArrayParameter(ps, 10, statusList, connection);
 
-                ps.setLong(15, pageable.getOffset());
-                ps.setInt(16, pageable.getPageSize());
+                ps.setLong(11, pageable.getOffset());
+                ps.setInt(12, pageable.getPageSize());
+
+                log.debug("offset: {}", pageable.getOffset());
+                log.debug("limit: {}", pageable.getPageSize());
 
                 return ps;
             },
@@ -145,26 +128,10 @@ public class TutorProfileJdbcRepository {
                 LEFT JOIN SubjectEntity s ON tpe.id = s.tutorId
                 WHERE
                     (? IS NULL OR m.gender = ?)
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND s.subject = ANY(?::text[])
-                        )
-                    )
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND tpe.location = ANY(?::text[])
-                        )
-                    )
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND tpe.university = ANY(?::text[])
-                        )
-                    )
-                    AND (
-                        ? IS NULL OR (
-                            ? != '{}' AND tpe.status = ANY(?::text[])
-                        )
-                    )
+                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND s.subject = ANY(?::text[])))
+                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND tpe.location = ANY(?::text[])))
+                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND tpe.university = ANY(?::text[])))
+                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND tpe.status = ANY(?::text[])))
                 GROUP BY tpe.id
             ) AS count_query
         """;
@@ -176,20 +143,40 @@ public class TutorProfileJdbcRepository {
 
     private Long getTotalCount(String countSql, String gender, List<String> subjects, List<String> locations,
         List<String> universities, List<String> statusList) {
-        return jdbcTemplate.queryForObject(
-            countSql,
-            (rs, rowNum) -> rs.getLong(1),
-            gender,
-            createSqlArray("text", subjects),
-            createSqlArray("text", locations),
-            createSqlArray("text", universities),
-            createSqlArray("text", statusList)
+        return jdbcTemplate.query(
+            connection -> {
+                PreparedStatement ps = connection.prepareStatement(countSql);
+                ps.setString(1, gender); // 1. Gender IS NULL
+                ps.setString(2, gender); // 2. Gender 값 설정
+                setArrayParameter(ps, 3, subjects, connection);
+                setArrayParameter(ps, 4, subjects, connection);
+                setArrayParameter(ps, 5, subjects, connection);
+                setArrayParameter(ps, 6, locations, connection);
+                setArrayParameter(ps, 7, locations, connection);
+                setArrayParameter(ps, 8, locations, connection);
+                setArrayParameter(ps, 9, universities, connection);
+                setArrayParameter(ps, 10, universities, connection);
+                setArrayParameter(ps, 11, universities, connection);
+                setArrayParameter(ps, 12, statusList, connection);
+                setArrayParameter(ps, 13, statusList, connection);
+                setArrayParameter(ps, 14, statusList, connection);
+                return ps;
+            },
+            rs -> {
+                if (rs.next()) {
+                    return rs.getLong(1); // 단일 값 반환
+                }
+                return 0L; // 결과가 없을 경우 0 반환
+            }
         );
     }
 
     private Array createSqlArray(String typeName, List<String> values) {
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
-            return connection.createArrayOf(typeName, values != null ? values.toArray() : new String[]{});
+            if (values == null || values.isEmpty()) {
+                return null;
+            }
+            return connection.createArrayOf(typeName, values.toArray());
         } catch (SQLException e) {
             throw new RuntimeException("Error creating SQL Array", e);
         }
@@ -206,12 +193,12 @@ public class TutorProfileJdbcRepository {
 
     private void setArrayParameter(PreparedStatement ps, int index, List<String> values, Connection connection)
         throws SQLException {
-        log.debug("PreparedStatement Parameter [{}]: {}", index, values);
+        log.debug("PreparedStatement Parameter [{}]: {}", index, values != null ? values : "NULL");
 
         if (values != null && !values.isEmpty()) {
             ps.setArray(index, connection.createArrayOf("text", values.toArray()));
         } else {
-            ps.setNull(index, Types.ARRAY);
+            ps.setArray(index, connection.createArrayOf("text", new String[]{}));
         }
     }
 }
