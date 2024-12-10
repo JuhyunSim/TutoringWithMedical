@@ -6,13 +6,14 @@ import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -47,11 +48,11 @@ public class TutorProfileJdbcRepository {
                 LEFT JOIN
                     SubjectEntity s ON tpe.id = s.tutorId
                 WHERE
-                    (? IS NULL OR m.gender = ?)
-                    AND (? IS NULL OR s.subject = ANY(?::text[]))
-                    AND (? IS NULL OR tpe.location = ANY(?::text[]))
-                    AND (? IS NULL OR tpe.university = ANY(?::text[]))
-                    AND (? IS NULL OR tpe.status = ANY(?::text[]))
+                    (? IS NULL OR m.gender = COALESCE(?, m.gender))
+                    AND (? IS NULL OR s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                    AND (? IS NULL OR tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                    AND (? IS NULL OR tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                    AND (? IS NULL OR tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[])))
                 GROUP BY
                     tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
             )
@@ -81,14 +82,34 @@ public class TutorProfileJdbcRepository {
         log.debug("Universities: {}", universities);
         log.debug("StatusList: {}", statusList);
 
-        RowMapper<TutorSimpleResponseDto> rowMapper = (rs, rowNum) -> new TutorSimpleResponseDto(
-            rs.getLong("tutor_id"),
-            rs.getString("image_url"),
-            rs.getString("tutor_nickname"),
-            University.valueOf(rs.getString("tutor_university")),
-            Location.valueOf(rs.getString("tutor_location")),
-            Arrays.asList((Subject[]) rs.getArray("subjects").getArray())
-        );
+        RowMapper<TutorSimpleResponseDto> rowMapper = (rs, rowNum) -> {
+
+            List<Subject> subjectList = Optional.ofNullable(rs.getArray("subjects"))
+                .map(array -> {
+                    try {
+                        String[] subjectStrings = (String[]) array.getArray();
+                        return Arrays.stream(subjectStrings)
+                            .map(Subject::valueOf) // String을 Subject enum으로 변환
+                            .toList();
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error mapping subjects", e);
+                    }
+                })
+                .orElse(Collections.emptyList());
+
+            return new TutorSimpleResponseDto(
+                rs.getLong("tutor_id"),
+                rs.getString("image_url"),
+                rs.getString("tutor_nickname"),
+                Optional.ofNullable(rs.getString("tutor_university"))
+                    .map(University::valueOf)
+                    .orElse(null),
+                Optional.ofNullable(rs.getString("tutor_location"))
+                    .map(Location::valueOf)
+                    .orElse(null),
+                subjectList // 변환된 Subject 리스트
+            );
+        };
 
         List<TutorSimpleResponseDto> tutorList = jdbcTemplate.query(
             connection -> {
@@ -111,13 +132,19 @@ public class TutorProfileJdbcRepository {
                 ps.setLong(11, pageable.getOffset());
                 ps.setInt(12, pageable.getPageSize());
 
+                log.debug("PreparedStatement parameters: {}", ps.toString());
+
                 log.debug("offset: {}", pageable.getOffset());
                 log.debug("limit: {}", pageable.getPageSize());
+
+                log.debug("Final SQL Query: {}", ps.toString());
 
                 return ps;
             },
             rowMapper
         );
+
+        log.debug("Number of results: {}", tutorList.size());
 
         String countSql = """
             SELECT COUNT(*)
@@ -127,14 +154,15 @@ public class TutorProfileJdbcRepository {
                 LEFT JOIN member m ON tpe.memberId = m.id
                 LEFT JOIN SubjectEntity s ON tpe.id = s.tutorId
                 WHERE
-                    (? IS NULL OR m.gender = ?)
-                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND s.subject = ANY(?::text[])))
-                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND tpe.location = ANY(?::text[])))
-                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND tpe.university = ANY(?::text[])))
-                    AND (? IS NULL OR (ARRAY_LENGTH(?::text[], 1) > 0 AND tpe.status = ANY(?::text[])))
+                    (? IS NULL OR m.gender = COALESCE(?, m.gender))
+                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
                 GROUP BY tpe.id
             ) AS count_query
         """;
+
 
         Long total = getTotalCount(countSql, gender, subjects, locations, universities, statusList);
 
@@ -160,6 +188,9 @@ public class TutorProfileJdbcRepository {
                 setArrayParameter(ps, 12, statusList, connection);
                 setArrayParameter(ps, 13, statusList, connection);
                 setArrayParameter(ps, 14, statusList, connection);
+
+                log.debug("Final SQL Query: {}", ps.toString());
+
                 return ps;
             },
             rs -> {
@@ -171,19 +202,10 @@ public class TutorProfileJdbcRepository {
         );
     }
 
-    private Array createSqlArray(String typeName, List<String> values) {
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
-            if (values == null || values.isEmpty()) {
-                return null;
-            }
-            return connection.createArrayOf(typeName, values.toArray());
-        } catch (SQLException e) {
-            throw new RuntimeException("Error creating SQL Array", e);
-        }
-    }
-
     private void setParameter(PreparedStatement ps, int index, String value, Connection connection)
         throws SQLException {
+        log.debug("Setting parameter [{}]: {}", index, value != null ? value : "NULL");
+
         if (value != null) {
             ps.setString(index, value);
         } else {
@@ -198,7 +220,7 @@ public class TutorProfileJdbcRepository {
         if (values != null && !values.isEmpty()) {
             ps.setArray(index, connection.createArrayOf("text", values.toArray()));
         } else {
-            ps.setArray(index, connection.createArrayOf("text", new String[]{}));
+            ps.setArray(index, connection.createArrayOf("text", null));
         }
     }
 }

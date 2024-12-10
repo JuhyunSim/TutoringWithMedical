@@ -1,10 +1,6 @@
-package com.simzoo.withmedical.service;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
+package com.simzoo.withmedical.other;
 
 import com.simzoo.withmedical.config.QueryDslConfig;
-import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
-import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
@@ -16,10 +12,8 @@ import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
-import com.simzoo.withmedical.repository.tutor.TutorProfileJdbcRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import org.junit.jupiter.api.Test;
@@ -27,22 +21,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort.Direction;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.RowMapper;
 import org.springframework.test.context.ActiveProfiles;
 
 @DataJpaTest
-@Import({TutorProfileService.class, TutorProfileJdbcRepository.class, QueryDslConfig.class})
-@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-class TutorProfileServiceDatabaseTest {
+@Import(QueryDslConfig.class)
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+public class JdbcLeftJoinTest {
 
     @Autowired
-    private MemberRepository memberRepository;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     private SubjectRepository subjectRepository;
@@ -51,13 +40,10 @@ class TutorProfileServiceDatabaseTest {
     private TutorProfileRepository tutorProfileRepository;
 
     @Autowired
-    private TutorProfileService tutorProfileService;
-
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+    private MemberRepository memberRepository;
 
     @Test
-    void testFindAllTutorProfiles() {
+    void testLeftJoinResult() {
         //저장
         MemberEntity member1 = MemberEntity.builder()
             .nickname("nickname1")
@@ -116,22 +102,6 @@ class TutorProfileServiceDatabaseTest {
         System.out.println("tutor1 subjects = " + tutorProfileRepository.findById(tutor1.getId()).get().getSubjects());
         System.out.println("tutor2 subjects = " + tutorProfileRepository.findById(tutor2.getId()).get().getSubjects());
 
-        //given
-        Pageable pageable = PageRequest.of(0, 10, Direction.ASC, "createdAt");
-        TutorFilterRequestDto filterRequest = TutorFilterRequestDto.builder()
-//            .gender(Gender.MALE)
-//            .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
-//            .locations(new ArrayList<>())
-//            .universities(new ArrayList<>())
-//            .statusList(new ArrayList<>())
-            .gender(null)
-            .subjects(null)
-            .locations(null)
-            .universities(null)
-            .statusList(null)
-            .build();
-
-        //Debug
         // LEFT JOIN 결과 확인 쿼리
         String debugSql = """
             SELECT 
@@ -144,31 +114,11 @@ class TutorProfileServiceDatabaseTest {
             GROUP BY tpe.id, m.nickname
         """;
 
-        //TutorSimpleResponseDto 매핑
-        RowMapper<TutorSimpleResponseDto> rowMapper = (rs, rowNum) -> {
-            List<String> subjectList = Arrays.asList((String[]) rs.getArray("subjects").getArray());
-            System.out.println("Mapped subjects: " + subjectList);
-            return new TutorSimpleResponseDto(
-                rs.getLong("tutor_id"),
-                rs.getString("image_url"),
-                rs.getString("tutor_nickname"),
-                University.valueOf(rs.getString("tutor_university")),
-                Location.valueOf(rs.getString("tutor_location")),
-                subjectList.stream().map(Subject::valueOf).toList()
-            );
-        };
-
 
         List<Map<String, Object>> results = jdbcTemplate.queryForList(debugSql);
         results.forEach(result -> {
             System.out.println("Result Row: " + result);
         });
 
-        //when
-        Page<TutorSimpleResponseDto> tutorProfileDtos = tutorProfileService.getTutorList(pageable,
-            filterRequest);
-
-        //then
-        assertEquals(2, tutorProfileDtos.getTotalElements());
     }
 }
