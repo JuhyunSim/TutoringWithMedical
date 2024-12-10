@@ -1,6 +1,7 @@
 package com.simzoo.withmedical.controller;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
+import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.service.TutorProfileService;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -26,9 +28,10 @@ public class TutorProfileController {
      */
     @GetMapping
     public ResponseEntity<Page<TutorSimpleResponseDto>> getTutorProfiles(
+        @ModelAttribute TutorFilterRequestDto filterRequest,
         @PageableDefault(page = 0, size = 10, direction = Direction.ASC, sort = "createdAt") Pageable pageable) {
 
-        return ResponseEntity.ok(tutorProfileService.getTutorList(pageable));
+        return ResponseEntity.ok(tutorProfileService.getTutorList(pageable, filterRequest));
     }
 
     /**

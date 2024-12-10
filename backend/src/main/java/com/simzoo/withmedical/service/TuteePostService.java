@@ -2,7 +2,7 @@ package com.simzoo.withmedical.service;
 
 
 import com.simzoo.withmedical.dto.SortRequestDto;
-import com.simzoo.withmedical.dto.filter.FilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TuteePostFilterRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.CreateTuteePostingRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
 import com.simzoo.withmedical.dto.tuteePost.UpdateTuteePostingRequestDto;
@@ -78,9 +78,10 @@ public class TuteePostService {
     @Transactional(readOnly = true)
     public Page<TuteePostingSimpleResponseDto> getInquiryPostings(
         Pageable pageable, List<SortRequestDto<TuteePostSortCriteria>> sortRequests,
-        FilterRequestDto filterRequestDto) {
+        TuteePostFilterRequestDto tuteePostFilterRequestDto) {
 
-        return tuteePostRepository.findAllTuteePostings(pageable, sortRequests, filterRequestDto);
+        return tuteePostRepository.findAllTuteePostings(pageable, sortRequests,
+            tuteePostFilterRequestDto);
     }
 
     @Transactional(readOnly = true)

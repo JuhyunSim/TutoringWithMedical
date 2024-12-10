@@ -89,7 +89,7 @@ class SignupServiceTest {
             .description("description")
             .university(University.KOREA_UNIVERSITY)
             .status(EnrollmentStatus.ENROLLED)
-            .memberId(member.getId())
+            .member(member)
             .subjects(new ArrayList<>())
             .build();
 

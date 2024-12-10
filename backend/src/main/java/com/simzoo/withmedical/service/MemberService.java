@@ -15,7 +15,6 @@ import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
-import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -32,7 +31,6 @@ public class MemberService {
     private final MemberRepository memberRepository;
     private final SubjectRepository subjectRepository;
     private final TuteeProfileRepository tuteeProfileRepository;
-    private final TutorProfileRepository tutorProfileRepository;
 
     @Transactional(readOnly = true)
     public void checkMemberExist(String phoneNumber) {

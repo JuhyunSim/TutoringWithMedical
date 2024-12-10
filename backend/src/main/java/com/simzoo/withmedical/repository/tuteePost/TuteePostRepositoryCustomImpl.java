@@ -5,7 +5,7 @@ import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.simzoo.withmedical.dto.SortRequestDto;
-import com.simzoo.withmedical.dto.filter.FilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TuteePostFilterRequestDto;
 import com.simzoo.withmedical.dto.tuteePost.QTuteePostingSimpleResponseDto;
 import com.simzoo.withmedical.dto.tuteePost.TuteePostingSimpleResponseDto;
 import com.simzoo.withmedical.entity.QMemberEntity;
@@ -27,7 +27,7 @@ public class TuteePostRepositoryCustomImpl implements TuteePostRepositoryCustom 
     @Override
     public Page<TuteePostingSimpleResponseDto> findAllTuteePostings(Pageable pageable,
         List<SortRequestDto<TuteePostSortCriteria>> sortRequests,
-        FilterRequestDto filterRequest) {
+        TuteePostFilterRequestDto filterRequest) {
 
         QMemberEntity member = QMemberEntity.memberEntity;
         QTuteePostEntity tuteePost = QTuteePostEntity.tuteePostEntity;
@@ -68,7 +68,7 @@ public class TuteePostRepositoryCustomImpl implements TuteePostRepositoryCustom 
         return new PageImpl<>(results, pageable, total);
     }
 
-    private BooleanExpression buildPredicate(FilterRequestDto filterRequest,
+    private BooleanExpression buildPredicate(TuteePostFilterRequestDto filterRequest,
         QTuteePostEntity tuteePost, QMemberEntity member) {
         BooleanExpression predicate = null;
 

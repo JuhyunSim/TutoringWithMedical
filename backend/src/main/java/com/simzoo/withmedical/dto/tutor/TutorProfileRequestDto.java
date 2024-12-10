@@ -24,7 +24,7 @@ public class TutorProfileRequestDto {
 
     public TutorProfileEntity toEntity(MemberEntity member) {
         return TutorProfileEntity.builder()
-            .memberId(member.getId())
+            .member(member)
             .imageUrl(imageUrl)
             .location(location)
             .description(description)

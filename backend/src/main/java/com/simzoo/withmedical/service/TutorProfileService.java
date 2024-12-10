@@ -1,9 +1,11 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
+import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
+import com.simzoo.withmedical.repository.tutor.TutorProfileJdbcRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,13 +18,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class TutorProfileService {
 
     private final TutorProfileRepository tutorProfileRepository;
-
+    private final TutorProfileJdbcRepository tutorProfileJdbcRepository;
     /**
      * 선생님 전체 조회
      */
     @Transactional(readOnly = true)
-    public Page<TutorSimpleResponseDto> getTutorList(Pageable pageable) {
-        return tutorProfileRepository.findTutorProfileDtos(pageable);
+    public Page<TutorSimpleResponseDto> getTutorList(Pageable pageable,
+        TutorFilterRequestDto filterRequest) {
+        return tutorProfileJdbcRepository.findFilteredProfiles(filterRequest, pageable);
     }
 
     /**

@@ -12,7 +12,9 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -33,7 +35,10 @@ public class TutorProfileEntity extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long memberId;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "memberId")
+    private MemberEntity member;
+
     private String imageUrl;
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tutorProfile")
     private List<SubjectEntity> subjects = new ArrayList<>();
@@ -82,6 +87,10 @@ public class TutorProfileEntity extends BaseEntity {
     public void updateSubjects(List<SubjectEntity> newSubjects) {
         this.subjects.clear();
         this.subjects.addAll(newSubjects);
+    }
+
+    public void saveMember(MemberEntity member) {
+        this.member = member;
     }
 
     private <T> void updateIfNotNull(T value, java.util.function.Consumer<T> updater) {
