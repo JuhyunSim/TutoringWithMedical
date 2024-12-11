@@ -30,37 +30,38 @@ public class TutorProfileJdbcRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
-    public Page<TutorSimpleResponseDto> findFilteredProfiles(TutorFilterRequestDto filterRequest, Pageable pageable) {
+    public Page<TutorSimpleResponseDto> findFilteredProfiles(
+        TutorFilterRequestDto.TutorEnumFilter filterRequest, Pageable pageable) {
 
         String sql = """
-            WITH filtered_profiles AS (
-                SELECT
-                    tpe.id AS tutor_id,
-                    tpe.imageUrl AS image_url,
-                    m.nickname AS tutor_nickname,
-                    tpe.university AS tutor_university,
-                    tpe.location AS tutor_location,
-                    ARRAY_AGG(s.subject) AS subjects
-                FROM
-                    tutorProfile tpe
-                LEFT JOIN
-                    member m ON tpe.memberId = m.id
-                LEFT JOIN
-                    SubjectEntity s ON tpe.id = s.tutorId
-                WHERE
-                    (? IS NULL OR m.gender = COALESCE(?, m.gender))
-                    AND (? IS NULL OR s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[])))
-                    AND (? IS NULL OR tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[])))
-                    AND (? IS NULL OR tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[])))
-                    AND (? IS NULL OR tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[])))
-                GROUP BY
-                    tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
-            )
-            SELECT *
-            FROM filtered_profiles
-            ORDER BY tutor_id
-            OFFSET ? ROWS FETCH FIRST ? ROWS ONLY
-        """;
+                WITH filtered_profiles AS (
+                    SELECT
+                        tpe.id AS tutor_id,
+                        tpe.imageUrl AS image_url,
+                        m.nickname AS tutor_nickname,
+                        tpe.university AS tutor_university,
+                        tpe.location AS tutor_location,
+                        ARRAY_AGG(s.subject) AS subjects
+                    FROM
+                        tutorProfile tpe
+                    LEFT JOIN
+                        member m ON tpe.memberId = m.id
+                    LEFT JOIN
+                        SubjectEntity s ON tpe.id = s.tutorId
+                    WHERE
+                        (? IS NULL OR m.gender = COALESCE(?, m.gender))
+                        AND (? IS NULL OR s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                        AND (? IS NULL OR tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                        AND (? IS NULL OR tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                        AND (? IS NULL OR tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                    GROUP BY
+                        tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
+                )
+                SELECT *
+                FROM filtered_profiles
+                ORDER BY tutor_id
+                OFFSET ? ROWS FETCH FIRST ? ROWS ONLY
+            """;
 
         String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
         List<String> subjects = filterRequest.getSubjects() != null
@@ -147,29 +148,29 @@ public class TutorProfileJdbcRepository {
         log.debug("Number of results: {}", tutorList.size());
 
         String countSql = """
-            SELECT COUNT(*)
-            FROM (
-                SELECT tpe.id
-                FROM tutorProfile tpe
-                LEFT JOIN member m ON tpe.memberId = m.id
-                LEFT JOIN SubjectEntity s ON tpe.id = s.tutorId
-                WHERE
-                    (? IS NULL OR m.gender = COALESCE(?, m.gender))
-                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
-                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
-                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
-                    AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
-                GROUP BY tpe.id
-            ) AS count_query
-        """;
-
+                SELECT COUNT(*)
+                FROM (
+                    SELECT tpe.id
+                    FROM tutorProfile tpe
+                    LEFT JOIN member m ON tpe.memberId = m.id
+                    LEFT JOIN SubjectEntity s ON tpe.id = s.tutorId
+                    WHERE
+                        (? IS NULL OR m.gender = COALESCE(?, m.gender))
+                        AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                        AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                        AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                        AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                    GROUP BY tpe.id
+                ) AS count_query
+            """;
 
         Long total = getTotalCount(countSql, gender, subjects, locations, universities, statusList);
 
         return new PageImpl<>(tutorList, pageable, total);
     }
 
-    private Long getTotalCount(String countSql, String gender, List<String> subjects, List<String> locations,
+    private Long getTotalCount(String countSql, String gender, List<String> subjects,
+        List<String> locations,
         List<String> universities, List<String> statusList) {
         return jdbcTemplate.query(
             connection -> {
@@ -213,7 +214,8 @@ public class TutorProfileJdbcRepository {
         }
     }
 
-    private void setArrayParameter(PreparedStatement ps, int index, List<String> values, Connection connection)
+    private void setArrayParameter(PreparedStatement ps, int index, List<String> values,
+        Connection connection)
         throws SQLException {
         log.debug("PreparedStatement Parameter [{}]: {}", index, values != null ? values : "NULL");
 

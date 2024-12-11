@@ -116,21 +116,6 @@ class TutorProfileServiceDatabaseTest {
         System.out.println("tutor1 subjects = " + tutorProfileRepository.findById(tutor1.getId()).get().getSubjects());
         System.out.println("tutor2 subjects = " + tutorProfileRepository.findById(tutor2.getId()).get().getSubjects());
 
-        //given
-        Pageable pageable = PageRequest.of(0, 10, Direction.ASC, "createdAt");
-        TutorFilterRequestDto filterRequest = TutorFilterRequestDto.builder()
-//            .gender(Gender.MALE)
-//            .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
-//            .locations(new ArrayList<>())
-//            .universities(new ArrayList<>())
-//            .statusList(new ArrayList<>())
-            .gender(null)
-            .subjects(null)
-            .locations(null)
-            .universities(null)
-            .statusList(null)
-            .build();
-
         //Debug
         // LEFT JOIN 결과 확인 쿼리
         String debugSql = """
@@ -163,6 +148,22 @@ class TutorProfileServiceDatabaseTest {
         results.forEach(result -> {
             System.out.println("Result Row: " + result);
         });
+
+        //given
+        Pageable pageable = PageRequest.of(0, 10, Direction.ASC, "createdAt");
+        TutorFilterRequestDto.TutorEnumFilter filterRequest = TutorFilterRequestDto.TutorEnumFilter.builder()
+//            .gender(Gender.MALE)
+//            .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
+//            .locations(new ArrayList<>())
+//            .universities(new ArrayList<>())
+//            .statusList(new ArrayList<>())
+            .gender(null)
+            .subjects(null)
+            .locations(null)
+            .universities(null)
+            .statusList(null)
+            .build();
+
 
         //when
         Page<TutorSimpleResponseDto> tutorProfileDtos = tutorProfileService.getTutorList(pageable,

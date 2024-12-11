@@ -1,5 +1,8 @@
 package com.simzoo.withmedical.enums;
 
+import com.simzoo.withmedical.exception.CustomException;
+import com.simzoo.withmedical.exception.ErrorCode;
+import java.util.Arrays;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -12,4 +15,11 @@ public enum EnrollmentStatus {
     DROPPED_OUT("중퇴");
 
     private final String description;
+
+    public static EnrollmentStatus fromDescription(String description) {
+        return Arrays.stream(values())
+            .filter(status -> status.getDescription().equals(description))
+            .findFirst()
+            .orElseThrow(() -> new CustomException(ErrorCode.INVALID_DATA_REQUEST));
+    }
 }
