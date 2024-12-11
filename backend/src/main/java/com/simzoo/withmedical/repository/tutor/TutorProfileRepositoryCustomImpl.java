@@ -38,7 +38,7 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
     private EntityManager entityManager;
 
     @Override
-    public Long countFilteredProfiles(TutorFilterRequestDto filterRequestDto) {
+    public Long countFilteredProfiles(TutorFilterRequestDto.TutorEnumFilter filterRequestDto) {
 
         QTutorProfileEntity tutorProfile = QTutorProfileEntity.tutorProfileEntity;
         QSubjectEntity subject = QSubjectEntity.subjectEntity;
@@ -55,38 +55,40 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             .where(eqFilterCondition)
             .fetchOne();
     }
+
     @Override
-    public Page<TutorSimpleResponseDto> findFilteredProfiles(TutorFilterRequestDto filterRequest,
+    public Page<TutorSimpleResponseDto> findFilteredProfiles(
+        TutorFilterRequestDto.TutorEnumFilter filterRequest,
         Pageable pageable) {
         String sql = """
-            WITH filtered_profiles AS (
-                SELECT
-                    tpe.id AS tutor_id,
-                    tpe.imageUrl AS image_url,
-                    m.nickname AS tutor_nickname,
-                    tpe.university AS tutor_university,
-                    tpe.location AS tutor_location,
-                    ARRAY_AGG(s.subject) AS subjects
-                FROM
-                    tutorProfile tpe
-                LEFT JOIN
-                    member m ON tpe.memberId = m.id
-                LEFT JOIN
-                    SubjectEntity s ON tpe.id = s.tutorId
-                WHERE
-                    (:gender IS NULL OR m.gender = :gender)
-                    AND (:subjects IS NULL OR s.subject = ANY(:subjects))
-                    AND (:locations IS NULL OR tpe.location = ANY(:locations))
-                    AND (:universities IS NULL OR tpe.university = ANY(:universities))
-                    AND (:statuslist IS NULL OR tpe.status = ANY(:statuslist))
-                GROUP BY
-                    tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
-            )
-            SELECT *
-            FROM filtered_profiles
-            ORDER BY tutor_id
-            OFFSET :offset ROWS FETCH FIRST :limit ROWS ONLY
-        """;
+                WITH filtered_profiles AS (
+                    SELECT
+                        tpe.id AS tutor_id,
+                        tpe.imageUrl AS image_url,
+                        m.nickname AS tutor_nickname,
+                        tpe.university AS tutor_university,
+                        tpe.location AS tutor_location,
+                        ARRAY_AGG(s.subject) AS subjects
+                    FROM
+                        tutorProfile tpe
+                    LEFT JOIN
+                        member m ON tpe.memberId = m.id
+                    LEFT JOIN
+                        SubjectEntity s ON tpe.id = s.tutorId
+                    WHERE
+                        (:gender IS NULL OR m.gender = :gender)
+                        AND (:subjects IS NULL OR s.subject = ANY(:subjects))
+                        AND (:locations IS NULL OR tpe.location = ANY(:locations))
+                        AND (:universities IS NULL OR tpe.university = ANY(:universities))
+                        AND (:statuslist IS NULL OR tpe.status = ANY(:statuslist))
+                    GROUP BY
+                        tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
+                )
+                SELECT *
+                FROM filtered_profiles
+                ORDER BY tutor_id
+                OFFSET :offset ROWS FETCH FIRST :limit ROWS ONLY
+            """;
 
         // 필터링 값 추출
         String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
@@ -100,7 +102,8 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             ? filterRequest.getUniversities().stream().map(University::name).toArray(String[]::new)
             : new String[0];
         String[] statusList = filterRequest.getStatusList() != null
-            ? filterRequest.getStatusList().stream().map(EnrollmentStatus::name).toArray(String[]::new)
+            ? filterRequest.getStatusList().stream().map(EnrollmentStatus::name)
+            .toArray(String[]::new)
             : new String[0];
 
         // 페이징
@@ -121,7 +124,8 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
         List<Object[]> results = query.getResultList();
 
         // 전체 데이터 개수 쿼리
-        long total = ((Number) entityManager.createNativeQuery("SELECT COUNT(*) FROM ...") // Simplified for brevity
+        long total = ((Number) entityManager.createNativeQuery(
+                "SELECT COUNT(*) FROM ...") // Simplified for brevity
             .setParameter("gender", gender)
             .setParameter("subjects", subjects)
             .setParameter("locations", locations) // NPE 방지
@@ -173,7 +177,7 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
         return Optional.ofNullable(dtoResult);
     }
 
-    private BooleanExpression buildPredicate(TutorFilterRequestDto filterRequest,
+    private BooleanExpression buildPredicate(TutorFilterRequestDto.TutorEnumFilter filterRequest,
         QTutorProfileEntity tutorProfile, QSubjectEntity subject, QMemberEntity member) {
         BooleanExpression predicate = null;
 

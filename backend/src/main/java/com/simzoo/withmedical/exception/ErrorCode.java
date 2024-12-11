@@ -27,7 +27,8 @@ public enum ErrorCode {
     NOT_MATCH_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호가 일치하지 않습니다."),
     ALREADY_EXIST_REVIEW(HttpStatus.UNAUTHORIZED, "이미 작성한 리뷰가 있습니다."),
     TUTEE_PROFILE_CANNOT_EXCEED_ONE_PROFILE(HttpStatus.BAD_REQUEST, "학생은 프로필을 2개 이상 가질 수 없습니다."),
-    INVALID_DATA(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 데이터입니다.");
+    INVALID_DATA(HttpStatus.INTERNAL_SERVER_ERROR, "유효하지 않은 데이터입니다."),
+    INVALID_DATA_REQUEST(HttpStatus.BAD_REQUEST, "유효하지 않는 데이터 요청입니다.");
 
     private HttpStatus httpStatus;
     private String message;

@@ -24,7 +24,7 @@ public class TutorProfileService {
      */
     @Transactional(readOnly = true)
     public Page<TutorSimpleResponseDto> getTutorList(Pageable pageable,
-        TutorFilterRequestDto filterRequest) {
+        TutorFilterRequestDto.TutorEnumFilter filterRequest) {
         return tutorProfileJdbcRepository.findFilteredProfiles(filterRequest, pageable);
     }
 
