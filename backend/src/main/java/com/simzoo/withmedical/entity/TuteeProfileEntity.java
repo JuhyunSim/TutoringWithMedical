@@ -4,7 +4,6 @@ import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTuteeProfi
 import com.simzoo.withmedical.dto.tutee.TuteeProfileResponseDto;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.GradeType;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -46,8 +45,7 @@ public class TuteeProfileEntity extends BaseEntity {
 
     private Gender gender;
 
-    @Enumerated(EnumType.STRING)
-    private Location location;
+    private String location;
 
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tuteeProfile")
     private List<SubjectEntity> subjects = new ArrayList<>();
@@ -105,7 +103,7 @@ public class TuteeProfileEntity extends BaseEntity {
             tuteeGrade -> this.grade = tuteeGrade);
         updateIfNotNull(updateTuteeProfileRequestDto.getDescription(),
             description -> this.description = description);
-        updateIfNotNull(updateTuteeProfileRequestDto.getLocation(),
+        updateIfNotNull(updateTuteeProfileRequestDto.getLocation().getSigungu().getFull_addr(),
             location -> this.location = location);
     }
 

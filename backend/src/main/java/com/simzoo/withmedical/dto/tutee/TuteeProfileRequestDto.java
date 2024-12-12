@@ -1,9 +1,9 @@
 package com.simzoo.withmedical.dto.tutee;
 
+import com.simzoo.withmedical.dto.LocationDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.enums.Gender;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import jakarta.validation.constraints.NotNull;
@@ -20,7 +20,7 @@ public class TuteeProfileRequestDto {
 
     private Gender gender;
     @NotNull
-    private Location location;
+    private LocationDto location;
     @NotNull
     private List<Subject> subjects;
 
@@ -34,7 +34,7 @@ public class TuteeProfileRequestDto {
             .member(member)
             .name(tuteeName)
             .gender(gender)
-            .location(location)
+            .location(location.getSigungu().getFull_addr())
             .personality(personality)
             .description(description)
             .grade(tuteeGrade)

@@ -3,7 +3,6 @@ package com.simzoo.withmedical.entity;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTutorProfileRequestDto;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.University;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -43,8 +42,7 @@ public class TutorProfileEntity extends BaseEntity {
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "tutorProfile")
     private List<SubjectEntity> subjects = new ArrayList<>();
 
-    @Enumerated(EnumType.STRING)
-    private Location location;
+    private String location;
 
     @Enumerated(EnumType.STRING)
     private University university;
@@ -75,7 +73,7 @@ public class TutorProfileEntity extends BaseEntity {
 
         updateIfNotNull(updateTutorProfileRequestDto.getImageUrl(), imageUrl -> this.imageUrl = imageUrl);
 
-        updateIfNotNull(updateTutorProfileRequestDto.getLocation(), location -> this.location = location);
+        updateIfNotNull(updateTutorProfileRequestDto.getLocation(), location -> this.location = location.getSigungu().getFull_addr());
 
         updateIfNotNull(updateTutorProfileRequestDto.getDescription(), description -> this.description = description);
 
