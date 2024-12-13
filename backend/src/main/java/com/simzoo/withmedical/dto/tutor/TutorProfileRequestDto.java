@@ -1,11 +1,11 @@
 package com.simzoo.withmedical.dto.tutor;
 
-import com.simzoo.withmedical.dto.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.univ.UnivDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -18,7 +18,7 @@ public class TutorProfileRequestDto {
     private List<Subject> subjects;
     private LocationDto location;
     private String description;
-    private University university;
+    private UnivDto university;
     private EnrollmentStatus status;
 
     public TutorProfileEntity toEntity(MemberEntity member) {
@@ -27,7 +27,8 @@ public class TutorProfileRequestDto {
             .imageUrl(imageUrl)
             .location(location.getSigungu().getFull_addr())
             .description(description)
-            .university(university)
+            .univName(university.getSchoolName())
+            .univNumber(university.getSeq())
             .status(status)
             .subjects(new ArrayList<>())
             .build();

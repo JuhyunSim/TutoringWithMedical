@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto.externalInfo;
+package com.simzoo.withmedical.dto.univ;
 
 import java.util.List;
 import lombok.Getter;
@@ -23,6 +23,7 @@ public class UnivInfoResponseDto {
         private String schoolName; // 학교명
         private String region; // 지역
         private String adres; // 주소
+        private String seq;
     }
 }
 

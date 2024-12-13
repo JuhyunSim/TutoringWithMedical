@@ -3,7 +3,6 @@ package com.simzoo.withmedical.entity;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTutorProfileRequestDto;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
-import com.simzoo.withmedical.enums.University;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -44,8 +43,9 @@ public class TutorProfileEntity extends BaseEntity {
 
     private String location;
 
-    @Enumerated(EnumType.STRING)
-    private University university;
+    private String univName;
+
+    private String univNumber;
 
     @Enumerated(EnumType.STRING)
     private EnrollmentStatus status;
@@ -59,7 +59,7 @@ public class TutorProfileEntity extends BaseEntity {
             .imageUrl(imageUrl)
             .subjects(this.subjects.stream().map(SubjectEntity::getSubject).toList())
             .location(this.location)
-            .university(this.university)
+            .univName(this.univName)
             .status(this.status)
             .description(this.description)
             .build();
@@ -77,7 +77,9 @@ public class TutorProfileEntity extends BaseEntity {
 
         updateIfNotNull(updateTutorProfileRequestDto.getDescription(), description -> this.description = description);
 
-        updateIfNotNull(updateTutorProfileRequestDto.getUniversity(), university -> this.university = university);
+        updateIfNotNull(updateTutorProfileRequestDto.getUniversity().getSchoolName(), univName -> this.univName = univName);
+
+        updateIfNotNull(updateTutorProfileRequestDto.getUniversity().getSeq(), univNumber -> this.univNumber = univNumber);
 
         updateIfNotNull(updateTutorProfileRequestDto.getStatus(), status -> this.status = status);
     }

@@ -1,9 +1,9 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.client.SgisClient;
-import com.simzoo.withmedical.dto.externalInfo.SgisToken;
-import com.simzoo.withmedical.dto.externalInfo.location.StageLocationRequestDto;
-import com.simzoo.withmedical.dto.externalInfo.location.StageLocationResponseDto;
+import com.simzoo.withmedical.dto.token.SgisToken;
+import com.simzoo.withmedical.dto.location.StageLocationRequestDto;
+import com.simzoo.withmedical.dto.location.StageLocationResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;

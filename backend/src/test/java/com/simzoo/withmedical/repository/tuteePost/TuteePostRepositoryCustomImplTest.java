@@ -12,7 +12,6 @@ import com.simzoo.withmedical.entity.TuteePostEntity;
 import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.GradeType;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.enums.TutoringType;
@@ -104,7 +103,7 @@ class TuteePostRepositoryCustomImplTest {
             .description("tutee_description")
             .personality("personality")
             .school("school")
-            .location(Location.SEOUL)
+            .location("서울특별시 강남구")
             .build();
 
         TuteeProfileEntity tuteeProfile2 = TuteeProfileEntity.builder()
@@ -118,7 +117,7 @@ class TuteePostRepositoryCustomImplTest {
             .description("tutee_description2")
             .personality("personality2")
             .school("school2")
-            .location(Location.INCHEON)
+            .location("인천광역시 미추홀구")
             .build();
 
         List<TuteeProfileEntity> tuteeProfileList = List.of(tuteeProfile, tuteeProfile2);
@@ -211,7 +210,7 @@ class TuteePostRepositoryCustomImplTest {
             .description("tutee_description")
             .personality("personality")
             .school("school")
-            .location(Location.SEOUL)
+            .location("서울특별시 강남구")
             .build();
 
         member.saveTuteeProfiles(List.of(tuteeProfile), Role.TUTEE);
@@ -227,7 +226,7 @@ class TuteePostRepositoryCustomImplTest {
             .description("tutee_description2")
             .personality("personality2")
             .school("school2")
-            .location(Location.INCHEON)
+            .location("인천광역시 남동구")
             .build();
 
         member2.saveTuteeProfiles(List.of(tuteeProfile2), Role.TUTEE);

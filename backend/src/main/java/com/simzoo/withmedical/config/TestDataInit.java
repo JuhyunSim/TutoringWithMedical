@@ -1,8 +1,8 @@
 package com.simzoo.withmedical.config;
 
-import com.simzoo.withmedical.dto.LocationDto;
-import com.simzoo.withmedical.dto.LocationDto.Sido;
-import com.simzoo.withmedical.dto.LocationDto.Sigungu;
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto.Sido;
+import com.simzoo.withmedical.dto.location.LocationDto.Sigungu;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TuteePostEntity;
@@ -14,7 +14,6 @@ import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.enums.TutoringType;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
@@ -114,7 +113,7 @@ public class TestDataInit {
                 TutorProfileEntity tutorProfile = TutorProfileEntity.builder()
                     .member(tutorMember)
                     .location(tutorLocation.getSigungu().getFull_addr())
-                    .university(i % 2 == 0 ? University.KOREA_UNIVERSITY : University.YONSEI_UNIVERSITY)
+                    .univName(i % 2 == 0 ? "고려대학교" : "연세대학교")
                     .status(EnrollmentStatus.ENROLLED)
                     .description("Tutor Description " + i)
                     .build();

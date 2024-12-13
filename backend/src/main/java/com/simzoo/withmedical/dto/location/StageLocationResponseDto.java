@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto.externalInfo.location;
+package com.simzoo.withmedical.dto.location;
 
 import java.util.List;
 import lombok.Getter;

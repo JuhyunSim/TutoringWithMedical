@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.client.CareerNetClient;
-import com.simzoo.withmedical.dto.externalInfo.UnivInfoResponseDto;
+import com.simzoo.withmedical.dto.univ.UnivInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,10 +26,11 @@ public class CareerNetService {
         String svcCode = "SCHOOL";
         String gubun = "univ_list";
         String contentType = "Json";
-
+        String schoolType1 = "100323";
+        String schoolType2 = "100328";
         log.debug("apiKey: {}", UNIV_API_KEY);
 
         return careerNetClient.getUniversities(UNIV_API_KEY, svcType, svcCode, gubun, thisPage,
-            perPage, searchSchoolName, contentType);
+            perPage, searchSchoolName, contentType, schoolType1, schoolType2);
     }
 }

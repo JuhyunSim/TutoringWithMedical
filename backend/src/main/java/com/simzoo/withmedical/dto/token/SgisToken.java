@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto.externalInfo;
+package com.simzoo.withmedical.dto.token;
 
 import lombok.Getter;
 

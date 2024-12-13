@@ -1,6 +1,6 @@
 package com.simzoo.withmedical.controller;
 
-import com.simzoo.withmedical.dto.externalInfo.UnivInfoResponseDto;
+import com.simzoo.withmedical.dto.univ.UnivInfoResponseDto;
 import com.simzoo.withmedical.service.CareerNetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

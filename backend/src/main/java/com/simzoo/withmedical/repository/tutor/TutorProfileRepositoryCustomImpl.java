@@ -167,7 +167,7 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
                     tutorProfile.imageUrl,
                     list(subject.subject),
                     tutorProfile.location,
-                    tutorProfile.university,
+                    tutorProfile.univName,
                     tutorProfile.status,
                     tutorProfile.description
                 )
@@ -197,7 +197,7 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             List<String> universityNames = filterRequest.getUniversities().stream()
                 .map(University::name).toList();
             predicate = combine(predicate,
-                tutorProfile.university.stringValue().in(universityNames));
+                tutorProfile.univName.in(universityNames));
         }
         if (filterRequest.getStatusList() != null && !filterRequest.getStatusList().isEmpty()) {
             List<String> statusNames = filterRequest.getStatusList().stream()

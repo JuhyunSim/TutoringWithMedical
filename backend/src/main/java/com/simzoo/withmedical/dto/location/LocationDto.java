@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto;
+package com.simzoo.withmedical.dto.location;
 
 import lombok.Builder;
 import lombok.Getter;

@@ -1,11 +1,11 @@
 package com.simzoo.withmedical.dto.member;
 
-import com.simzoo.withmedical.dto.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.univ.UnivDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
-import com.simzoo.withmedical.enums.University;
 import jakarta.validation.constraints.NotNull;
 import java.util.List;
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ public class UpdateMemberRequestDto {
         private List<Subject> subjects;
         private LocationDto location;
         private String description;
-        private University university;
+        private UnivDto university;
         private EnrollmentStatus status;
     }
 

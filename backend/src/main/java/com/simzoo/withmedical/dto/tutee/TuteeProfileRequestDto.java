@@ -1,6 +1,6 @@
 package com.simzoo.withmedical.dto.tutee;
 
-import com.simzoo.withmedical.dto.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.enums.Gender;

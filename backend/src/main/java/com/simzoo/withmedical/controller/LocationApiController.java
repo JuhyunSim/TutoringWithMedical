@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.controller;
 
-import com.simzoo.withmedical.dto.externalInfo.location.StageLocationRequestDto;
-import com.simzoo.withmedical.dto.externalInfo.location.StageLocationResponseDto;
+import com.simzoo.withmedical.dto.location.StageLocationRequestDto;
+import com.simzoo.withmedical.dto.location.StageLocationResponseDto;
 import com.simzoo.withmedical.service.SgisLocationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

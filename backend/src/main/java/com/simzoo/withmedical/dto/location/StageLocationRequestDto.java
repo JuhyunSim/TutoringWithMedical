@@ -1,4 +1,4 @@
-package com.simzoo.withmedical.dto.externalInfo.location;
+package com.simzoo.withmedical.dto.location;
 
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;

@@ -78,8 +78,8 @@ class TutorProfileServiceDatabaseTest {
 
         TutorProfileEntity tutor1 = TutorProfileEntity.builder()
             .member(member1)
-            .location(Location.SEOUL)
-            .university(University.KOREA_UNIVERSITY)
+            .location("서울특별시 강남구")
+            .univName("고려대학교")
             .status(EnrollmentStatus.ENROLLED)
             .subjects(new ArrayList<>())
             .build();
@@ -88,8 +88,8 @@ class TutorProfileServiceDatabaseTest {
 
         TutorProfileEntity tutor2 = TutorProfileEntity.builder()
             .member(member2)
-            .location(Location.INCHEON)
-            .university(University.KOREA_UNIVERSITY)
+            .location("인천광역시 연수구")
+            .univName("고려대학교")
             .status(EnrollmentStatus.ENROLLED)
             .subjects(new ArrayList<>())
             .build();
