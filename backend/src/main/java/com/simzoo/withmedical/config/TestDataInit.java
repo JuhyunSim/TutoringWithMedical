@@ -1,5 +1,8 @@
 package com.simzoo.withmedical.config;
 
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto.Sido;
+import com.simzoo.withmedical.dto.location.LocationDto.Sigungu;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TuteePostEntity;
@@ -7,12 +10,10 @@ import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.enums.TutoringType;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
@@ -43,12 +44,23 @@ public class TestDataInit {
                 memberRepository.save(member);
 
                 // TuteeProfiles 생성
+                LocationDto tuteeLocation = LocationDto.builder()
+                    .sido(Sido.builder()
+                        .addr_name("서울특별시")
+                        .full_addr("서울특별시")
+                        .build())
+                    .sigungu(Sigungu.builder()
+                        .addr_name(i % 2 == 0 ? "강남구" : "송파구")
+                        .full_addr("서울특별시 " + (i % 2 == 0 ? "강남구" : "송파구"))
+                        .build())
+                    .build();
+
                 TuteeProfileEntity tuteeProfile = TuteeProfileEntity.builder()
                     .member(member)
                     .name("Tutee" + i)
                     .gender(i % 2 == 0 ? Gender.MALE : Gender.FEMALE)
                     .grade(i % 3 == 0 ? TuteeGrade.ELEMENTARY_1 : TuteeGrade.HIGH_1)
-                    .location(i % 5 == 0 ? Location.SEOUL : Location.INCHEON)
+                    .location(tuteeLocation.getSigungu().getFull_addr())
                     .school("School" + i)
                     .personality("Personality" + i)
                     .description("Tutee description " + i)
@@ -87,10 +99,21 @@ public class TestDataInit {
                     .build();
                 memberRepository.save(tutorMember);
 
+                LocationDto tutorLocation = LocationDto.builder()
+                    .sido(Sido.builder()
+                        .addr_name("서울특별시")
+                        .full_addr("서울특별시")
+                        .build())
+                    .sigungu((Sigungu.builder()
+                        .addr_name("종로구")
+                        .full_addr("서울특별시 종로구")
+                        .build()))
+                    .build();
+
                 TutorProfileEntity tutorProfile = TutorProfileEntity.builder()
                     .member(tutorMember)
-                    .location(Location.SEOUL)
-                    .university(i % 2 == 0 ? University.KOREA_UNIVERSITY : University.YONSEI_UNIVERSITY)
+                    .location(tutorLocation.getSigungu().getFull_addr())
+                    .univName(i % 2 == 0 ? "고려대학교" : "연세대학교")
                     .status(EnrollmentStatus.ENROLLED)
                     .description("Tutor Description " + i)
                     .build();
@@ -104,4 +127,3 @@ public class TestDataInit {
         };
     }
 }
-

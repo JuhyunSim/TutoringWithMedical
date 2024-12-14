@@ -9,7 +9,6 @@ import com.simzoo.withmedical.entity.TuteePostEntity;
 import com.simzoo.withmedical.entity.TuteeProfileEntity;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.GradeType;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.TuteeGrade;
 import com.simzoo.withmedical.enums.TutoringType;
@@ -72,7 +71,7 @@ class TuteePostServiceDatabaseTest {
             .description("tutee_description")
             .personality("personality")
             .school("school")
-            .location(Location.SEOUL)
+            .location("서울특별시 강남구")
             .build();
 
         member.saveTuteeProfiles(List.of(tuteeProfile), Role.TUTEE);

@@ -7,19 +7,20 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.when;
 
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto.Sido;
+import com.simzoo.withmedical.dto.location.LocationDto.Sigungu;
 import com.simzoo.withmedical.dto.tutor.TutorProfileRequestDto;
+import com.simzoo.withmedical.dto.school.SchoolDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
-import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import com.simzoo.withmedical.util.AesUtil;
 import java.util.ArrayList;
@@ -41,9 +42,6 @@ class SignupServiceTest {
     MemberRepository memberRepository;
 
     @Mock
-    TuteeProfileRepository tuteeProfileRepository;
-
-    @Mock
     PasswordEncoder passwordEncoder;
 
     @Mock
@@ -56,12 +54,16 @@ class SignupServiceTest {
     void signup_tutor_success() {
         //given
         TutorProfileRequestDto tutorRequest = TutorProfileRequestDto.builder()
-            .proofFileUrl(null)
             .imageUrl(null)
             .subjects(List.of(Subject.HIGH_ENGLISH, Subject.MIDDLE_ENGLISH))
-            .location(Location.BUSAN)
+            .location(LocationDto.builder()
+                .sido(Sido.builder().addr_name("부산광역시").full_addr("부산광역시").build())
+                .sigungu(Sigungu.builder().addr_name("해운대구").full_addr("부산광역시 해운대구").build())
+                .build())
             .description("description")
-            .university(University.KOREA_UNIVERSITY)
+            .university(SchoolDto.builder()
+                .schoolName("고려대학교")
+                .build())
             .status(EnrollmentStatus.ENROLLED)
             .build();
 
@@ -85,10 +87,10 @@ class SignupServiceTest {
             .build();
 
         TutorProfileEntity tutorProfile = TutorProfileEntity.builder()
-            .location(Location.BUSAN)
-            .description("description")
-            .university(University.KOREA_UNIVERSITY)
-            .status(EnrollmentStatus.ENROLLED)
+            .location(requestDto.getTutorProfile().getLocation().getSigungu().getFull_addr())
+            .description(requestDto.getTutorProfile().getDescription())
+            .univName(requestDto.getTutorProfile().getUniversity().getSchoolName())
+            .status(requestDto.getTutorProfile().getStatus())
             .member(member)
             .subjects(new ArrayList<>())
             .build();
@@ -104,7 +106,7 @@ class SignupServiceTest {
 
         when(tutorProfileRepository.save(argThat(e ->
                 e.getLocation().equals(tutorProfile.getLocation()) &&
-                e.getUniversity().equals(tutorProfile.getUniversity()) &&
+                e.getUnivName().equals(tutorProfile.getUnivName()) &&
                 e.getStatus().equals(tutorProfile.getStatus()) &&
                 e.getDescription().equals(tutorProfile.getDescription())))).thenReturn(
             tutorProfile);
@@ -119,6 +121,6 @@ class SignupServiceTest {
         assertNotNull(result);
         assertEquals("description", result.getTutorProfile().getDescription());
         assertEquals(Gender.MALE, result.getGender());
-        assertEquals(University.KOREA_UNIVERSITY, result.getTutorProfile().getUniversity());
+        assertEquals("고려대학교", result.getTutorProfile().getUnivName());
     }
 }

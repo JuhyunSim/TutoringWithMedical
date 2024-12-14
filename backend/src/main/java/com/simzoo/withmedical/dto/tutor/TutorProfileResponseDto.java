@@ -2,9 +2,7 @@ package com.simzoo.withmedical.dto.tutor;
 
 import com.querydsl.core.annotations.QueryProjection;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -19,20 +17,20 @@ public class TutorProfileResponseDto {
     private Long tutorId;
     private String imageUrl;
     private List<Subject> subjects = new ArrayList<>();
-    private Location location;
-    private University university;
+    private String location;
+    private String univName;
     private EnrollmentStatus status;
     private String description;
 
     @QueryProjection
     public TutorProfileResponseDto(Long tutorId, String imageUrl, List<Subject> subjects,
-        Location location, University university, EnrollmentStatus status,
+        String location, String univName, EnrollmentStatus status,
         String description) {
         this.tutorId = tutorId;
         this.imageUrl = imageUrl;
         this.subjects = subjects;
         this.location = location;
-        this.university = university;
+        this.univName = univName;
         this.status = status;
         this.description = description;
     }

@@ -6,10 +6,8 @@ import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
@@ -64,8 +62,8 @@ public class JdbcLeftJoinTest {
 
         TutorProfileEntity tutor1 = TutorProfileEntity.builder()
             .member(member1)
-            .location(Location.SEOUL)
-            .university(University.KOREA_UNIVERSITY)
+            .location("서울특별시 종로구")
+            .univName("고려대학교")
             .status(EnrollmentStatus.ENROLLED)
             .subjects(new ArrayList<>())
             .build();
@@ -74,8 +72,8 @@ public class JdbcLeftJoinTest {
 
         TutorProfileEntity tutor2 = TutorProfileEntity.builder()
             .member(member2)
-            .location(Location.INCHEON)
-            .university(University.KOREA_UNIVERSITY)
+            .location("인천광역시 연수구")
+            .univName("고려대학교")
             .status(EnrollmentStatus.ENROLLED)
             .subjects(new ArrayList<>())
             .build();

@@ -16,7 +16,7 @@ public enum University {
 
     private final String description;
 
-    public static University fromDescription(String description) {
+    public static University fromDescription(java.lang.String description) {
         return Arrays.stream(values())
             .filter(e -> e.getDescription().equals(description))
             .findFirst()

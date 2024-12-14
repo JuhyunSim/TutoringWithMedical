@@ -4,8 +4,8 @@ import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
-import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
+import com.simzoo.withmedical.enums.Subject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -33,13 +33,13 @@ public class TutorProfileJdbcRepository {
     public Page<TutorSimpleResponseDto> findFilteredProfiles(
         TutorFilterRequestDto.TutorEnumFilter filterRequest, Pageable pageable) {
 
-        String sql = """
+        java.lang.String sql = """
                 WITH filtered_profiles AS (
                     SELECT
                         tpe.id AS tutor_id,
                         tpe.imageUrl AS image_url,
                         m.nickname AS tutor_nickname,
-                        tpe.university AS tutor_university,
+                        tpe.univName AS tutor_university,
                         tpe.location AS tutor_location,
                         ARRAY_AGG(s.subject) AS subjects
                     FROM
@@ -52,10 +52,10 @@ public class TutorProfileJdbcRepository {
                         (? IS NULL OR m.gender = COALESCE(?, m.gender))
                         AND (? IS NULL OR s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[])))
                         AND (? IS NULL OR tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[])))
-                        AND (? IS NULL OR tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[])))
+                        AND (? IS NULL OR tpe.univName = ANY(COALESCE(?::text[], ARRAY[]::text[])))
                         AND (? IS NULL OR tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[])))
                     GROUP BY
-                        tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
+                        tpe.id, m.nickname, tpe.imageUrl, tpe.univName, tpe.location
                 )
                 SELECT *
                 FROM filtered_profiles
@@ -63,17 +63,17 @@ public class TutorProfileJdbcRepository {
                 OFFSET ? ROWS FETCH FIRST ? ROWS ONLY
             """;
 
-        String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
-        List<String> subjects = filterRequest.getSubjects() != null
+        java.lang.String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
+        List<java.lang.String> subjects = filterRequest.getSubjects() != null
             ? filterRequest.getSubjects().stream().map(Enum::name).toList()
             : null;
-        List<String> locations = filterRequest.getLocations() != null
+        List<java.lang.String> locations = filterRequest.getLocations() != null
             ? filterRequest.getLocations().stream().map(Location::name).toList()
             : null;
-        List<String> universities = filterRequest.getUniversities() != null
+        List<java.lang.String> universities = filterRequest.getUniversities() != null
             ? filterRequest.getUniversities().stream().map(University::name).toList()
             : null;
-        List<String> statusList = filterRequest.getStatusList() != null
+        List<java.lang.String> statusList = filterRequest.getStatusList() != null
             ? filterRequest.getStatusList().stream().map(EnrollmentStatus::name).toList()
             : null;
 
@@ -88,7 +88,7 @@ public class TutorProfileJdbcRepository {
             List<Subject> subjectList = Optional.ofNullable(rs.getArray("subjects"))
                 .map(array -> {
                     try {
-                        String[] subjectStrings = (String[]) array.getArray();
+                        java.lang.String[] subjectStrings = (java.lang.String[]) array.getArray();
                         return Arrays.stream(subjectStrings)
                             .map(Subject::valueOf) // String을 Subject enum으로 변환
                             .toList();
@@ -102,12 +102,8 @@ public class TutorProfileJdbcRepository {
                 rs.getLong("tutor_id"),
                 rs.getString("image_url"),
                 rs.getString("tutor_nickname"),
-                Optional.ofNullable(rs.getString("tutor_university"))
-                    .map(University::valueOf)
-                    .orElse(null),
-                Optional.ofNullable(rs.getString("tutor_location"))
-                    .map(Location::valueOf)
-                    .orElse(null),
+                rs.getString("tutor_university"),
+                rs.getString("tutor_location"),
                 subjectList // 변환된 Subject 리스트
             );
         };
@@ -147,7 +143,7 @@ public class TutorProfileJdbcRepository {
 
         log.debug("Number of results: {}", tutorList.size());
 
-        String countSql = """
+        java.lang.String countSql = """
                 SELECT COUNT(*)
                 FROM (
                     SELECT tpe.id
@@ -158,7 +154,7 @@ public class TutorProfileJdbcRepository {
                         (? IS NULL OR m.gender = COALESCE(?, m.gender))
                         AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND s.subject = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
                         AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.location = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
-                        AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.university = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
+                        AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.univName = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
                         AND (? IS NULL OR (ARRAY_LENGTH(COALESCE(?::text[], ARRAY[]::text[]), 1) > 0 AND tpe.status = ANY(COALESCE(?::text[], ARRAY[]::text[]))))
                     GROUP BY tpe.id
                 ) AS count_query
@@ -169,9 +165,10 @@ public class TutorProfileJdbcRepository {
         return new PageImpl<>(tutorList, pageable, total);
     }
 
-    private Long getTotalCount(String countSql, String gender, List<String> subjects,
-        List<String> locations,
-        List<String> universities, List<String> statusList) {
+    private Long getTotalCount(
+        java.lang.String countSql, java.lang.String gender, List<java.lang.String> subjects,
+        List<java.lang.String> locations,
+        List<java.lang.String> universities, List<java.lang.String> statusList) {
         return jdbcTemplate.query(
             connection -> {
                 PreparedStatement ps = connection.prepareStatement(countSql);
@@ -203,7 +200,7 @@ public class TutorProfileJdbcRepository {
         );
     }
 
-    private void setParameter(PreparedStatement ps, int index, String value, Connection connection)
+    private void setParameter(PreparedStatement ps, int index, java.lang.String value, Connection connection)
         throws SQLException {
         log.debug("Setting parameter [{}]: {}", index, value != null ? value : "NULL");
 
@@ -214,7 +211,7 @@ public class TutorProfileJdbcRepository {
         }
     }
 
-    private void setArrayParameter(PreparedStatement ps, int index, List<String> values,
+    private void setArrayParameter(PreparedStatement ps, int index, List<java.lang.String> values,
         Connection connection)
         throws SQLException {
         log.debug("PreparedStatement Parameter [{}]: {}", index, values != null ? values : "NULL");

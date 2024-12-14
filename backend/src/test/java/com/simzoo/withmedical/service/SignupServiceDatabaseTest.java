@@ -6,6 +6,9 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import com.simzoo.withmedical.TestSecurityConfig;
 import com.simzoo.withmedical.config.QueryDslConfig;
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto.Sido;
+import com.simzoo.withmedical.dto.location.LocationDto.Sigungu;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.enums.Gender;
@@ -19,11 +22,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 
 @DataJpaTest
 @Import({QueryDslConfig.class, SignupService.class, TestSecurityConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
 class SignupServiceDatabaseTest {
 
     @Autowired
@@ -36,12 +41,24 @@ class SignupServiceDatabaseTest {
         //given
 
         TuteeProfileRequestDto tuteeRequest1 = TuteeProfileRequestDto.builder()
+            .tuteeName("name1")
+            .gender(Gender.MALE)
             .subjects(new ArrayList<>(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH)))
+            .location(LocationDto.builder()
+                .sido(Sido.builder().addr_name("서울특별시").build())
+                .sigungu(Sigungu.builder().addr_name("강남구").full_addr("서울특별시 강남구").build())
+                .build())
             .tuteeName("testName")
             .build();
 
         TuteeProfileRequestDto tuteeRequest2 = TuteeProfileRequestDto.builder()
+            .tuteeName("name1")
+            .gender(Gender.MALE)
             .subjects(new ArrayList<>(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH)))
+            .location(LocationDto.builder()
+                .sido(Sido.builder().addr_name("서울특별시").build())
+                .sigungu(Sigungu.builder().addr_name("강남구").full_addr("서울특별시 강남구").build())
+                .build())
             .tuteeName("testName")
             .build();
 
