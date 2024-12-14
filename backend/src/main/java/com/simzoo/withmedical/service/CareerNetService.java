@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.client.CareerNetClient;
-import com.simzoo.withmedical.dto.univ.UnivInfoResponseDto;
+import com.simzoo.withmedical.dto.school.SchoolInfoResponseDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +19,7 @@ public class CareerNetService {
     private String UNIV_API_KEY;
 
     @Transactional
-    public UnivInfoResponseDto getSchoolInfo(String thisPage, String perPage,
+    public SchoolInfoResponseDto getSchoolInfo(String thisPage, String perPage,
         String searchSchoolName, String gubun, String schoolType1, String schoolType2) {
 
         String svcType = "api";

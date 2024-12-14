@@ -1,20 +1,20 @@
-package com.simzoo.withmedical.dto.univ;
+package com.simzoo.withmedical.dto.school;
 
 import java.util.List;
 import lombok.Getter;
 
 @Getter
-public class UnivInfoResponseDto {
+public class SchoolInfoResponseDto {
     private DataSearch dataSearch;
 
     @Getter
     public static class DataSearch {
-        private List<UniversityDto> content;
+        private List<SchoolDto> content;
     }
 
     @Getter
-    public static class UniversityDto {
-        private String campustName;
+    public static class SchoolDto {
+        private String campusName;
         private String collegeinfourl;
         private String schoolType;
         private String link;

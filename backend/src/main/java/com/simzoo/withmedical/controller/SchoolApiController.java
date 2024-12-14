@@ -1,6 +1,6 @@
 package com.simzoo.withmedical.controller;
 
-import com.simzoo.withmedical.dto.univ.UnivInfoResponseDto;
+import com.simzoo.withmedical.dto.school.SchoolInfoResponseDto;
 import com.simzoo.withmedical.service.CareerNetService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -14,14 +14,14 @@ public class SchoolApiController {
 
     private final CareerNetService careerNetService;
 
-    @GetMapping("/universities")
-    public ResponseEntity<UnivInfoResponseDto> getUniversities(
+    @GetMapping("/schools")
+    public ResponseEntity<SchoolInfoResponseDto> getUniversities(
         @RequestParam String schoolName,
         @RequestParam String thisPage,
         @RequestParam String perPage,
         @RequestParam String gubun,
-        @RequestParam String schoolType1,
-        @RequestParam String schoolType2) {
+        @RequestParam(required = false) String schoolType1,
+        @RequestParam(required = false) String schoolType2) {
 
         return ResponseEntity.ok(
             careerNetService.getSchoolInfo(thisPage, perPage, schoolName, gubun, schoolType1,

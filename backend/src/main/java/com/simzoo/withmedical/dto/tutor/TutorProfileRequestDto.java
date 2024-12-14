@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.dto.tutor;
 
 import com.simzoo.withmedical.dto.location.LocationDto;
-import com.simzoo.withmedical.dto.univ.UnivDto;
+import com.simzoo.withmedical.dto.school.SchoolDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
@@ -18,7 +18,7 @@ public class TutorProfileRequestDto {
     private List<Subject> subjects;
     private LocationDto location;
     private String description;
-    private UnivDto university;
+    private SchoolDto university;
     private EnrollmentStatus status;
 
     public TutorProfileEntity toEntity(MemberEntity member) {

@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.dto.member;
 
 import com.simzoo.withmedical.dto.location.LocationDto;
-import com.simzoo.withmedical.dto.univ.UnivDto;
+import com.simzoo.withmedical.dto.school.SchoolDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Subject;
@@ -33,7 +33,7 @@ public class UpdateMemberRequestDto {
         private List<Subject> subjects;
         private LocationDto location;
         private String description;
-        private UnivDto university;
+        private SchoolDto university;
         private EnrollmentStatus status;
     }
 

@@ -11,7 +11,7 @@ import com.simzoo.withmedical.dto.location.LocationDto;
 import com.simzoo.withmedical.dto.location.LocationDto.Sido;
 import com.simzoo.withmedical.dto.location.LocationDto.Sigungu;
 import com.simzoo.withmedical.dto.tutor.TutorProfileRequestDto;
-import com.simzoo.withmedical.dto.univ.UnivDto;
+import com.simzoo.withmedical.dto.school.SchoolDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
@@ -61,7 +61,7 @@ class SignupServiceTest {
                 .sigungu(Sigungu.builder().addr_name("해운대구").full_addr("부산광역시 해운대구").build())
                 .build())
             .description("description")
-            .university(UnivDto.builder()
+            .university(SchoolDto.builder()
                 .schoolName("고려대학교")
                 .build())
             .status(EnrollmentStatus.ENROLLED)
