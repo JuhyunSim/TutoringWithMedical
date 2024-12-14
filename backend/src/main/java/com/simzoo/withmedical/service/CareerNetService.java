@@ -19,15 +19,13 @@ public class CareerNetService {
     private String UNIV_API_KEY;
 
     @Transactional
-    public UnivInfoResponseDto getUniversities(String thisPage, String perPage,
-        String searchSchoolName) {
+    public UnivInfoResponseDto getSchoolInfo(String thisPage, String perPage,
+        String searchSchoolName, String gubun, String schoolType1, String schoolType2) {
 
         String svcType = "api";
         String svcCode = "SCHOOL";
-        String gubun = "univ_list";
         String contentType = "Json";
-        String schoolType1 = "100323";
-        String schoolType2 = "100328";
+
         log.debug("apiKey: {}", UNIV_API_KEY);
 
         return careerNetClient.getUniversities(UNIV_API_KEY, svcType, svcCode, gubun, thisPage,

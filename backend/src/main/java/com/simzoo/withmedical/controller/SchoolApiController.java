@@ -10,15 +10,21 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequiredArgsConstructor
-public class UniversityApiController {
+public class SchoolApiController {
 
     private final CareerNetService careerNetService;
 
     @GetMapping("/universities")
-    public ResponseEntity<UnivInfoResponseDto> getUniversities(@RequestParam String schoolName,
-        @RequestParam String thisPage, @RequestParam String perPage) {
+    public ResponseEntity<UnivInfoResponseDto> getUniversities(
+        @RequestParam String schoolName,
+        @RequestParam String thisPage,
+        @RequestParam String perPage,
+        @RequestParam String gubun,
+        @RequestParam String schoolType1,
+        @RequestParam String schoolType2) {
 
         return ResponseEntity.ok(
-            careerNetService.getUniversities(thisPage, perPage, schoolName));
+            careerNetService.getSchoolInfo(thisPage, perPage, schoolName, gubun, schoolType1,
+                schoolType2));
     }
 }

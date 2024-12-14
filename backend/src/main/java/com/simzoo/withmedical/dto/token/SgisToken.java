@@ -9,6 +9,6 @@ public class SgisToken {
     @Getter
     public static class Result {
         String accessToken;
-        String accessTimout;
+        String accessTimeout;
     }
 }

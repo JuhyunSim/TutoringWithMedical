@@ -1,9 +1,9 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.client.SgisClient;
-import com.simzoo.withmedical.dto.token.SgisToken;
 import com.simzoo.withmedical.dto.location.StageLocationRequestDto;
 import com.simzoo.withmedical.dto.location.StageLocationResponseDto;
+import com.simzoo.withmedical.redis.SgisTokenManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SgisLocationService {
 
     private final SgisClient sgisClient;
-
+    private final SgisTokenManager sgisTokenManager;
     @Value("${sgis.api.consumerKey}")
     private String consumerKey;
 
@@ -28,8 +28,7 @@ public class SgisLocationService {
      */
     @Transactional
     public StageLocationResponseDto getStagedLocations(StageLocationRequestDto requestDto) {
-        String accessToken = ensureAccessToken(consumerKey, consumerSecret).getResult()
-            .getAccessToken();
+        String accessToken = sgisTokenManager.getAccessToken(consumerKey, consumerSecret);
         log.debug("accessToken: {}", accessToken);
 
         if (requestDto.getCd().isEmpty()) {
@@ -38,12 +37,5 @@ public class SgisLocationService {
 
         return sgisClient.getStageLocation(accessToken, requestDto.getCd(),
             requestDto.getPg_yn());
-    }
-
-    /**
-     * SGIS AccessToken 발급 또는 갱신
-     */
-    private SgisToken ensureAccessToken(String consumerKey, String consumerSecret) {
-        return sgisClient.getAccessToken(consumerKey, consumerSecret);
     }
 }
