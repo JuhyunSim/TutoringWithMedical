@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "careerNetClient", url = "https://www.career.go.kr")
 public interface CareerNetClient {
     @GetMapping("/cnet/openapi/getOpenApi.json")
-    SchoolInfoResponseDto getUniversities(
+    SchoolInfoResponseDto getSchools(
         @RequestParam String apiKey,
         @RequestParam String svcType,
         @RequestParam String svcCode,

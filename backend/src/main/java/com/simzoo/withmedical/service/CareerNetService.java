@@ -28,7 +28,7 @@ public class CareerNetService {
 
         log.debug("apiKey: {}", UNIV_API_KEY);
 
-        return careerNetClient.getUniversities(UNIV_API_KEY, svcType, svcCode, gubun, thisPage,
+        return careerNetClient.getSchools(UNIV_API_KEY, svcType, svcCode, gubun, thisPage,
             perPage, searchSchoolName, contentType, schoolType1, schoolType2);
     }
 }
