@@ -19,8 +19,6 @@ import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
-import com.simzoo.withmedical.repository.TuteeProfileRepository;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
@@ -42,9 +40,6 @@ class SignupServiceTest {
 
     @Mock
     MemberRepository memberRepository;
-
-    @Mock
-    TuteeProfileRepository tuteeProfileRepository;
 
     @Mock
     PasswordEncoder passwordEncoder;
@@ -92,10 +87,10 @@ class SignupServiceTest {
             .build();
 
         TutorProfileEntity tutorProfile = TutorProfileEntity.builder()
-            .location("부산광역시 해운대구")
-            .description("description")
-            .univName("부산대학교")
-            .status(EnrollmentStatus.ENROLLED)
+            .location(requestDto.getTutorProfile().getLocation().getSigungu().getFull_addr())
+            .description(requestDto.getTutorProfile().getDescription())
+            .univName(requestDto.getTutorProfile().getUniversity().getSchoolName())
+            .status(requestDto.getTutorProfile().getStatus())
             .member(member)
             .subjects(new ArrayList<>())
             .build();
@@ -126,6 +121,6 @@ class SignupServiceTest {
         assertNotNull(result);
         assertEquals("description", result.getTutorProfile().getDescription());
         assertEquals(Gender.MALE, result.getGender());
-        assertEquals(University.KOREA_UNIVERSITY, result.getTutorProfile().getUnivName());
+        assertEquals("고려대학교", result.getTutorProfile().getUnivName());
     }
 }

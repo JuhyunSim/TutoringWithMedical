@@ -16,8 +16,9 @@ import lombok.Getter;
 @Builder
 public class TuteeProfileRequestDto {
 
+    @NotNull
     private String tuteeName;
-
+    @NotNull
     private Gender gender;
     @NotNull
     private LocationDto location;

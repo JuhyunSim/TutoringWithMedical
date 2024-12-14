@@ -10,10 +10,8 @@ import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Role;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.subject.SubjectRepository;
 import com.simzoo.withmedical.repository.tutor.TutorProfileJdbcRepository;
@@ -118,7 +116,7 @@ class TutorProfileServiceDatabaseTest {
 
         //Debug
         // LEFT JOIN 결과 확인 쿼리
-        String debugSql = """
+        java.lang.String debugSql = """
             SELECT 
                 tpe.id AS tutor_id,
                 m.nickname AS member_nickname,
@@ -131,20 +129,20 @@ class TutorProfileServiceDatabaseTest {
 
         //TutorSimpleResponseDto 매핑
         RowMapper<TutorSimpleResponseDto> rowMapper = (rs, rowNum) -> {
-            List<String> subjectList = Arrays.asList((String[]) rs.getArray("subjects").getArray());
+            List<java.lang.String> subjectList = Arrays.asList((java.lang.String[]) rs.getArray("subjects").getArray());
             System.out.println("Mapped subjects: " + subjectList);
             return new TutorSimpleResponseDto(
                 rs.getLong("tutor_id"),
                 rs.getString("image_url"),
                 rs.getString("tutor_nickname"),
-                University.valueOf(rs.getString("tutor_university")),
-                Location.valueOf(rs.getString("tutor_location")),
+                rs.getString("tutor_university"),
+                rs.getString("tutor_location"),
                 subjectList.stream().map(Subject::valueOf).toList()
             );
         };
 
 
-        List<Map<String, Object>> results = jdbcTemplate.queryForList(debugSql);
+        List<Map<java.lang.String, Object>> results = jdbcTemplate.queryForList(debugSql);
         results.forEach(result -> {
             System.out.println("Result Row: " + result);
         });

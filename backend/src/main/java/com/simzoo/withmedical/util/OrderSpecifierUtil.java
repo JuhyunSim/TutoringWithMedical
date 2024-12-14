@@ -16,8 +16,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -82,7 +84,11 @@ public class OrderSpecifierUtil {
                     .getField();
                 // 복합 경로 처리
 
-                Order direction = sortRequest.getDirection().isAscending() ? Order.ASC : Order.DESC;
+                Order direction = Optional.ofNullable(sortRequest.getDirection())
+                    .map(Direction::isAscending)
+                    .map(isAscending -> isAscending ? Order.ASC : Order.DESC)
+                    .orElse(Order.DESC);
+
                 Expression fieldPath = createFieldPath(entityPath, field);
                 orders.add(new OrderSpecifier<>(direction, fieldPath));
             }

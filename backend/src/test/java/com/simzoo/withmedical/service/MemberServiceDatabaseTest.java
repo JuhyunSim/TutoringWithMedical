@@ -3,6 +3,9 @@ package com.simzoo.withmedical.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.simzoo.withmedical.config.QueryDslConfig;
+import com.simzoo.withmedical.dto.location.LocationDto;
+import com.simzoo.withmedical.dto.location.LocationDto.Sido;
+import com.simzoo.withmedical.dto.location.LocationDto.Sigungu;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTuteeProfileRequestDto;
 import com.simzoo.withmedical.dto.tutee.TuteeProfileRequestDto;
@@ -32,7 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Import({MemberService.class, QueryDslConfig.class})
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-class  MemberServiceDatabaseTest {
+class MemberServiceDatabaseTest {
 
     @Autowired
     private MemberService memberService;
@@ -60,6 +63,15 @@ class  MemberServiceDatabaseTest {
             .tuteeName("testName")
             .gender(Gender.MALE)
             .description("testDescription")
+            .location(LocationDto.builder()
+                .sido(Sido.builder()
+                    .addr_name("서울특별시")
+                    .build())
+                .sigungu(Sigungu.builder()
+                    .addr_name("강남구")
+                    .full_addr("서울특별시 강남구")
+                    .build())
+                .build())
             .subjects(List.of(Subject.HIGH_ENGLISH))
             .build();
 
@@ -159,6 +171,10 @@ class  MemberServiceDatabaseTest {
             .tuteeProfile(UpdateTuteeProfileRequestDto.builder()
                 .tuteeName("updatedTuteeName")
                 .tuteeId(savedTutee.getId())
+                .location(LocationDto.builder()
+                    .sido(Sido.builder().addr_name("서울특별시").build())
+                    .sigungu(Sigungu.builder().addr_name("강남구").full_addr("서울특별시 강남구").build())
+                    .build())
                 .subjects(newSubjects)
                 .build())
             .build();

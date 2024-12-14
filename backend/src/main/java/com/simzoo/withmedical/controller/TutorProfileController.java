@@ -63,9 +63,9 @@ public class TutorProfileController {
      * 선생님 조회 필터요청값 불러오기
      */
     @GetMapping("/filters")
-    public ResponseEntity<Map<String, List<String>>> getFilters() {
+    public ResponseEntity<Map<java.lang.String, List<java.lang.String>>> getFilters() {
 
-        Map<String, List<String>> filters = new HashMap<>();
+        Map<java.lang.String, List<java.lang.String>> filters = new HashMap<>();
 
         filters.put("subjects", Arrays.stream(Subject.values()).map(Subject::getDescription).toList());
         filters.put("locations", Arrays.stream(Location.values()).map(Location::getDescription).toList());

@@ -15,8 +15,8 @@ import com.simzoo.withmedical.entity.QSubjectEntity;
 import com.simzoo.withmedical.entity.QTutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Location;
-import com.simzoo.withmedical.enums.Subject;
 import com.simzoo.withmedical.enums.University;
+import com.simzoo.withmedical.enums.Subject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -60,13 +60,13 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
     public Page<TutorSimpleResponseDto> findFilteredProfiles(
         TutorFilterRequestDto.TutorEnumFilter filterRequest,
         Pageable pageable) {
-        String sql = """
+        java.lang.String sql = """
                 WITH filtered_profiles AS (
                     SELECT
                         tpe.id AS tutor_id,
                         tpe.imageUrl AS image_url,
                         m.nickname AS tutor_nickname,
-                        tpe.university AS tutor_university,
+                        tpe.string AS tutor_university,
                         tpe.location AS tutor_location,
                         ARRAY_AGG(s.subject) AS subjects
                     FROM
@@ -79,10 +79,10 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
                         (:gender IS NULL OR m.gender = :gender)
                         AND (:subjects IS NULL OR s.subject = ANY(:subjects))
                         AND (:locations IS NULL OR tpe.location = ANY(:locations))
-                        AND (:universities IS NULL OR tpe.university = ANY(:universities))
+                        AND (:universities IS NULL OR tpe.string = ANY(:universities))
                         AND (:statuslist IS NULL OR tpe.status = ANY(:statuslist))
                     GROUP BY
-                        tpe.id, m.nickname, tpe.imageUrl, tpe.university, tpe.location
+                        tpe.id, m.nickname, tpe.imageUrl, tpe.string, tpe.location
                 )
                 SELECT *
                 FROM filtered_profiles
@@ -91,20 +91,20 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             """;
 
         // 필터링 값 추출
-        String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
-        String[] subjects = filterRequest.getSubjects() != null
-            ? filterRequest.getSubjects().stream().map(Enum::name).toArray(String[]::new)
-            : new String[0]; // null 대신 빈 배열로 처리
-        String[] locations = filterRequest.getLocations() != null
-            ? filterRequest.getLocations().stream().map(Location::name).toArray(String[]::new)
-            : new String[0];
-        String[] universities = filterRequest.getUniversities() != null
-            ? filterRequest.getUniversities().stream().map(University::name).toArray(String[]::new)
-            : new String[0];
-        String[] statusList = filterRequest.getStatusList() != null
+        java.lang.String gender = filterRequest.getGender() != null ? filterRequest.getGender().name() : null;
+        java.lang.String[] subjects = filterRequest.getSubjects() != null
+            ? filterRequest.getSubjects().stream().map(Enum::name).toArray(java.lang.String[]::new)
+            : new java.lang.String[0]; // null 대신 빈 배열로 처리
+        java.lang.String[] locations = filterRequest.getLocations() != null
+            ? filterRequest.getLocations().stream().map(Location::name).toArray(java.lang.String[]::new)
+            : new java.lang.String[0];
+        java.lang.String[] universities = filterRequest.getUniversities() != null
+            ? filterRequest.getUniversities().stream().map(University::name).toArray(java.lang.String[]::new)
+            : new java.lang.String[0];
+        java.lang.String[] statusList = filterRequest.getStatusList() != null
             ? filterRequest.getStatusList().stream().map(EnrollmentStatus::name)
-            .toArray(String[]::new)
-            : new String[0];
+            .toArray(java.lang.String[]::new)
+            : new java.lang.String[0];
 
         // 페이징
         Long offset = pageable.getOffset();
@@ -137,10 +137,10 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
         List<TutorSimpleResponseDto> tutorList = results.stream()
             .map(row -> new TutorSimpleResponseDto(
                 (Long) row[0], // tutor_id
-                (String) row[1], // image_url
-                (String) row[2], // tutor_nickname
-                University.valueOf((String) row[3]), // tutor_university
-                Location.valueOf((String) row[4]), // tutor_location
+                (java.lang.String) row[1], // image_url
+                (java.lang.String) row[2], // tutor_nickname
+                (java.lang.String) row[3], // tutor_university
+                (java.lang.String) row[4], // tutor_location
                 Arrays.asList((Subject[]) row[5]) // subjects as List<String>
             ))
             .toList();
@@ -189,18 +189,18 @@ public class TutorProfileRepositoryCustomImpl implements TutorProfileRepositoryC
             predicate = combine(predicate, subject.subject.in(filterRequest.getSubjects()));
         }
         if (filterRequest.getLocations() != null && !filterRequest.getLocations().isEmpty()) {
-            List<String> locationNames = filterRequest.getLocations().stream().map(Location::name)
+            List<java.lang.String> locationNames = filterRequest.getLocations().stream().map(Location::name)
                 .toList();
             predicate = combine(predicate, tutorProfile.location.stringValue().in(locationNames));
         }
         if (filterRequest.getUniversities() != null && !filterRequest.getUniversities().isEmpty()) {
-            List<String> universityNames = filterRequest.getUniversities().stream()
+            List<java.lang.String> stringNames = filterRequest.getUniversities().stream()
                 .map(University::name).toList();
             predicate = combine(predicate,
-                tutorProfile.univName.in(universityNames));
+                tutorProfile.univName.in(stringNames));
         }
         if (filterRequest.getStatusList() != null && !filterRequest.getStatusList().isEmpty()) {
-            List<String> statusNames = filterRequest.getStatusList().stream()
+            List<java.lang.String> statusNames = filterRequest.getStatusList().stream()
                 .map(EnrollmentStatus::name).toList();
             predicate = combine(predicate, tutorProfile.status.stringValue().in(statusNames));
         }
