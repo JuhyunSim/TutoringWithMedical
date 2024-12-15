@@ -15,6 +15,10 @@ public class PhoneNumberValidator implements ConstraintValidator<PhoneNumber, St
 
     @Override
     public boolean isValid(String s, ConstraintValidatorContext constraintValidatorContext) {
+        if (s == null || s.isEmpty()) {
+            return false;
+        }
+
         return Pattern.matches(regex, s);
     }
 }
