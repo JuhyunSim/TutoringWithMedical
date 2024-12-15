@@ -14,6 +14,15 @@ public class ProfileNotNullValidator implements ConstraintValidator<ProfileNotNu
 
     @Override
     public boolean isValid(SignupRequestDto requestDto, ConstraintValidatorContext context) {
+
+        boolean isTutorProfileInvalid = Objects.isNull(requestDto.getTutorProfile());
+        boolean isTuteeProfileInvalid = Objects.isNull(requestDto.getTuteeProfile());
+        boolean isTuteeProfilesEmpty = requestDto.getTuteeProfiles() == null || requestDto.getTuteeProfiles().isEmpty();
+
+        if (isTuteeProfileInvalid || isTuteeProfilesEmpty || isTutorProfileInvalid) {
+            return false;
+        }
+
         if (requestDto.getRole() == Role.TUTOR) {
             return !Objects.isNull(requestDto.getTutorProfile());
         } else {

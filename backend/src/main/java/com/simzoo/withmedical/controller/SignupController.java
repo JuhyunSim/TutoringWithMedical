@@ -1,10 +1,11 @@
 package com.simzoo.withmedical.controller;
 
-import com.simzoo.withmedical.dto.member.MemberResponseDto;
 import com.simzoo.withmedical.dto.auth.SignupRequestDto;
+import com.simzoo.withmedical.dto.member.MemberResponseDto;
 import com.simzoo.withmedical.service.MemberService;
 import com.simzoo.withmedical.service.SignupService;
 import com.simzoo.withmedical.service.VerificationService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -23,7 +24,7 @@ public class SignupController {
     private final VerificationService verificationService;
 
     @PostMapping("/signup")
-    public ResponseEntity<MemberResponseDto> signup(@RequestBody SignupRequestDto requestDto) {
+    public ResponseEntity<MemberResponseDto> signup(@Valid @RequestBody SignupRequestDto requestDto) {
 
         return ResponseEntity.ok(signupService.signup(requestDto).toResponseDto());
     }
