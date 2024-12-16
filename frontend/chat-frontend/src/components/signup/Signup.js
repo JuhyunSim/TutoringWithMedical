@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router';
 import axios from 'axios';
 import './Signup.css';
+import LocationModal from '../modal/LocationModal.js';
+import SchoolModal from '../modal/SchoolModal.js';
 
 // Define subjects according to the enum in the backend
 const subjectsList = [
@@ -11,14 +13,6 @@ const subjectsList = [
     { value: "ELEMENTARY_ENGLISH", label: "초등영어" },
     { value: "MIDDLE_ENGLISH", label: "중등영어" },
     { value: "HIGH_ENGLISH", label: "고등영어" }
-];
-
-const universityList = [
-    { value: "SEOUL_UNIVERSITY", label: "서울대학교" },
-    { value: "KOREA_UNIVERSITY", label: "고려대학교" },
-    { value: "YONSEI_UNIVERSITY", label: "연세대학교" },
-    { value: "SUNKYUNKWAN_UNIVERSITY", label: "성균관대학교" }
-    // Add more universities as needed
 ];
 
 // 추가된 학년 옵션
@@ -35,13 +29,6 @@ const tuteeGradeList = [
     { value: "HIGH_1", label: "고등학교 1학년" },
     { value: "HIGH_2", label: "고등학교 2학년" },
     { value: "HIGH_3", label: "고등학교 3학년" }
-];
-
-const locationList = [
-    { value: "SEOUL", label: "서울" },
-    { value: "BUSAN", label: "부산" },
-    { value: "INCHEON", label: "인천" },
-    // Add more locations as needed
 ];
 
 const enrollmentStatusList = [
@@ -61,9 +48,7 @@ const Signup = () => {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [role, setRole] = useState('');
     const [tutorProfile, setTutorProfile] = useState({
-        proofFile: null,
         imageUrl: null,
-        proofFilePreview: null, 
         profileImagePreview: null,
         subjects: [],
         location: '',
@@ -90,8 +75,25 @@ const Signup = () => {
         },
     ]);
     const [currentProfileIndex, setCurrentProfileIndex] = useState(0);
+    const [locations, setLocations] = useState([]); 
+    const [universities, setUniversities] = useState([]); 
     const [error, setError] = useState('');
     const navigate = useNavigate();
+    const [selectedLocation, setSelectedLocation] = useState(null);
+    const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
+    const [isSchoolModalOpen, setIsSchoolModalOpen] = useState(false);
+    const [selectedSchool, setSelectedSchool] = useState(null);
+    const [schoolType, setSchoolType] = useState("university");
+
+    const handleOpenLocationModal = () => setIsLocationModalOpen(true);
+    const handleCloseLocationModal = () => setIsLocationModalOpen(false);
+    
+    const handleOpenSchoolModal = (type) => {
+        setSchoolType(type); // 검색할 학교 유형 설정
+        setIsSchoolModalOpen(true);
+    };
+
+    const handleCloseSchoolModal = () => setIsSchoolModalOpen(false);
 
     // const sendVerificationCode = async () => {
     //     setError('');
@@ -122,6 +124,57 @@ const Signup = () => {
             setCurrentProfileIndex((prevIndex) => prevIndex - 1);
         }
     };
+
+    useEffect(() => {
+        // Fetch locations from API
+        const fetchLocations = async ( retry = false ) => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/locations`, {
+                    params: {
+                        cd: '',
+                        pg_yn: '0', 
+                    }
+                });
+                setLocations(response.data.content);
+            } catch (err) {
+                console.error('Failed to fetch locations:', err);
+                // 에러가 -401이고, 재호출하지 않은 경우
+                if (
+                    err.response?.data?.errCd === -401 &&
+                    err.response?.data?.errMsg === "인증 정보가 존재하지 않습니다" &&
+                    !retry
+                ) {
+                    console.log('Retrying fetchLocations...');
+                    await fetchLocations(true); // 재호출
+                } else {
+                    setError('지역 정보를 가져오는데 실패했습니다.');
+                }
+                }
+        };
+
+        // Fetch universities from API
+        const fetchUniversities = async () => {
+            try {
+                const response = await axios.get(`${process.env.REACT_APP_BACKEND_URL}/schools`, {
+                    params: {
+                        schoolName: '',
+                        thisPage: '1',
+                        perPage: '100',
+                        gubun: 'univ_list',
+                        schoolType1: '100323',
+                        schoolType2: '100328'
+                    },
+                });
+                setUniversities(response.data.content);
+            } catch (err) {
+                console.error('Failed to fetch universities:', err);
+                setError('대학교 정보를 가져오는데 실패했습니다.');
+            }
+        };
+
+        fetchLocations();
+        fetchUniversities();
+    }, []);
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -252,6 +305,56 @@ const Signup = () => {
         }
     };
 
+    const handleSaveLocation = (location) => {
+        if (role === 'TUTOR') {
+            setTutorProfile((prev) => ({ ...prev, location }));
+        } else if (role === 'TUTEE') {
+            setTuteeProfile((prev) => ({ ...prev, location }));
+        } else if (role === 'PARENT') {
+            setTuteeProfiles((prevProfiles) => {
+                const updatedProfiles = [...prevProfiles];
+                updatedProfiles[currentProfileIndex] = {
+                    ...updatedProfiles[currentProfileIndex],
+                    location,
+                };
+                return updatedProfiles;
+        });
+        }
+        handleCloseLocationModal();
+    };
+
+    const handleSaveSchool = (school) => {
+        if (role === "TUTOR") {
+            setTutorProfile((prev) => ({
+                ...prev,
+                university: {
+                    schoolName: school.schoolName,
+                    seq: school.seq,
+                },
+            }));
+        } else if (role === "TUTEE") {
+            setTuteeProfile((prev) => ({
+                ...prev,
+                school: {
+                    schoolName: school.schoolName,
+                    seq: school.seq,
+                },
+            }));
+        } else if (role === "PARENT") {
+            setTuteeProfiles((prevProfiles) => {
+                const updatedProfiles = [...prevProfiles];
+                updatedProfiles[currentProfileIndex] = {
+                    ...updatedProfiles[currentProfileIndex],
+                    school: {
+                        schoolName: school.schoolName,
+                        seq: school.seq,
+                    },
+                };
+                return updatedProfiles;
+            });
+        }
+        handleCloseSchoolModal(); // 모달 닫기
+    };  
 
     return (
         <div className="signup-container">
@@ -328,10 +431,7 @@ const Signup = () => {
                     <>
                     {role === 'TUTOR' && (
                         <>
-                            <div className="input-group">
-                                <label>Proof File</label>
-                                <input type="file" onChange={(e) => handleFileChange(e, 'proofFile')} />
-                            </div>
+
                             <div className="input-group">
                                 <label>Profile Image</label>
                                 <div className="profile-image-container">
@@ -366,22 +466,18 @@ const Signup = () => {
                                 </div>
                             </div>
                             <div className="input-group">
-                                <label>Location</label>
-                                <select value={tutorProfile.location} onChange={(e) => setTutorProfile({ ...tutorProfile, location: e.target.value })}>
-                                    <option value="">Select Location</option>
-                                    {locationList.map((location) => (
-                                        <option key={location.value} value={location.value}>{location.label}</option>
-                                    ))}
-                                </select>
+                                <label>지역</label>
+                                <button onClick={handleOpenLocationModal}>
+                                    {tutorProfile.location
+                                        ? `${tutorProfile.location.sido.addr_name} > ${tutorProfile.location.sigungu.addr_name}`
+                                        : '지역 선택'}
+                                </button>
                             </div>
                             <div className="input-group">
-                                <label>University</label>
-                                <select value={tutorProfile.university} onChange={(e) => setTutorProfile({ ...tutorProfile, university: e.target.value })}>
-                                    <option value="">Select University</option>
-                                    {universityList.map((uni) => (
-                                        <option key={uni.value} value={uni.value}>{uni.label}</option>
-                                    ))}
-                                </select>
+                                <label>대학</label>
+                                <button onClick={handleOpenSchoolModal("university")}>
+                                    {tutorProfile.university.schoolName || "대학 선택"}
+                                </button>
                             </div>
                             <div className="input-group">
                                 <label>Enrollment Status</label>
@@ -420,12 +516,11 @@ const Signup = () => {
 
                             <div className="input-group">
                                 <label>Location</label>
-                                <select value={tuteeProfile.location} onChange={(e) => setTuteeProfile({ ...tuteeProfile, location: e.target.value })}>
-                                    <option value="">Select Location</option>
-                                    {locationList.map((location) => (
-                                        <option key={location.value} value={location.value}>{location.label}</option>
-                                    ))}
-                                </select>
+                                <button onClick={handleOpenLocationModal}>
+                                    {tuteeProfile.location
+                                        ? `${tuteeProfile.location.sido.addrName} > ${tuteeProfile.location.sigungu.addrName}`
+                                        : '지역 선택'}
+                                </button>
                             </div>
                             
                             <div className="input-group">
@@ -491,17 +586,11 @@ const Signup = () => {
 
                             <div className="input-group">
                                 <label>Location</label>
-                                <select
-                                    value={tuteeProfiles[currentProfileIndex].location}
-                                    onChange={(e) => handleProfileChange('location', e.target.value)}
-                                >
-                                    <option value="">Select Location</option>
-                                    {locationList.map((loc) => (
-                                        <option key={loc.value} value={loc.value}>
-                                            {loc.label}
-                                        </option>
-                                    ))}
-                                </select>
+                                <button onClick={handleOpenLocationModal}>
+                                    {tutorProfile.location
+                                        ? `${tuteeProfiles[currentProfileIndex].location.sido.addrName} > ${tuteeProfiles[currentProfileIndex].location.sigungu.addrName}`
+                                        : '지역 선택'}
+                                </button>
                             </div>    
 
                             <div className="input-group">
@@ -556,6 +645,12 @@ const Signup = () => {
                                 <button onClick={handleSignup}>회원가입</button>
                             </div>                                          
                         </>
+                    )}
+                    {isLocationModalOpen && (
+                        <LocationModal onClose={handleCloseLocationModal} onSave={handleSaveLocation}/>
+                    )}
+                    {isSchoolModalOpen && (
+                        <SchoolModal onClose={handleCloseSchoolModal} onSave={handleSaveSchool} schoolType={schoolType} />
                     )}
                 </>
                 )}
