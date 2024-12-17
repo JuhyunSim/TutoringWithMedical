@@ -78,12 +78,193 @@ const Signup = () => {
     const [locations, setLocations] = useState([]); 
     const [universities, setUniversities] = useState([]); 
     const [error, setError] = useState('');
+    const [errors, setErrors] = useState('');
     const navigate = useNavigate();
     const [selectedLocation, setSelectedLocation] = useState(null);
     const [isLocationModalOpen, setIsLocationModalOpen] = useState(false);
     const [isSchoolModalOpen, setIsSchoolModalOpen] = useState(false);
     const [selectedSchool, setSelectedSchool] = useState(null);
     const [schoolType, setSchoolType] = useState("university");
+
+    const phoneRegex = /^\d{2,3}\d{3,4}\d{4}$/;
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@#$%^&+=!]).{8,50}$/;
+
+    const handleChange = (field, value) => {
+        switch (field) {
+            case 'nickname':
+                setNickname(value);
+                setErrors((prev) => ({ ...prev, nickname: value.length >= 2 && value.length <= 20 ? '' : '닉네임은 2~20자 이내여야 합니다.' }));
+                break;
+            case 'phoneNumber':
+                setPhoneNumber(value);
+                setErrors((prev) => ({ ...prev, phoneNumber: phoneRegex.test(value) ? '' : '핸드폰 번호 형식이 올바르지 않습니다.' }));
+                break;
+            case 'password':
+                setPassword(value);
+                setErrors((prev) => ({ ...prev, password: passwordRegex.test(value) ? '' : '비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.' }));
+                break;
+            case 'passwordConfirm':
+                setPasswordConfirm(value);
+                setErrors((prev) => ({ ...prev, passwordConfirm: value === password ? '' : '비밀번호가 일치하지 않습니다.' }));
+                break;
+            case 'role':
+                setRole(value);
+                setErrors((prev) => ({ ...prev, role: value ? '' : '역할을 선택해주세요.' }));
+                break;
+            default:
+                break;
+        }
+    };
+
+    const handleProfileFieldChange = (field, value, profileType) => {
+        if (profileType === "TUTOR") {
+            setTutorProfile((prev) => ({ ...prev, [field]: value }));
+    
+            // 필수 필드에 대한 검증
+            if (field === "subjects") {
+                setErrors((prev) => ({
+                    ...prev,
+                    subjects: value.length > 0 ? "" : "과목을 1개 이상 선택해주세요."
+                }));
+            }
+            if (field === "location") {
+                setErrors((prev) => ({
+                    ...prev,
+                    location: value ? "" : "지역을 선택해주세요."
+                }));
+            }
+            if (field === "university") {
+                setErrors((prev) => ({
+                    ...prev,
+                    university: value ? "" : "대학 정보를 선택해주세요."
+                }));
+            }
+            if (field === "status") {
+                setErrors((prev) => ({
+                    ...prev,
+                    status: value ? "" : "재학 상태를 선택해주세요."
+                }));
+            }
+        } else if (profileType === "TUTEE") {
+            setTuteeProfile((prev) => ({ ...prev, [field]: value }));
+    
+            // 필수 필드에 대한 검증
+            if (field === "tuteeName") {
+                setErrors((prev) => ({
+                    ...prev,
+                    tuteeName: value ? "" : "이름을 입력해주세요."
+                }));
+            }
+            if (field === "gender") {
+                setErrors((prev) => ({
+                    ...prev,
+                    gender: value ? "" : "성별을 선택해주세요."
+                }));
+            }
+            if (field === "location") {
+                setErrors((prev) => ({
+                    ...prev,
+                    location: value ? "" : "지역을 선택해주세요."
+                }));
+            }
+            if (field === "subjects") {
+                setErrors((prev) => ({
+                    ...prev,
+                    subjects: value.length > 0 ? "" : "과목을 1개 이상 선택해주세요."
+                }));
+            }
+            if (field === "tuteeGrade") {
+                setErrors((prev) => ({
+                    ...prev,
+                    tuteeGrade: value ? "" : "학년을 선택해주세요."
+                }));
+            }
+        } else if (profileType === "PARENT") {
+            setTuteeProfiles((prevProfiles) => {
+                const updatedProfiles = [...prevProfiles]; // 불변성을 유지하며 배열 복사
+                updatedProfiles[currentProfileIndex] = {
+                    ...updatedProfiles[currentProfileIndex], // 현재 인덱스의 프로필 복사
+                    [field]: value, // 변경된 필드만 업데이트
+                };
+                return updatedProfiles; // 업데이트된 배열 반환
+            });
+
+            // 필수 필드에 대한 검증
+            if (field === "tuteeName") {
+                setErrors((prev) => ({
+                    ...prev,
+                    tuteeName: value ? '' : "이름을 입력해주세요."
+                }));
+            }
+            if (field === "gender") {
+                setErrors((prev) => ({
+                    ...prev,
+                    gender: value ? "" : "성별을 선택해주세요."
+                }));
+            }
+            if (field === "location") {
+                setErrors((prev) => ({
+                    ...prev,
+                    location: value ? "" : "지역을 선택해주세요."
+                }));
+            }
+            if (field === "subjects") {
+                setErrors((prev) => ({
+                    ...prev,
+                    subjects: value.length > 0 ? "" : "과목을 1개 이상 선택해주세요."
+                }));
+            }
+            if (field === "tuteeGrade") {
+                setErrors((prev) => ({
+                    ...prev,
+                    tuteeGrade: value ? "" : "학년을 선택해주세요."
+                }));
+            }
+        }
+    };
+
+    const validateStep = () => {
+        const newErrors = {};
+        if (step === 1) {
+            if (!nickname || nickname.length < 2 || nickname.length > 20) newErrors.nickname = "닉네임은 2~20자 이내여야 합니다.";
+            if (!phoneRegex.test(phoneNumber)) newErrors.phoneNumber = "핸드폰 번호 형식이 올바르지 않습니다. (예: 01000000000)";
+        } else if (step === 2) {
+            if (!passwordRegex.test(password)) newErrors.password = "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다.";
+            if (password !== passwordConfirm) newErrors.passwordConfirm = "비밀번호가 일치하지 않습니다.";
+            if (!role) newErrors.role = "역할을 선택해주세요.";
+        } else if (step === 3) { // Step 3 검증
+            if (role === "TUTOR") {
+                if (!tutorProfile.subjects || tutorProfile.subjects.length === 0)
+                    newErrors.subjects = "과목을 1개 이상 선택해주세요.";
+                if (!tutorProfile.location)
+                    newErrors.location = "지역을 선택해주세요.";
+                if (!tutorProfile.university)
+                    newErrors.university = "대학 정보를 선택해주세요.";
+                if (!tutorProfile.status)
+                    newErrors.status = "재학 상태를 선택해주세요.";
+            } else if (role === "TUTEE") {
+                if (!tuteeProfile.tuteeName)
+                    newErrors.tuteeName = "이름을 입력해주세요.";
+                if (!tuteeProfile.gender)
+                    newErrors.gender = "성별을 선택해주세요.";
+                if (!tuteeProfile.location)
+                    newErrors.location = "지역을 선택해주세요.";
+                if (!tuteeProfile.subjects || tuteeProfile.subjects.length === 0)
+                    newErrors.subjects = "과목을 1개 이상 선택해주세요.";
+                if (!tuteeProfile.tuteeGrade)
+                    newErrors.tuteeGrade = "학년을 선택해주세요.";
+            }
+        }
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+
+    const handleNextStep = () => {
+        if (validateStep()) {
+            setStep((prevStep) => prevStep + 1);
+        }
+    };
 
     const handleOpenLocationModal = () => setIsLocationModalOpen(true);
     const handleCloseLocationModal = () => setIsLocationModalOpen(false);
@@ -112,7 +293,7 @@ const Signup = () => {
         setError('');
         try {
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/auth/login/verify?receivePhone=${phoneNumber}&verifyNumber=${verificationCode}`);
-            nextStep(); // Move to the next step only if validation is successful
+            handleNextStep(); // Move to the next step only if validation is successful
         } catch (err) {
             setError('잘못된 인증번호입니다. 다시 확인해 주세요.');
             console.error(err);
@@ -178,32 +359,31 @@ const Signup = () => {
 
     const handleSignup = async (e) => {
         e.preventDefault();
-        const requestBody = {
-            nickname,
-            gender,
-            phoneNumber,
-            password,
-            passwordConfirm,
-            role,
-            tutorProfile: role === 'TUTOR' ? tutorProfile : null,
-            tuteeProfile: role === 'TUTEE' ? tuteeProfile : null,
-            tuteeProfiles: role === 'PARENT' ? tuteeProfiles : [],
-        };
+        if (validateStep()) {
+            const requestBody = {
+                nickname,
+                gender,
+                phoneNumber,
+                password,
+                passwordConfirm,
+                role,
+                tutorProfile: role === 'TUTOR' ? tutorProfile : null,
+                tuteeProfile: role === 'TUTEE' ? tuteeProfile : null,
+                tuteeProfiles: role === 'PARENT' ? tuteeProfiles : [],
+            };
 
-        console.log(requestBody); // requestBody에서 location 값 확인
+            console.log(requestBody); // requestBody에서 location 값 확인
 
-        try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, requestBody);
-            navigate('/login');
-            alert('회원가입이 완료되었습니다!');
-        } catch (error) {
-            console.error(error);
-            setError('회원가입에 실패했습니다. 입력 정보를 확인해주세요.');
+            try {
+                await axios.post(`${process.env.REACT_APP_BACKEND_URL}/signup`, requestBody);
+                navigate('/login');
+                alert('회원가입이 완료되었습니다!');
+            } catch (error) {
+                console.error(error);
+                setError('회원가입에 실패했습니다. 입력 정보를 확인해주세요.');
+            }
         }
     };
-
-    const nextStep = () => setStep((prev) => prev + 1);
-    const prevStep = () => setStep((prev) => prev - 1);
 
     const handleFileChange = async (e, field) => {
         const file = e.target.files[0];
@@ -241,30 +421,48 @@ const Signup = () => {
 
     const handleAddTuteeProfile = () => {
         const currentProfile = tuteeProfiles[currentProfileIndex];
-
-        if (
-            !currentProfile.tuteeName ||
-            !currentProfile.gender ||
-            !currentProfile.location ||
-            currentProfile.subjects.length === 0 ||
-            !currentProfile.tuteeGrade
-        ) {
-            alert('모든 필수 정보를 입력해주세요: 이름, 성별, 지역, 과목, 학년.');
+        const newErrors = {};
+    
+        if (!currentProfile.tuteeName) {
+            newErrors.tuteeName = "이름을 입력해주세요.";
+        }
+        if (!currentProfile.gender) {
+            newErrors.gender = "성별을 선택해주세요.";
+        }
+        if (!currentProfile.location) {
+            newErrors.location = "지역을 선택해주세요.";
+        }
+        if (currentProfile.subjects.length === 0) {
+            newErrors.subjects = "과목을 1개 이상 선택해주세요.";
+        }
+        if (!currentProfile.tuteeGrade) {
+            newErrors.tuteeGrade = "학년을 선택해주세요.";
+        }
+    
+        if (Object.keys(newErrors).length > 0) {
+            // 에러 상태 업데이트
+            setErrors(newErrors);
             return;
         }
-        
-        setTuteeProfiles(
-            [...tuteeProfiles, 
+    
+        // 새로운 학생 프로필 추가
+        setTuteeProfiles([
+            ...tuteeProfiles,
             { 
-                name: '',
+                tuteeName: '',
                 gender: '', 
                 location: '', 
                 subjects: [], 
                 description: '', 
                 tuteeGrade: '' 
-            }]);
+            }
+        ]);
         setCurrentProfileIndex((prevIndex) => prevIndex + 1);
+    
+        // 오류 초기화
+        setErrors({});
     };
+    
 
     const handleProfileChange = (field, value) => {
         // 방어 코드 추가
@@ -364,12 +562,17 @@ const Signup = () => {
             {step === 1 && (
                 <>
                     <div className="input-group">
-                        <label>Nickname</label>
-                        <input type="text" value={nickname} onChange={(e) => setNickname(e.target.value)} required />
+                        <label>닉네임 <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            value={nickname} 
+                            onChange={(e) => handleChange('nickname', e.target.value)}     
+                        />
+                        {errors.nickname && <p className="error">{errors.nickname}</p>}
                     </div>
 
                     <div className="input-group">
-                        <label>Gender</label>
+                        <label>성별 <span className="required">*</span></label>
                         <select value={gender} onChange={(e) => setGender(e.target.value)} required>
                             <option value="">Select Gender</option>
                             <option value="MALE">Male</option>
@@ -378,11 +581,16 @@ const Signup = () => {
                     </div>
 
                     <div className="input-group">
-                        <label>Phone Number</label>
-                        <input type="text" value={phoneNumber} onChange={(e) => setPhoneNumber(e.target.value)} required />
+                        <label>핸드폰 번호 <span className="required">*</span></label>
+                        <input 
+                            type="text" 
+                            value={phoneNumber} 
+                            onChange={(e) => handleChange('phoneNumber', e.target.value)} 
+                        />
                         {/* <button type="button" onClick={sendVerificationCode} className="verify-button">인증</button> */}
+                        {errors.phoneNumber && <p className="error">{errors.phoneNumber}</p>}
                     </div>
-                    <button onClick={nextStep}>다음</button>
+                    <button onClick={handleNextStep}>다음</button>
                 </>
             )}
 
@@ -402,26 +610,39 @@ const Signup = () => {
             {step === 2 && (
                 <>
                     <div className="input-group">
-                        <label>Password</label>
-                        <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                        <label>비밀번호 <span className="required">*</span></label>
+                        <input 
+                            type="password" 
+                            value={password} 
+                            onChange={(e) => handleChange('password', e.target.value)}
+                        />
+                        {errors.password && <p className="error">{errors.password}</p>}
                     </div>
 
                     <div className="input-group">
-                        <label>Confirm Password</label>
-                        <input type="password" value={passwordConfirm} onChange={(e) => setPasswordConfirm(e.target.value)} required />
+                        <label>비밀번호 확인 <span className="required">*</span></label>
+                        <input 
+                            type="password" 
+                            value={passwordConfirm} 
+                            onChange={(e) => handleChange('passwordConfirm', e.target.value)} 
+                        />
+                        {errors.passwordConfirm && (
+                            <p className="error">{errors.passwordConfirm}</p>
+                        )}
                     </div>
 
                     <div className="input-group">
-                        <label>Role</label>
-                        <select value={role} onChange={(e) => setRole(e.target.value)} required>
+                        <label>역할 <span className="required">*</span></label>
+                        <select value={role} onChange={(e) => handleChange('role', e.target.value)} >
                             <option value="">Select Role</option>
                             <option value="TUTOR">Tutor</option>
                             <option value="TUTEE">Student</option>
                             <option value="PARENT">Parent</option>
                         </select>
+                        {errors.role && <p className='error'>{errors.role}</p>}
                     </div>
-                    <button onClick={prevStep}>이전</button>
-                    <button onClick={nextStep}>다음</button>
+                    <button onClick={() => setStep(1)}>이전</button>
+                    <button onClick={handleNextStep}>다음</button>
                 </>
             )}
 
@@ -452,7 +673,7 @@ const Signup = () => {
                                 />
                             </div>
                             <div className="input-group">
-                                <label>Subjects</label>
+                                <label>과목 <span className="required">*</span></label>
                                 <div className="chip-container">
                                     {subjectsList.map((subject) => (
                                         <div
@@ -464,29 +685,35 @@ const Signup = () => {
                                         </div>
                                     ))}
                                 </div>
+                                {errors.subjects && <p className="error">{errors.subjects}</p>}
                             </div>
                             <div className="input-group">
-                                <label>지역</label>
+                                <label>지역 <span className='required'>*</span></label>
                                 <button onClick={handleOpenLocationModal}>
                                     {tutorProfile.location
                                         ? `${tutorProfile.location.sido.addr_name} > ${tutorProfile.location.sigungu.addr_name}`
                                         : '지역 선택'}
                                 </button>
+                                {errors.location && <p className="error">{errors.location}</p>}
                             </div>
                             <div className="input-group">
-                                <label>대학</label>
+                                <label>대학 <span className='required'>*</span></label>
                                 <button onClick={handleOpenSchoolModal("university")}>
                                     {tutorProfile.university.schoolName || "대학 선택"}
                                 </button>
+                                {errors.university && <p className="error">{errors.university}</p>}
                             </div>
                             <div className="input-group">
-                                <label>Enrollment Status</label>
-                                <select value={tutorProfile.status} onChange={(e) => setTutorProfile({ ...tutorProfile, status: e.target.value })}>
+                                <label>재적 상태 <span className='required'>*</span></label>
+                                <select 
+                                    value={tutorProfile.status} 
+                                    onChange={(e) => handleProfileFieldChange('status', e.target.value, 'TUTOR')}>
                                     <option value="">Select Enrollment Status</option>
                                     {enrollmentStatusList.map((status) => (
                                         <option key={status.value} value={status.value}>{status.label}</option>
                                     ))}
                                 </select>
+                                {errors.status && <p className="error">{errors.status}</p>}
                             </div>
                         </>
                     )}
@@ -494,37 +721,40 @@ const Signup = () => {
                     {role === 'TUTEE' && (
                         <>
                             <div className="input-group">
-                                <label>이름</label>
+                                <label>이름 <span className='required'>*</span></label>
                                 <input
                                     type="text"
                                     value={tuteeProfile.tuteeName}
-                                    onChange={(e) => setTuteeProfile({ ...tuteeProfile, tuteeName: e.target.value })}
+                                    onChange={(e) => handleProfileFieldChange('tuteeName', e.target.value, 'TUTEE')}
                                 />
+                                {errors.tuteeName && <p className="error">{errors.tuteeName}</p>}
                             </div>
 
                             <div className="input-group">
-                                <label>성별</label>
+                                <label>성별 <span className='required'>*</span></label>
                                 <select
                                     value={tuteeProfile.gender}
-                                    onChange={(e) => setTuteeProfile({...tuteeProfile, gender: e.target.value})}
+                                    onChange={(e) => handleProfileFieldChange('gender', e.target.value, 'TUTEE')}
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="MALE">Male</option>
                                     <option value="FEMALE">Female</option>
                                 </select>
+                                {errors.gender && <p className="error">{errors.gender}</p>}
                             </div>
 
                             <div className="input-group">
-                                <label>Location</label>
+                                <label>지역 <span className='required'>*</span></label>
                                 <button onClick={handleOpenLocationModal}>
                                     {tuteeProfile.location
-                                        ? `${tuteeProfile.location.sido.addrName} > ${tuteeProfile.location.sigungu.addrName}`
+                                        ? `${tuteeProfile.location.sido.addr_name} > ${tuteeProfile.location.sigungu.addr_name}`
                                         : '지역 선택'}
                                 </button>
+                                {errors.location && <p className="error">{errors.location}</p>}
                             </div>
                             
                             <div className="input-group">
-                                <label>Subjects</label>
+                                <label>과목 <span className='required'>*</span></label>
                                 <div className="chip-container">
                                     {subjectsList.map((subject) => (
                                         <div
@@ -536,6 +766,7 @@ const Signup = () => {
                                         </div>
                                     ))}
                                 </div>
+                                {errors.subjects && <p className="error">{errors.subjects}</p>}
                             </div>
 
                             <div className="input-group">
@@ -554,47 +785,45 @@ const Signup = () => {
                         </>
                     )}
 
-                    {/* Buttons for TUTOR and TUTEE */}
-                    <div className="button-group">
-                        <button onClick={prevStep}>이전</button>
-                        <button onClick={handleSignup}>회원가입</button>
-                    </div>
                     </>
                     {role === 'PARENT' && (
                         <>
                             <h3>학생 {currentProfileIndex + 1} 프로필</h3>
                             <div className="input-group">
-                                <label>이름</label>
+                                <label>이름 <span className='required'>*</span></label>
                                 <input
                                     type="text"
                                     value={tuteeProfiles[currentProfileIndex]?.tuteeName || ''}
-                                    onChange={(e) => handleProfileChange('tuteeName', e.target.value)} 
+                                    onChange={(e) => handleProfileFieldChange('tuteeName', e.target.value, 'PARENT')}
                                 />
+                                {errors.tuteeName && <p className="error">{errors.tuteeName}</p>}
                             </div>
 
                             <div className="input-group">
-                                <label>성별</label>
+                                <label>성별 <span className='required'>*</span></label>
                                 <select
                                     value={tuteeProfiles[currentProfileIndex]?.gender || ''}
-                                    onChange={(e) => handleProfileChange('gender', e.target.value)}
+                                    onChange={(e) => handleProfileFieldChange('gender', e.target.value, 'PARENT')}
                                 >
                                     <option value="">Select Gender</option>
                                     <option value="MALE">Male</option>
                                     <option value="FEMALE">Female</option>
                                 </select>
+                                {errors.gender && <p className="error">{errors.gender}</p>}
                             </div>
 
                             <div className="input-group">
-                                <label>Location</label>
+                                <label>지역 <span className='required'>*</span></label>
                                 <button onClick={handleOpenLocationModal}>
-                                    {tutorProfile.location
-                                        ? `${tuteeProfiles[currentProfileIndex].location.sido.addrName} > ${tuteeProfiles[currentProfileIndex].location.sigungu.addrName}`
+                                    {tuteeProfiles[currentProfileIndex]?.location
+                                        ? `${tuteeProfiles[currentProfileIndex]?.location.sido.addr_name} > ${tuteeProfiles[currentProfileIndex]?.location.sigungu.addr_name}`
                                         : '지역 선택'}
                                 </button>
+                                {errors.location && <p className="error">{errors.location}</p>}
                             </div>    
 
                             <div className="input-group">
-                                <label>Subjects</label>
+                                <label>과목 <span className='required'>*</span></label>
                                 <div className="chip-container">
                                     {subjectsList.map((subject) => (
                                         <div
@@ -610,13 +839,14 @@ const Signup = () => {
                                         </div>
                                     ))}
                                 </div>
+                                {errors.subject && <p className="error">{errors.subject}</p>}
                             </div>
 
                             <div className="input-group">
-                                <label>Grade</label>
+                                <label>학년 <span className='required'>*</span></label>
                                 <select
                                     value={tuteeProfiles[currentProfileIndex].tuteeGrade}
-                                    onChange={(e) => handleProfileChange('tuteeGrade', e.target.value)}
+                                    onChange={(e) => handleProfileFieldChange('tuteeGrade', e.target.value, 'PARENT')}
                                 >
                                     <option value="">Select Grade</option>
                                     {tuteeGradeList.map((grade) => (
@@ -625,6 +855,7 @@ const Signup = () => {
                                         </option>
                                     ))}
                                 </select>
+                                {errors.tuteeGrade && <p className="error">{errors.tuteeGrade}</p>}
                             </div>
                             <div className="input-group">
                                 <label>소개</label>
@@ -632,18 +863,7 @@ const Signup = () => {
                                     value={tuteeProfiles[currentProfileIndex].description}
                                     onChange={(e) => handleProfileChange('description', e.target.value)}
                                 />
-                            </div>
-                            <div className="button-group">
-                                {currentProfileIndex > 0 ? (
-                                    // 첫 번째 학생 프로필이 아닐 때 이전 프로필로 이동
-                                    <button onClick={handlePreviousProfile}>이전</button>
-                                ) : (
-                                    // 첫 번째 학생 프로필일 때 이전 스텝으로 이동
-                                    <button onClick={prevStep}>이전</button>
-                                )}
-                                <button onClick={handleAddTuteeProfile}>학생 프로필 추가하기</button>
-                                <button onClick={handleSignup}>회원가입</button>
-                            </div>                                          
+                            </div>                                       
                         </>
                     )}
                     {isLocationModalOpen && (
@@ -652,9 +872,23 @@ const Signup = () => {
                     {isSchoolModalOpen && (
                         <SchoolModal onClose={handleCloseSchoolModal} onSave={handleSaveSchool} schoolType={schoolType} />
                     )}
+
+                    <div className="button-group">
+                        {role === 'PARENT' && currentProfileIndex > 0 ? (
+                            // 첫 번째 학생 프로필이 아닐 때 이전 프로필로 이동
+                            <button onClick={handlePreviousProfile}>이전</button>
+                        ) : (
+                            // 첫 번째 학생 프로필일 때 이전 스텝으로 이동
+                            <button onClick={() => setStep(2)}>이전</button>
+                        )}
+                        {role === 'PARENT' && (
+                            <button onClick={handleAddTuteeProfile}>학생 프로필 추가</button>
+                        )}
+                        <button onClick={handleSignup}>회원가입</button>
+                    </div>   
                 </>
                 )}
-                {error && <p className="error">{error}</p>}
+            {errors.server && <p className="error">{errors.server}</p>}
         </div>
     );
 };

@@ -75,3 +75,14 @@
     border: 2px solid #007bff;
 }
 
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px; /* 버튼 간 상단 여백 추가 */
+    position: static; /* 부모 컨테이너 내 정렬 */
+}
+
+.required {
+    color: rgb(230, 97, 97);
+}
