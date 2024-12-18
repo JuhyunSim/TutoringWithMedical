@@ -10,6 +10,7 @@ import com.simzoo.withmedical.util.validator.Password;
 import com.simzoo.withmedical.util.validator.PasswordConfirm;
 import com.simzoo.withmedical.util.validator.PhoneNumber;
 import com.simzoo.withmedical.util.validator.ProfileNotNull;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -49,8 +50,11 @@ public class SignupRequestDto {
     private String passwordConfirm;
     private Role role;
 
+    @Valid
     private TutorProfileRequestDto tutorProfile;
+    @Valid
     private TuteeProfileRequestDto tuteeProfile;
+    @Valid
     private List<TuteeProfileRequestDto> tuteeProfiles = new ArrayList<>();
 
     public MemberEntity toMemberEntity(PasswordEncoder passwordEncoder) {

@@ -11,8 +11,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Constraint(validatedBy = {PhoneNumberValidator.class})
 public @interface PhoneNumber {
-    String message() default "핸드폰 번호 양식에 맞지 않습니다. ex) 010-0000-0000";
-    String regexp() default "^\\d{2,3}-\\d{3,4}-\\d{4}$";
+    String message() default "핸드폰 번호 양식에 맞지 않습니다. ex) 01000000000";
+    String regexp() default "^\\d{2,3}\\d{3,4}\\d{4}$";
 
     Class<?>[] groups() default { };
 

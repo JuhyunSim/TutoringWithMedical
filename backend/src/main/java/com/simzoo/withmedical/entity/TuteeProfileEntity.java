@@ -86,6 +86,7 @@ public class TuteeProfileEntity extends BaseEntity {
             .location(location)
             .subjects(subjects.stream().map(SubjectEntity::getSubject).toList())
             .tuteeGrade(grade)
+            .personality(personality)
             .description(description)
             .build();
     }
