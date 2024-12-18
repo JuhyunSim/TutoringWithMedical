@@ -77,12 +77,29 @@
 
 .button-group {
     display: flex;
-    justify-content: center;
-    gap: 10px;
+    justify-content: space-around;
     margin-top: 20px; /* 버튼 간 상단 여백 추가 */
-    position: static; /* 부모 컨테이너 내 정렬 */
+    flex-wrap: wrap;
 }
 
 .required {
     color: rgb(230, 97, 97);
+}
+
+.remove-button {
+    float: right;
+    background-color: #ff4d4f;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.remove-button:hover {
+    background-color: #d9363e;
+}
+
+.form-container {
+    width: 100%;
 }
