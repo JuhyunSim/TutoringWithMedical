@@ -475,11 +475,6 @@ const Signup = () => {
     };
     
     const handleRemoveTuteeProfile = (index) => {
-        if (index === 0) {
-            alert("첫 번째 학생 프로필은 삭제할 수 없습니다.");
-            return;
-        }
-    
         setTuteeProfiles((prevProfiles) => {
             const updatedProfiles = prevProfiles.filter((_, i) => i !== index); // 선택한 프로필 삭제
             return updatedProfiles;
