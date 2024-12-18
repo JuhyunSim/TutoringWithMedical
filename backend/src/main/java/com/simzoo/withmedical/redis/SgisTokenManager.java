@@ -5,11 +5,13 @@ import com.simzoo.withmedical.dto.token.SgisToken;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class SgisTokenManager {
 
     private final StringRedisTemplate redisTemplate;
@@ -39,12 +41,17 @@ public class SgisTokenManager {
         SgisToken sgisToken = sgisClient.getAccessToken(consumerKey, consumerSecret);
 
         String accessToken = sgisToken.getResult().getAccessToken();
-        Long accessTimout = Long.parseLong(sgisToken.getResult().getAccessTimeout());
+        Long accessTimeout = Long.parseLong(sgisToken.getResult().getAccessTimeout());
+        log.debug("accessTimeout = {}", accessTimeout);
 
-        Long expiresIn = accessTimout - Instant.now().getEpochSecond();
+        Long now = Instant.now().toEpochMilli();
+        log.debug("now = {}", now);
 
-        // Redis에 저장 (TTL: 1시간)
-        redisTemplate.opsForValue().set(ACCESS_TOKEN_KEY, accessToken, expiresIn, TimeUnit.SECONDS);
+        Long expiresIn = accessTimeout - now;
+        log.debug("expiresIn = {}", expiresIn);
+
+        // Redis에 저장 (TTL: 4시간)
+        redisTemplate.opsForValue().set(ACCESS_TOKEN_KEY, accessToken, expiresIn, TimeUnit.MILLISECONDS);
 
         return accessToken;
     }

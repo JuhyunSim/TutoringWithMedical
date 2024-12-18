@@ -6,6 +6,8 @@ import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Subject;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Builder;
@@ -15,10 +17,15 @@ import lombok.Getter;
 @Builder
 public class TutorProfileRequestDto {
     private String imageUrl;
+    @NotNull
+    @NotEmpty
     private List<Subject> subjects;
+    @NotNull
     private LocationDto location;
     private String description;
+    @NotNull
     private SchoolDto university;
+    @NotNull
     private EnrollmentStatus status;
 
     public TutorProfileEntity toEntity(MemberEntity member) {

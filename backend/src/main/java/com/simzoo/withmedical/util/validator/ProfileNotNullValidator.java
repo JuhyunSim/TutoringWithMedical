@@ -6,7 +6,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.util.Objects;
 
-public class ProfileNotNullValidator implements ConstraintValidator<ProfileNotNull, SignupRequestDto>{
+public class ProfileNotNullValidator implements
+    ConstraintValidator<ProfileNotNull, SignupRequestDto> {
 
     @Override
     public void initialize(ProfileNotNull constraintAnnotation) {
@@ -17,16 +18,23 @@ public class ProfileNotNullValidator implements ConstraintValidator<ProfileNotNu
 
         boolean isTutorProfileInvalid = Objects.isNull(requestDto.getTutorProfile());
         boolean isTuteeProfileInvalid = Objects.isNull(requestDto.getTuteeProfile());
-        boolean isTuteeProfilesEmpty = requestDto.getTuteeProfiles() == null || requestDto.getTuteeProfiles().isEmpty();
+        boolean isTuteeProfilesEmpty =
+            requestDto.getTuteeProfiles() == null || requestDto.getTuteeProfiles().isEmpty();
 
-        if (isTuteeProfileInvalid || isTuteeProfilesEmpty || isTutorProfileInvalid) {
+        boolean isTutorProfileValid = !isTutorProfileInvalid;
+        boolean isTuteeProfileValid = !isTuteeProfileInvalid;
+        boolean isTuteeProfilesNotEmpty = !isTuteeProfilesEmpty;
+
+        if (isTuteeProfileInvalid && isTuteeProfilesEmpty && isTutorProfileInvalid) {
             return false;
         }
 
         if (requestDto.getRole() == Role.TUTOR) {
-            return !Objects.isNull(requestDto.getTutorProfile());
+            return isTutorProfileValid;
+        } else if (requestDto.getRole() == Role.TUTEE) {
+            return isTuteeProfileValid;
         } else {
-            return !Objects.isNull(requestDto.getTuteeProfile());
+            return isTuteeProfilesNotEmpty;
         }
     }
 }

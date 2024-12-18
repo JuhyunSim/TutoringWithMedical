@@ -18,6 +18,7 @@ public class TuteeProfileResponseDto {
     private List<Subject> subjects = new ArrayList<>();
     private String location;
     private TuteeGrade tuteeGrade;
+    private String personality;
     private String description;
 
 }
