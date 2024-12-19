@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import com.simzoo.withmedical.config.QueryDslConfig;
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
-import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto.TutorSearchFilter;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.SubjectEntity;
 import com.simzoo.withmedical.entity.TutorProfileEntity;
@@ -149,7 +149,7 @@ class TutorProfileServiceDatabaseTest {
 
         //given
         Pageable pageable = PageRequest.of(0, 10, Direction.ASC, "createdAt");
-        TutorFilterRequestDto.TutorEnumFilter filterRequest = TutorFilterRequestDto.TutorEnumFilter.builder()
+        TutorSearchFilter filterRequest = TutorSearchFilter.builder()
 //            .gender(Gender.MALE)
 //            .subjects(List.of(Subject.ELEMENTARY_ENGLISH, Subject.MIDDLE_ENGLISH))
 //            .locations(new ArrayList<>())

@@ -2,12 +2,11 @@ package com.simzoo.withmedical.controller;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto.TutorSearchFilter;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
 import com.simzoo.withmedical.enums.Gender;
-import com.simzoo.withmedical.enums.Location;
 import com.simzoo.withmedical.enums.Subject;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.service.TutorProfileService;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -40,11 +39,11 @@ public class TutorProfileController {
         @ModelAttribute TutorFilterRequestDto filterRequest,
         @PageableDefault(page = 0, size = 10, direction = Direction.ASC, sort = "createdAt") Pageable pageable) {
 
-        TutorFilterRequestDto.TutorEnumFilter filter = TutorFilterRequestDto.TutorEnumFilter.builder()
+        TutorSearchFilter filter = TutorSearchFilter.builder()
             .gender(filterRequest.convertGender(filterRequest.getGender()))
             .subjects(filterRequest.convertSubjects(filterRequest.getSubjects()))
-            .locations(filterRequest.convertLocations(filterRequest.getLocations()))
-            .universities(filterRequest.convertUniversity(filterRequest.getUniversities()))
+            .locations(filterRequest.getLocations())
+            .universities(filterRequest.getUniversities())
             .statusList(filterRequest.convertEnrollmentStatus(filterRequest.getStatusList()))
             .build();
 
@@ -63,13 +62,11 @@ public class TutorProfileController {
      * 선생님 조회 필터요청값 불러오기
      */
     @GetMapping("/filters")
-    public ResponseEntity<Map<java.lang.String, List<java.lang.String>>> getFilters() {
+    public ResponseEntity<Map<String, List<String>>> getFilters() {
 
-        Map<java.lang.String, List<java.lang.String>> filters = new HashMap<>();
+        Map<String, List<String>> filters = new HashMap<>();
 
         filters.put("subjects", Arrays.stream(Subject.values()).map(Subject::getDescription).toList());
-        filters.put("locations", Arrays.stream(Location.values()).map(Location::getDescription).toList());
-        filters.put("universities", Arrays.stream(University.values()).map(University::getDescription).toList());
         filters.put("statusList", Arrays.stream(EnrollmentStatus.values()).map(EnrollmentStatus::getDescription).toList());
         filters.put("gender", Arrays.stream(Gender.values()).map(Gender::getDescription).toList());
 

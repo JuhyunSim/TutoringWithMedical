@@ -1,7 +1,7 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
-import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto.TutorSearchFilter;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
@@ -24,7 +24,7 @@ public class TutorProfileService {
      */
     @Transactional(readOnly = true)
     public Page<TutorSimpleResponseDto> getTutorList(Pageable pageable,
-        TutorFilterRequestDto.TutorEnumFilter filterRequest) {
+        TutorSearchFilter filterRequest) {
         return tutorProfileJdbcRepository.findFilteredProfiles(filterRequest, pageable);
     }
 
