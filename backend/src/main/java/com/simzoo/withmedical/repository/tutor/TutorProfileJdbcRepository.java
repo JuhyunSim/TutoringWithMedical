@@ -1,10 +1,8 @@
 package com.simzoo.withmedical.repository.tutor;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
-import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto;
+import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto.TutorSearchFilter;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
-import com.simzoo.withmedical.enums.Location;
-import com.simzoo.withmedical.enums.University;
 import com.simzoo.withmedical.enums.Subject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -31,7 +29,7 @@ public class TutorProfileJdbcRepository {
     private final JdbcTemplate jdbcTemplate;
 
     public Page<TutorSimpleResponseDto> findFilteredProfiles(
-        TutorFilterRequestDto.TutorEnumFilter filterRequest, Pageable pageable) {
+        TutorSearchFilter filterRequest, Pageable pageable) {
 
         java.lang.String sql = """
                 WITH filtered_profiles AS (
@@ -68,11 +66,9 @@ public class TutorProfileJdbcRepository {
             ? filterRequest.getSubjects().stream().map(Enum::name).toList()
             : null;
         List<java.lang.String> locations = filterRequest.getLocations() != null
-            ? filterRequest.getLocations().stream().map(Location::name).toList()
-            : null;
+            ? filterRequest.getLocations() : null;
         List<java.lang.String> universities = filterRequest.getUniversities() != null
-            ? filterRequest.getUniversities().stream().map(University::name).toList()
-            : null;
+            ? filterRequest.getUniversities() : null;
         List<java.lang.String> statusList = filterRequest.getStatusList() != null
             ? filterRequest.getStatusList().stream().map(EnrollmentStatus::name).toList()
             : null;
