@@ -91,3 +91,50 @@
 .page-button.active {
     background-color: #0056b3;
 }
+
+.filter-button {
+    padding: 10px 15px;
+    background-color: #007bff; /* 기본 배경색 */
+    color: #fff; /* 기본 텍스트 색 */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-button:hover {
+    background-color: #0056b3;
+}
+
+
+/* 프로필 보기 버튼 스타일 */
+.view-profile-button {
+    background-color: #007bff;
+    color: white;
+    display: inline-block; /* 버튼 스타일 적용 */
+}
+
+.view-profile-button:hover {
+    background-color: #0056b3;
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between; /* 버튼 사이의 간격 확보 */
+    align-items: center; /* 버튼 수직 정렬 */
+    gap: 10px; /* 버튼 간 간격 */
+    margin-top: 10px; /* 버튼 위 여백 */
+}
+
+/* 공통 버튼 스타일 */
+.button-common {
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    text-decoration-line: none;
+}

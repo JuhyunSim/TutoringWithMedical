@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../axios/AxiosInstance';
 import Review from '../review/Review';
+import InquiryButton from '../button/InquiryButton';
 import './TutorProfile.css';
 
 const TutorProfile = () => {
@@ -47,18 +48,23 @@ const TutorProfile = () => {
             </div>
             <p>성별: {profile.gender}</p>
             <p>과목: {profile.subjects.join(', ')}</p>
-            <p>학교: {profile.university}</p>
+            <p>학교: {profile.univName}</p>
             <p>지역: {profile.location}</p>
             <p>등록 상태: {profile.status}</p>
             <p>소개: {profile.description}</p>
 
             {/* 리뷰 버튼 */}
-            <button
-                className="review-toggle-button"
-                onClick={toggleShowReviews}
-            >
-                {showReviews ? '리뷰 닫기' : '리뷰 보기'}
-            </button>
+            <div className='button-row'>
+                <button
+                    className="review-toggle-button"
+                    onClick={toggleShowReviews}
+                >
+                    {showReviews ? '리뷰 닫기' : '리뷰 보기'}
+                </button>
+                <InquiryButton recipientId={tutorId}
+                 memberNickname={profile.nickname} />
+            </div>
+            
 
             {/* 리뷰 표시 */}
             {showReviews && <Review tutorId={tutorId} />}

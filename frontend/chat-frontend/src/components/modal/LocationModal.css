@@ -59,7 +59,7 @@ li.selected {
     margin-top: 10px;
 }
 
-button {
+.modal-actions button {
     padding: 8px 16px;
     margin-left: 10px;
     border: none;
@@ -69,21 +69,21 @@ button {
     transition: background-color 0.2s ease;
 }
 
-button:hover {
+.modal-actions button:hover {
     opacity: 0.8;
 }
 
-button:nth-child(1) {
+.modal-actions button:nth-child(1) {
     background-color: #ccc;
     color: #333;
 }
 
-button:nth-child(2) {
+.modal-actions button:nth-child(2) {
     background-color: #007bff;
     color: white;
 }
 
-button[disabled] {
+.modal-actions button[disabled] {
     background-color: #ddd;
     color: #aaa;
     cursor: not-allowed;

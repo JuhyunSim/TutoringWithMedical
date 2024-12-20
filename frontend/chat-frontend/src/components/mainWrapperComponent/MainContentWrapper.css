@@ -1,7 +1,7 @@
 /* MainContentWrapper.css */
 
 .main-content {
-    margin-top: 350px; /* 헤더 높이만큼 여백 추가 */
+    margin-top: 250px; /* 헤더 높이만큼 여백 추가 */
     padding: 20px; /* 내용 내부 여백 */
     width: 100%;
     box-sizing: border-box; /* 패딩 포함하여 크기 계산 */
