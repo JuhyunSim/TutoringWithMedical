@@ -3,6 +3,7 @@ package com.simzoo.withmedical.entity;
 import com.simzoo.withmedical.dto.member.UpdateMemberRequestDto.UpdateTutorProfileRequestDto;
 import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
+import com.simzoo.withmedical.enums.Subject;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -56,11 +57,14 @@ public class TutorProfileEntity extends BaseEntity {
 
         return TutorProfileResponseDto.builder()
             .tutorId(id)
+            .nickname(this.getMember().getNickname())
+            .gender(this.getMember().getGender().getDescription())
             .imageUrl(imageUrl)
-            .subjects(this.subjects.stream().map(SubjectEntity::getSubject).toList())
+            .subjects(this.subjects.stream().map(SubjectEntity::getSubject).map(
+                Subject::getDescription).toList())
             .location(this.location)
             .univName(this.univName)
-            .status(this.status)
+            .status(this.status.getDescription())
             .description(this.description)
             .build();
     }

@@ -6,7 +6,6 @@ import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
 import com.simzoo.withmedical.repository.tutor.TutorProfileJdbcRepository;
-import com.simzoo.withmedical.repository.tutor.TutorProfileRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,7 +16,6 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TutorProfileService {
 
-    private final TutorProfileRepository tutorProfileRepository;
     private final TutorProfileJdbcRepository tutorProfileJdbcRepository;
     /**
      * 선생님 전체 조회
@@ -33,7 +31,7 @@ public class TutorProfileService {
      */
     @Transactional(readOnly = true)
     public TutorProfileResponseDto getTutorDetail(Long tutorId) {
-        return tutorProfileRepository.findTutorProfileDtoById(tutorId)
+        return tutorProfileJdbcRepository.findTutorProfileDtoById(tutorId)
             .orElseThrow(() -> new CustomException(ErrorCode.NOT_FOUND_USER));
     }
 }

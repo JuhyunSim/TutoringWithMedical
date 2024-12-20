@@ -1,7 +1,6 @@
 package com.simzoo.withmedical.dto;
 
 import com.querydsl.core.annotations.QueryProjection;
-import com.simzoo.withmedical.enums.Subject;
 import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,12 +14,12 @@ public class TutorSimpleResponseDto {
     private java.lang.String nickname;
     private String univName;
     private String location;
-    private List<Subject> subjects;
+    private List<String> subjects;
 
     @QueryProjection
     public TutorSimpleResponseDto(Long id, java.lang.String imageUrl, String nickname,
         String univName, String location,
-        List<Subject> subjects) {
+        List<String> subjects) {
         this.id = id;
         this.imageUrl = imageUrl;
         this.nickname = nickname;
