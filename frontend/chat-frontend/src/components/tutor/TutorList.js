@@ -8,6 +8,7 @@ import StatusFilterModal from '../modal/StatusFilterModal';
 import SubjectFilterModal from '../modal/SubjectFilterModal';
 import SchoolModal from '../modal/SchoolModal';
 import FilterTags from '../button/FilterTags';
+import InquiryButton from '../button/InquiryButton';
 
 const TutorList = () => {
     const [tutors, setTutors] = useState([]);
@@ -172,7 +173,13 @@ const TutorList = () => {
                         <p>학교: {tutor.univName}</p>
                         <p>지역: {tutor.location}</p>
                         <p>과목: {tutor.subjects.join(', ')}</p>
-                        <Link to={`/tutor-profiles/${tutor.id}`} className="view-profile-button">프로필 보기</Link>
+                        <div className="button-row">
+                            <Link to={`/tutor-profiles/${tutor.id}`} className="view-profile-button button-common">프로필 보기</Link>
+                            <InquiryButton 
+                                recipientId={tutor.id}
+                                memberNickname={tutor.nickname}
+                            />
+                        </div>
                     </div>
                 ))}
             </div>
