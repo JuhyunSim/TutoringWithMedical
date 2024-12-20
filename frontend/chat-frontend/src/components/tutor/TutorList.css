@@ -91,3 +91,17 @@
 .page-button.active {
     background-color: #0056b3;
 }
+
+.filter-button {
+    padding: 10px 15px;
+    background-color: #007bff; /* 기본 배경색 */
+    color: #fff; /* 기본 텍스트 색 */
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.filter-button:hover {
+    background-color: #0056b3;
+}

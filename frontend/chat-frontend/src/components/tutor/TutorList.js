@@ -3,10 +3,11 @@ import axios from 'axios';
 import qs from 'qs';
 import './TutorList.css';
 import { Link } from 'react-router-dom';
-import LocationFilterModal from '../modal/LocationFilterModal';
+import LocationModal from '../modal/LocationModal';
 import StatusFilterModal from '../modal/StatusFilterModal';
 import SubjectFilterModal from '../modal/SubjectFilterModal';
-import UniversityFilterModal from '../modal/\bUniversityFilterModal';
+import SchoolModal from '../modal/SchoolModal';
+import FilterTags from '../button/FilterTags';
 
 const TutorList = () => {
     const [tutors, setTutors] = useState([]);
@@ -25,8 +26,6 @@ const TutorList = () => {
 
     const [enumOptions, setEnumOptions] = useState({
         subjects: [],
-        locations: [],
-        universities: [],
         statusList: [],
         gender: [],
     });
@@ -88,35 +87,49 @@ const TutorList = () => {
         }
     };
 
+    const handleFilterRemove = (key, value) => {
+        setFilters((prev) => ({
+            ...prev,
+            [key]: prev[key].filter((item) => item !== value),
+        }));
+    };
+
     return (
         <div className="tutor-list-container">
             <div className="title-container">
                 <h1 className="tutor-list-title">선생님 목록</h1>
             </div>
 
+            <FilterTags filters={filters} onRemove={handleFilterRemove} />
+
             <div className="filters-container">
-                <button onClick={() => setModalState((prev) => ({ ...prev, location: true }))}>
+                <button className='filter-button' onClick={() => setModalState((prev) => ({ ...prev, location: true }))}>
                     지역 선택
                 </button>
-                <button onClick={() => setModalState((prev) => ({ ...prev, subject: true }))}>
+                <button className='filter-button' onClick={() => setModalState((prev) => ({ ...prev, subject: true }))}>
                     과목 선택
                 </button>
-                <button onClick={() => setModalState((prev) => ({ ...prev, status: true }))}>
-                    등록 상태 선택
-                </button>
-                <button onClick={() => setModalState((prev) => ({ ...prev, university: true }))}>
+                <button className='filter-button' onClick={() => setModalState((prev) => ({ ...prev, university: true }))}>
                     대학 선택
+                </button>
+                <button className='filter-button' onClick={() => setModalState((prev) => ({ ...prev, status: true }))}>
+                    등록 상태 선택
                 </button>
             </div>
 
             {/* 모달들 */}
-            <LocationFilterModal
-                isOpen={modalState.location}
+            {modalState.location && (
+            <LocationModal 
                 onClose={() => setModalState((prev) => ({ ...prev, location: false }))}
-                locations={enumOptions.locations}
-                selectedLocations={filters.locations}
-                onChange={(value) => handleFilterChange('locations', value)}
+                onSave={( value ) => {
+                    const location = `${value.sido.addr_name} ${value.sigungu.addr_name}`; 
+                    setFilters((prev) => ({
+                        ...prev,
+                        locations: [...(prev.locations || []), location],
+                    }));
+                }}
             />
+            )}
 
             <SubjectFilterModal
                 isOpen={modalState.subject}
@@ -134,13 +147,13 @@ const TutorList = () => {
                 onChange={(value) => handleFilterChange('statusList', value)}
             />
 
-            <UniversityFilterModal
-                isOpen={modalState.university}
-                onClose={() => setModalState((prev) => ({ ...prev, university: false }))}
-                universities={enumOptions.universities}
-                selectedUniversities={filters.universities}
-                onChange={(value) => handleFilterChange('universities', value)}
-            />
+            {modalState.university && (
+            <SchoolModal 
+                onClose={() => setModalState((prev) => ({ ...prev, university: false }))} 
+                onSave={(value) => handleFilterChange('universities', value)} 
+                schoolType={"university"}/>
+            )}
+
 
             {/* 선생님 리스트 */}
             <div className="tutor-grid">
@@ -156,7 +169,7 @@ const TutorList = () => {
                             <div className="placeholder-image">이미지 없음</div>
                         )}
                         <h3>{tutor.nickname}</h3>
-                        <p>학교: {tutor.university}</p>
+                        <p>학교: {tutor.univName}</p>
                         <p>지역: {tutor.location}</p>
                         <p>과목: {tutor.subjects.join(', ')}</p>
                         <Link to={`/tutor-profiles/${tutor.id}`} className="view-profile-button">프로필 보기</Link>

@@ -47,7 +47,7 @@ const TutorProfile = () => {
             </div>
             <p>성별: {profile.gender}</p>
             <p>과목: {profile.subjects.join(', ')}</p>
-            <p>학교: {profile.university}</p>
+            <p>학교: {profile.univName}</p>
             <p>지역: {profile.location}</p>
             <p>등록 상태: {profile.status}</p>
             <p>소개: {profile.description}</p>
