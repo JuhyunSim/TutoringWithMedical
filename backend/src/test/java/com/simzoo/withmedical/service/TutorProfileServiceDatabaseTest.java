@@ -137,10 +137,12 @@ class TutorProfileServiceDatabaseTest {
                 rs.getString("tutor_nickname"),
                 rs.getString("tutor_university"),
                 rs.getString("tutor_location"),
-                subjectList.stream().map(Subject::valueOf).toList()
+                subjectList.stream()
+                    .map(Subject::valueOf)
+                    .map(Subject::getDescription)
+                    .toList()
             );
         };
-
 
         List<Map<java.lang.String, Object>> results = jdbcTemplate.queryForList(debugSql);
         results.forEach(result -> {

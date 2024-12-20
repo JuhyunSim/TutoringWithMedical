@@ -2,7 +2,9 @@ package com.simzoo.withmedical.repository.tutor;
 
 import com.simzoo.withmedical.dto.TutorSimpleResponseDto;
 import com.simzoo.withmedical.dto.filter.TutorFilterRequestDto.TutorSearchFilter;
+import com.simzoo.withmedical.dto.tutor.TutorProfileResponseDto;
 import com.simzoo.withmedical.enums.EnrollmentStatus;
+import com.simzoo.withmedical.enums.Gender;
 import com.simzoo.withmedical.enums.Subject;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -81,12 +83,13 @@ public class TutorProfileJdbcRepository {
 
         RowMapper<TutorSimpleResponseDto> rowMapper = (rs, rowNum) -> {
 
-            List<Subject> subjectList = Optional.ofNullable(rs.getArray("subjects"))
+            List<String> subjectList = Optional.ofNullable(rs.getArray("subjects"))
                 .map(array -> {
                     try {
                         java.lang.String[] subjectStrings = (java.lang.String[]) array.getArray();
                         return Arrays.stream(subjectStrings)
-                            .map(Subject::valueOf) // String을 Subject enum으로 변환
+                            .map(Subject::valueOf)
+                            .map(Subject::getDescription)
                             .toList();
                     } catch (SQLException e) {
                         throw new RuntimeException("Error mapping subjects", e);
@@ -217,5 +220,76 @@ public class TutorProfileJdbcRepository {
         } else {
             ps.setArray(index, connection.createArrayOf("text", null));
         }
+    }
+
+
+    public Optional<TutorProfileResponseDto> findTutorProfileDtoById(Long tutorId) {
+
+        String sql = """
+                        SELECT 
+                            tpe.id AS tutor_id,
+                            tpe.imageUrl AS image_url,
+                            m.gender As gender,
+                            m.nickname AS nickname,
+                            tpe.univName AS univ_name,
+                            tpe.location AS location,
+                            tpe.status AS status,
+                            tpe.description AS description,
+                            ARRAY_AGG(s.subject) AS subjects
+                        FROM 
+                            tutorProfile tpe
+                        LEFT JOIN 
+                            member m ON tpe.memberId = m.id
+                        LEFT JOIN 
+                            SubjectEntity s ON s.tutorId = tpe.id
+                        WHERE 
+                            tpe.id = ?
+                        GROUP BY 
+                            tpe.id, m.nickname, m.gender, tpe.imageUrl, tpe.univName, tpe.location, tpe.status, tpe.description
+                    """;
+
+        // RowMapper를 사용해 데이터를 매핑
+        RowMapper<TutorProfileResponseDto> rowMapper = (rs, rowNum) -> {
+            // subjects 변환 로직
+            List<String> subjects = Optional.ofNullable(rs.getArray("subjects"))
+                .map(array -> {
+                    try {
+                        String[] subjectStrings = (String[]) array.getArray();
+                            return Arrays.stream(subjectStrings)
+                                .map(subjectName -> Subject.valueOf(subjectName).getDescription())
+                                .toList();
+                    } catch (SQLException e) {
+                        throw new RuntimeException("Error mapping subjects", e);
+                    }
+                })
+                .orElse(Collections.emptyList()); // Null-safe 처리
+
+            String status = Optional.ofNullable(rs.getString("status"))
+                .map(e -> EnrollmentStatus.valueOf(e).getDescription())
+                .orElse("");
+
+            String gender = Optional.ofNullable(rs.getString("gender"))
+                .map(e -> Gender.valueOf(e).getDescription())
+                .orElse("");
+
+            // DTO 생성 및 반환
+            return new TutorProfileResponseDto(
+                rs.getLong("tutor_id"),       // tutorId
+                rs.getString("nickname"),
+                gender,
+                rs.getString("image_url"),    // imageUrl
+                subjects,                     // List<String> subjects
+                rs.getString("location"),     // location
+                rs.getString("univ_name"),    // univName
+                status,                       // status
+                rs.getString("description")   // description
+            );
+        };
+
+        // Query 실행
+        List<TutorProfileResponseDto> results = jdbcTemplate.query(sql, rowMapper, tutorId);
+
+        // 결과 반환
+        return results.isEmpty() ? Optional.empty() : Optional.of(results.get(0));
     }
 }
