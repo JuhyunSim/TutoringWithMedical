@@ -4,6 +4,7 @@ import axios from 'axios';
 import qs from 'qs'; 
 import axiosInstance from '../axios/AxiosInstance';
 import InquiryButton from '../button/InquiryButton';
+import SortButtonGroup from '../button/SortButtonGroup';
 import './TuteePostList.css';
 import { Link } from 'react-router-dom';
 
@@ -13,8 +14,7 @@ const TuteePostList = ({ memberId, memberRole }) => {
     const pageSize = 10;
     const maxPageDisplay = 10;
     const [totalPages, setTotalPages] = useState(0); // API로 받은 총 페이지 수 저장
-    const [sortCriteria, setSortCriteria] = useState([]);
-    const [sortDirections, setSortDirection] = useState([]);
+    const [sortCriteria, setSortCriteria] = useState([{ key: 'CREATED_AT', direction: 'DESC' }]);
     const [filters, setFilters] = useState({
         gender: '',
         tuteeGradeType: '',
@@ -30,8 +30,8 @@ const TuteePostList = ({ memberId, memberRole }) => {
                     `${process.env.REACT_APP_BACKEND_URL}/tutee/postings`,
                     {
                         params: {
-                            sortBy: [sortCriteria],
-                            sortDirection: sortDirections,
+                            sortBy: sortCriteria.map((criterion) => criterion.key),
+                            sortDirection: sortCriteria.map((criterion) => criterion.direction),
                             gender: filters.gender || null,
                             tuteeGradeType: filters.tuteeGradeType || null,
                             tutoringType: filters.tutoringType || null,
@@ -51,24 +51,25 @@ const TuteePostList = ({ memberId, memberRole }) => {
         };
 
         fetchPostings();
-    }, [currentPage, sortCriteria, sortDirections, filters]);
+    }, [currentPage, sortCriteria, filters]);
 
     // 필터 값 변경
     const handleFilterChange = (filterName, value) => {
         setFilters((prevFilters) => ({ ...prevFilters, [filterName]: value }));
     };
 
-    // 정렬 기준 변경
-    const handleSortChange = (event) => {
-        const selectedValue = event.target.value;
-        setSortCriteria((prev) =>
-            prev.includes(selectedValue) ? prev.filter((v) => v !== selectedValue) : [...prev, selectedValue]
-        );
+    const handleAddCriteria = () => {
+        setSortCriteria((prev) => [...prev, { key: '', direction: 'DESC' }]);
     };
-    
 
-    const handleSortDirectionChange = (event) => {
-        setSortDirection(event.target.value);
+    const handleRemoveCriteria = (index) => {
+        setSortCriteria((prev) => prev.filter((_, i) => i !== index));
+    };
+
+    const handleUpdateCriteria = (index, updatedCriterion) => {
+        setSortCriteria((prev) =>
+            prev.map((criterion, i) => (i === index ? updatedCriterion : criterion))
+        );
     };
 
     // 페이지 변경
@@ -108,55 +109,17 @@ const TuteePostList = ({ memberId, memberRole }) => {
 
     return (
         <div className="tutee-post-list-container">
+            <SortButtonGroup
+                sortCriteria={sortCriteria}
+                onAddCriteria={handleAddCriteria}
+                onRemoveCriteria={handleRemoveCriteria}
+                onUpdateCriteria={handleUpdateCriteria}
+            />
             <div className="title-container">
                 <h1 className="tutee-post-list-title">학생 목록</h1>
                 {memberRole === 'TUTEE' && (
                     <Link to="/posting-form" className="create-post-button">과외 구인 글 작성하기</Link>
                 )}
-            </div>
-            <div className='sorting-container'>
-                <h3>정렬 기준</h3>
-                <div className='sort-group'>
-                    <label>
-                        <input
-                            type="checkbox"
-                            value="CREATED_AT"
-                            onChange={handleSortChange}
-                            checked={sortCriteria.includes("CREATED_AT")}
-                        />
-                        최신순
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            value="FEE"
-                            onChange={handleSortChange}
-                            checked={sortCriteria.includes("FEE")}
-                        />
-                        수업료순
-                    </label>
-                    <label>
-                        <input
-                            type="checkbox"
-                            value="TUTEE_GRADE"
-                            onChange={handleSortChange}
-                            checked={sortCriteria.includes("TUTEE_GRADE")}
-                        />
-                        학년순
-                    </label>
-                </div>
-                {sortCriteria.map((criterion, index) => (
-                    <div key={criterion}>
-                        <label>{criterion}</label>
-                        <select
-                            value={sortDirections[index] || "DESC"}
-                            onChange={(e) => handleSortDirectionChange(e, criterion)}
-                        >
-                            <option value="DESC">내림차순</option>
-                            <option value="ASC">오름차순</option>
-                        </select>
-                    </div>
-                ))}
             </div>
             <div className='filters-container'>
                 <h3>필터</h3>
