@@ -1,0 +1,36 @@
+.sort-criteria-group {
+    margin-bottom: 20px;
+}
+
+.sort-criteria-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.sort-select,
+.direction-select {
+    padding: 8px 12px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+.add-criteria-button,
+.remove-criteria-button {
+    padding: 8px 12px;
+    font-size: 14px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.add-criteria-button:hover,
+.remove-criteria-button:hover {
+    background-color: #0056b3;
+}

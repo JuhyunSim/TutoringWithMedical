@@ -14,15 +14,6 @@
     transition: background-color 0.3s;
 }
 
-/* 돌아가기 버튼 스타일 */
-.back-button {
-    background-color: #6c757d;
-}
-
-.back-button:hover {
-    background-color: #5a6268;
-}
-
 /* 문의하기 버튼 스타일 */
 .inquiry-button {
     background-color: #007bff;

@@ -1,10 +1,10 @@
-// TutorProfile.js
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from '../axios/AxiosInstance';
 import Review from '../review/Review';
 import InquiryButton from '../button/InquiryButton';
 import './TutorProfile.css';
+import BackButton from '../button/BackButton';
 
 const TutorProfile = () => {
     const { tutorId } = useParams();
@@ -53,8 +53,8 @@ const TutorProfile = () => {
             <p>등록 상태: {profile.status}</p>
             <p>소개: {profile.description}</p>
 
-            {/* 리뷰 버튼 */}
             <div className='button-row'>
+                <BackButton />
                 <button
                     className="review-toggle-button"
                     onClick={toggleShowReviews}

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import InquiryButton from '../button/InquiryButton';
 import axios from '../axios/AxiosInstance';
+import BackButton from '../button/BackButton';
 import './TuteePost.css';
 
 const TuteePost = () => {
@@ -63,9 +64,7 @@ const TuteePost = () => {
                 <p><strong>수정일:</strong> {new Date(postDetails.updatedAt).toLocaleDateString()}</p>
             </div>
             <div className="post-actions">
-                <button onClick={() => navigate(-1)} className="back-button">
-                    돌아가기
-                </button>
+                 <BackButton />
                 <InquiryButton
                     recipientId={postDetails.memberId}
                     memberNickname={postDetails.memberNickname}
