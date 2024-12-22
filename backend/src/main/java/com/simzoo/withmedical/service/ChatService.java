@@ -1,6 +1,7 @@
 package com.simzoo.withmedical.service;
 
 import com.simzoo.withmedical.dto.chat.ChatMessageResponseDto;
+import com.simzoo.withmedical.dto.chat.ChatRoomExistDto;
 import com.simzoo.withmedical.dto.chat.ChatRoomSimpleResponseDto;
 import com.simzoo.withmedical.entity.MemberEntity;
 import com.simzoo.withmedical.entity.chat.ChatMessageEntity;
@@ -9,10 +10,10 @@ import com.simzoo.withmedical.entity.chat.ChatRoomMember;
 import com.simzoo.withmedical.enums.filter.ChatRoomFilterType;
 import com.simzoo.withmedical.exception.CustomException;
 import com.simzoo.withmedical.exception.ErrorCode;
-import com.simzoo.withmedical.repository.member.MemberRepository;
 import com.simzoo.withmedical.repository.chat.message.ChatMessageRepository;
 import com.simzoo.withmedical.repository.chat.room.ChatRoomMemberRepository;
 import com.simzoo.withmedical.repository.chat.room.ChatRoomRepository;
+import com.simzoo.withmedical.repository.member.MemberRepository;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -128,11 +129,21 @@ public class ChatService {
         }
     }
 
+    @Transactional
+    public ChatRoomExistDto checkRoomExist(Long senderId, Long recipientId) {
+        return chatRoomRepository.findByTwoMember(senderId, recipientId).orElse(null);
+
+    }
+
     private Map<Long, MemberEntity> getMemberEntityMap(Long senderId,
         Long recipientId) {
         Set<Long> memberIds = new HashSet<>(List.of(senderId, recipientId));
         Map<Long, MemberEntity> members = memberRepository.findAllById(memberIds).stream()
             .collect(Collectors.toMap(MemberEntity::getId, memberEntity -> memberEntity));
+        log.debug("senderId: {}, recipientId: {}", senderId, recipientId);
+        validateMemberExists(members, senderId);
+        validateMemberExists(members, recipientId);
+
         return members;
     }
 
@@ -142,5 +153,11 @@ public class ChatService {
             .member(participant1)
             .chatRoom(chatRoomEntity)
             .build();
+    }
+
+    private void validateMemberExists(Map<Long, MemberEntity> members, Long memberId) {
+        if (!members.containsKey(memberId)) {
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+        }
     }
 }
