@@ -3,9 +3,10 @@ package com.simzoo.withmedical.repository.chat.room;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.simzoo.withmedical.dto.chat.ChatRoomExistDto;
 import com.simzoo.withmedical.dto.chat.ChatRoomSimpleResponseDto;
+import com.simzoo.withmedical.dto.chat.QChatRoomExistDto;
 import com.simzoo.withmedical.dto.chat.QChatRoomSimpleResponseDto;
-import com.simzoo.withmedical.entity.chat.ChatRoomEntity;
 import com.simzoo.withmedical.entity.chat.QChatMessageEntity;
 import com.simzoo.withmedical.entity.chat.QChatRoomEntity;
 import com.simzoo.withmedical.entity.chat.QChatRoomMember;
@@ -68,19 +69,22 @@ public class ChatRoomRepositoryCustomImpl implements ChatRoomRepositoryCustom {
     }
 
     @Override
-    public Optional<ChatRoomEntity> findByIdWithMember(Long id, Long userId) {
+    public Optional<ChatRoomExistDto> findByTwoMember(Long member1, Long member2) {
 
         QChatRoomEntity chatRoom = QChatRoomEntity.chatRoomEntity;
         QChatRoomMember chatRoomMember = QChatRoomMember.chatRoomMember;
 
-        ChatRoomEntity result = queryFactory
-            .selectFrom(chatRoom)
+        ChatRoomExistDto chatRoomExistDto = queryFactory.select(new QChatRoomExistDto(
+                chatRoom.id
+            ))
+            .from(chatRoom)
             .join(chatRoom.members, chatRoomMember)
-            .where(chatRoom.id.eq(id)
-                .and(chatRoomMember.member.id.eq(userId)))
-            .fetchOne();
+            .where(chatRoomMember.member.id.in(member1, member2))
+            .groupBy(chatRoom.id)
+            .having(chatRoomMember.member.id.countDistinct().eq(2L)) // 두 멤버 모두 포함된 방
+            .fetchFirst();
 
-        return Optional.ofNullable(result);
+        return Optional.ofNullable(chatRoomExistDto);
     }
 
     private BooleanExpression getFilterCondition(QChatRoomEntity chatRoom,

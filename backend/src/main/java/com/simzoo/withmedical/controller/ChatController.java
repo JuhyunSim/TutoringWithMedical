@@ -2,8 +2,10 @@ package com.simzoo.withmedical.controller;
 
 import com.simzoo.withmedical.dto.chat.ChatMessageRequestDto;
 import com.simzoo.withmedical.dto.chat.ChatMessageResponseDto;
+import com.simzoo.withmedical.dto.chat.ChatRoomExistDto;
 import com.simzoo.withmedical.dto.chat.ChatRoomSimpleResponseDto;
 import com.simzoo.withmedical.dto.chat.ChatStartRequestDto;
+import com.simzoo.withmedical.entity.chat.ChatRoomEntity;
 import com.simzoo.withmedical.enums.filter.ChatRoomFilterType;
 import com.simzoo.withmedical.service.ChatService;
 import com.simzoo.withmedical.util.resolver.LoginId;
@@ -36,34 +38,31 @@ public class ChatController {
     private final SimpMessagingTemplate simpMessagingTemplate;
     private final ChatService chatService;
 
-    /**
-     * 채팅방 생성
-     */
-    @PostMapping("/chat/start")
-    public ResponseEntity<Long> startChat(@LoginId Long senderId,
+    @PostMapping("/chat/start-and-send")
+    public ResponseEntity<ChatRoomSimpleResponseDto> startAndSendMessage(
+        @LoginId Long senderId,
         @RequestBody ChatStartRequestDto requestDto) {
 
-        return ResponseEntity.ok(
-            chatService.createChatRoom(senderId, requestDto.getRecipientId())
-                .getId());
-    }
+        // 채팅방 생성
+        ChatRoomEntity chatRoom = chatService.createChatRoom(senderId, requestDto.getRecipientId());
 
-    /**
-     * 첫 채팅 메세지 전송
-     */
-    @PostMapping("/chat/{roomId}")
-    public ResponseEntity<?> sendMessage(@LoginId Long memberId, @PathVariable Long roomId,
-        @RequestBody ChatStartRequestDto requestDto) {
-
-        log.info("memberId: {}, recipientId: {}", memberId, requestDto.getRecipientId());
-        // 메시지 저장 처리
-        ChatMessageResponseDto chatMessage = chatService.sendMessage(roomId, memberId,
-            requestDto.getRecipientId(), requestDto.getMessage()).toResponseDto();
+        // 첫 메시지 전송
+        ChatMessageResponseDto chatMessage = chatService.sendMessage(chatRoom.getId(), senderId,
+                requestDto.getRecipientId(), requestDto.getMessage())
+            .toResponseDto();
 
         // 메시지 브로커로 메시지 전송
-        simpMessagingTemplate.convertAndSend("/topic/chat/" + roomId, chatMessage);
+        simpMessagingTemplate.convertAndSend("/topic/chat/" + chatRoom.getId(), chatMessage);
 
-        return ResponseEntity.ok("Message sent successfully");
+        // 채팅방 정보 반환
+        return ResponseEntity.ok(
+            ChatRoomSimpleResponseDto.builder()
+                .roomId(chatRoom.getId())
+                .title(chatRoom.getTitle())
+                .lastMessage(chatMessage.getMessage())
+                .updatedAt(chatRoom.getUpdatedAt())
+                .build()
+        );
     }
 
     /**
@@ -118,5 +117,16 @@ public class ChatController {
         chatService.exitChatroom(memberId, roomId);
 
         return ResponseEntity.ok().build();
+    }
+
+    /**
+     * 채팅방 중복체크
+     */
+    @GetMapping("/chatrooms/exist")
+    public ResponseEntity<ChatRoomExistDto> checkDuplication(@LoginId Long senderId,
+        @RequestParam Long recipientId) {
+        ChatRoomExistDto chatRoomExistDto = chatService.checkRoomExist(senderId, recipientId);
+
+        return ResponseEntity.ok(chatRoomExistDto);
     }
 }
