@@ -99,8 +99,8 @@ const LocationModal = ({ onClose, onSave }) => {
                     </div>
                 </div>
                 <div className="modal-actions">
-                    <button onClick={onClose}>취소</button>
-                    <button onClick={handleSave} disabled={!selectedSigungu}>
+                    <button className="cancel-button" onClick={onClose}>취소</button>
+                    <button className="confirm-button" onClick={handleSave} disabled={!selectedSigungu}>
                         저장
                     </button>
                 </div>
