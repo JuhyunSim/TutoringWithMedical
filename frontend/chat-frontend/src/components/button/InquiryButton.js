@@ -15,7 +15,7 @@ const InquiryButton = ({ recipientId, memberNickname }) => {
     useEffect(() => {
         if (roomId) {
             console.log("roomId: ", roomId);
-            navigate(`/chatrooms/${roomId}`);
+            navigate(`/me/chatrooms/${roomId}`);
         }
     }, [roomId, navigate]);
 

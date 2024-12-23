@@ -5,7 +5,7 @@ import './Sidebar.css';
 const Sidebar = () => {
     return (
         <nav className="sidebar">
-            <ul>
+            <ul className='sidebar-list'>
                 <li>
                     <Link to="/me/my-posts">나의 게시물</Link>
                 </li>
