@@ -56,14 +56,14 @@ const AppContent = () => {
                     <Route path="edit-post/:postingId" element={<EditTuteePostForm />} /> {/* 추가된 라우트 */}
                     <Route path="profile" element={<ProfileInfo />} />
                     <Route path="profile/edit" element={<ProfileEdit />} />
-                    <Route path="chatrooms" element={<ChatRoomList />} />
+                    <Route path="chatrooms">
+                        <Route index element={<ChatRoomList />} /> {/* 기본 경로 */}
+                    </Route>
                     <Route path="delete-account" element={<DeleteAccount />} />
                     <Route path="change-password" element={<ChangePassword />} />
                     <Route path="membership" element={<Membership />} />
                 </Route>
-                
-                
-                {/* Chat Layout */}
+
                 <Route path="/chatrooms" element={<ChatLayout />}>
                     <Route path=":roomId" element={<ChatRoom memberId={memberId} memberNickname={memberNickname} memberRole={memberRole} recipientId={recipientId}/>}/>
                 </Route>

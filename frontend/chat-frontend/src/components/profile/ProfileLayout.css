@@ -1,14 +1,14 @@
-/* ProfileLayout.css */
 .profile-layout {
     display: flex;
     height: 100vh;
-    margin-top: 250px;
+    margin-top: 220px;
+    overflow: hidden;
+    width: 100%;
 }
 
 .profile-content {
-    margin-left: 320px; /* Sidebar 너비만큼 띄우기 */
+    flex: 1;
     padding: 20px;
     overflow-y: auto;
-    width: calc(100% - 220px); /* Sidebar를 제외한 영역 */
+    box-sizing: border-box;
 }
-

@@ -2,12 +2,26 @@
 .chat-layout {
     display: flex;
     height: 100vh;
+    margin-top: 220px;
+    height: 100vh;
 }
 
 .chat-content {
     flex: 1;
     padding: 20px; /* Sidebar와 겹치지 않도록 padding-left 추가 */
-    overflow-y: auto;
     width: calc(100%px);
 }
 
+.profile-layout {
+    display: flex;
+
+    overflow: hidden;
+    width: 100%;
+}
+
+.profile-content {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    box-sizing: border-box;
+}

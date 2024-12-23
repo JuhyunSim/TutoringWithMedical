@@ -3,6 +3,7 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
+import './ChatRoom.css'
 
 const ChatRoom = ({ memberId, recipientId, memberNickname }) => {
     const { roomId } = useParams();
@@ -51,8 +52,9 @@ const ChatRoom = ({ memberId, recipientId, memberNickname }) => {
     }, [page]);
 
     useEffect(() => {
-        // 메시지 변경 시 스크롤을 맨 아래로 유지
-        messageEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+        if (containerRef.current) {
+            containerRef.current.scrollTop = containerRef.current.scrollHeight;
+        }
     }, [messages]);
 
     useEffect(() => {
@@ -127,13 +129,10 @@ const ChatRoom = ({ memberId, recipientId, memberNickname }) => {
     };
 
     return (
-        <div>
+        <div className="chatroom-container" ref={containerRef}>
             <h2>Chat Room: {roomId}</h2>
-            <div
-                onScroll={handleScroll}
-                ref={containerRef}  // 스크롤 컨테이너 참조
-                style={{ height: '500px', overflow: 'auto' }}
-            >
+            <div className="chatroom-messages">
+
                 {messages.map((msg, index) => (
                     <div key={index}>
                         <strong>{msg.senderNickname}:</strong> {msg.message}
@@ -142,8 +141,8 @@ const ChatRoom = ({ memberId, recipientId, memberNickname }) => {
                 <div ref={messageEndRef} />
             </div>
 
-            {/* 메시지 입력창 */}
-            <div style={{ display: 'flex', marginTop: '10px' }}>
+
+            <div className="chatroom-input">
                 <input
                     type="text"
                     value={inputMessage}
